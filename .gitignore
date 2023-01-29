@@ -1,2 +1,5 @@
-
+node_modules
+dist
 .history
+.DS_Store
+arc-tab-stash.code-workspace

@@ -1,8 +1,13 @@
 {
-    "name": "Arc Tab Stash",
+    "name": "Arc Stash",
     "description": "Extension to stash and sync tabs.",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "manifest_version": 3,
+    "icons": {
+        "16": "assets/icons/16x16.png",
+        "48": "assets/icons/48x48.png",
+        "128": "assets/icons/128x128.png"
+    },
     "content_scripts": [
         {
             "matches": [
@@ -19,7 +24,8 @@
     ],
     "permissions": [
         "storage",
-        "tabs"
+        "tabs",
+        "activeTab"
     ],
     "background": {
         "service_worker": "background.js"

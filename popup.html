@@ -1,16 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="initial-scale=1.0" />
     <title>Popup Page</title>
-  </head>
-  <body>
-    <div>
-      <h1>Popup Page</h1>
-      <p>Hello!</p>
-    </div>
-    <script src="./content.js" type="module"></script>
-  </body>
-</html>
+    <link href="./popup.css" type="text/css" rel="stylesheet" />
+</head>
 
+<body>
+    <main id="arc-bookmark-stash-main">
+        <span id="tester-span"></span>
+        <div class="bstash-list-con">
+            <ul>
+                <li>
+                    <a href="#" draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">😆 How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                <li>
+                    <a href="#" draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                <li>
+                    <a href="#"  draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                <li>
+                    <a href="#" draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                <li>
+                    <a href="#" draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                <li>
+                    <a href="#" draggable="false">
+                        <img src="./assets/logo.svg" />
+                        <span class="bstash-title">How to properly load CSS into a Chrome Extension popup.html? - Stack Overflow</span>
+                    </a>
+                    <img class="bstash-trash-icon" src="./assets/trash.svg" />
+                </li>
+                
+               
+               
+            </ul>
+        </div>
+        <footer>
+            <div class="bstash-footer-child" title="Stash current tab.">
+                <img src="./assets/add.svg" />
+            </div>
+            <div class="bstash-footer-child">
+                👋 hello
+            </div>
+            <div class="bstash-footer-child">
+                <img src="./assets/settings.svg" />
+            </div>
+        </footer>
+    </main>
+    <script src="./zepto.min.js"></script>
+    <script src="./slist-drag.js"></script>
+    <script src="./popup.js" type="module"></script>
+</body>
+
+</html>

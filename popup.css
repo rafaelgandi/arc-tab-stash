@@ -1,0 +1,145 @@
+:root {
+    font-size: 16px;
+    --app-spacing: 1rem;
+}
+
+body {
+    background: rgb(170, 249, 164);
+    background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
+}
+
+main {
+    display: block;
+    width: 300px;
+    min-height: 200px;
+}
+
+
+.bstash-list-con {
+    padding-bottom: 3rem;
+}
+
+.bstash-list-con ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bstash-list-con ul li {
+    position: relative;
+    display: block;
+    margin-top: calc(var(--app-spacing) / 2);
+    /* outline: 1px solid red; */
+    padding: calc(var(--app-spacing) / 2);
+    background-color: rgba(255, 255, 255, .5);
+    border-radius: 5px;
+    transition: all .3s linear;
+}
+
+
+/* DRAG-AND-DROP HINT */
+.bstash-list-con li.drag-hint {
+    /* border: 1px solid #ffc49a;
+    background: #feffb4; */
+}
+
+.bstash-list-con li.drag-active {
+    /* border: 5px solid #ffa5a5;
+    background: #ffe7e7;
+    outline: 1px solid red;
+    position: relative;
+    bottom: -1rem; */
+}
+
+.bstash-list-con ul li:hover {
+    background-color: rgba(255, 255, 255, 1);
+    box-shadow: 0px 6px 12px 2px rgba(0, 0, 0, 0.18);
+}
+
+.bstash-list-con ul li a {
+    color: #092609;
+    cursor: default;
+    display: grid;
+    grid-template-columns: 10% 1fr;
+    align-items: center;
+    text-decoration: none;
+    position: relative;
+
+    /* See: https://stackoverflow.com/questions/33309632/prevent-link-dragging-but-still-allow-text-highlighting */
+    /* user-select: none;
+    -webkit-user-drag: none; */
+}
+
+.bstash-list-con ul li a,
+.bstash-list-con ul li a * {
+    /* See: https://stackoverflow.com/questions/33309632/prevent-link-dragging-but-still-allow-text-highlighting */
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.bstash-list-con ul li a img {
+    width: 20px;
+    height: 20px;
+}
+
+.bstash-list-con ul li a span {
+    width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bstash-list-con ul li:hover a span {
+    width: 90%;
+}
+
+.bstash-list-con ul li .bstash-trash-icon {
+    position: absolute;
+    z-index: 100;
+    /* outline: 1px solid red;
+    background-color: yellow; */
+    top: -2px;
+    right: 0;
+    --size: 40px;
+    width: var(--size);
+    height: var(--size);
+    opacity: 0;
+}
+
+.bstash-list-con ul li:hover .bstash-trash-icon {
+    opacity: .5;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 1.5rem;
+    background-color: rgba(255, 255, 255, .3);
+    /* --radius: 5px;
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius); */
+    z-index: 1000;
+    /* padding: .5rem var(--app-spacing); */
+    display: grid;
+    grid-template-columns: 15% 1fr 15%;
+    align-items: center;
+    justify-content: center;
+}
+
+footer .bstash-footer-child {
+    /* --size: 20px;
+    width: var(--size);
+    height: var(--size); */
+    /* outline: 1px solid red; */
+    text-align: center;
+    padding: .5rem;
+}
+
+footer img {
+    opacity: .5;
+    --size: 15px;
+    width: var(--size);
+    height: var(--size);
+}
