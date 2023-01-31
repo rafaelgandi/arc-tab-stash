@@ -7,7 +7,7 @@
 
 
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
-        console.log(data, 'hohoho');
+        // console.log(data, 'hohoho');
         if (data.message === 'get-arc-colors') {
             // See: https://arc.net/colors.html
             sendResponse({
@@ -21,6 +21,12 @@
                     getArcColor('--arc-background-gradient-overlay-color2')
                 ]
             });
+        }
+        if (data.message === 'tab-added-to-stash') {
+            alert('Tab added to stash.');
+        }
+        if (data.message === 'log-please') {
+            console.log(data.data);
         }
     });
 

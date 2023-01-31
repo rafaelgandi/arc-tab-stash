@@ -1,4 +1,4 @@
-import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab } from './lib/helpers.js';
+import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet } from './lib/helpers.js';
 
 
 (async () => {
@@ -6,6 +6,16 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab }
     // setTimeout(() => {
     //     chrome.runtime.sendMessage(chrome.runtime.id, {},  () => {});
     // }, 1000);
+
+    chrome.runtime.onInstalled.addListener(() => {
+        console.log('running on install listener');
+        (async () => {
+            const res = await storageGet('stash');
+            if (!res) {
+                storageSet('stash', []);
+            }           
+        })();
+    });
 
 
     // See: https://dev.to/paulasantamaria/adding-shortcuts-to-your-chrome-extension-2i20
@@ -38,9 +48,17 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab }
         const tab = await getCurrentTabData();
         if (!tab) { return; }
         const { favIconUrl, title, url, id } = tab;
+        let STASH =  await storageGet('stash') ?? [];
+        const timestamp = (new Date()).getTime();
         await sendMessageToActiveTab( {
-            message: tab
+            message: 'tab-added-to-stash',
+            tabData: tab
         });
+        STASH.push({
+            favIconUrl, title, url, 
+            id: `_stash_${id}_${timestamp}`, 
+            order: STASH.length
+        });
+        await storageSet('stash', STASH);
     }
-
 })();
