@@ -4,6 +4,10 @@
     // See: https://stackoverflow.com/a/53033388
     const helpers = await import(chrome.runtime.getURL('lib/helpers.js'));
 
+    function getArcColor(name) {
+        return document.documentElement.style.getPropertyValue(name) ?? null;
+    }
+
     function getArcPalette() {
         return {
             'arcPaletteTitle': getArcColor('--arc-palette-title'),
@@ -50,13 +54,6 @@
             console.log(data.data);
         }
     });
-
-
-
-
-    function getArcColor(name) {
-        return document.documentElement.style.getPropertyValue(name) ?? null;
-    }
 
     const response = await helpers.sendMessageToBg({ message: "get-user-tab-stash-from-notion" });
 
