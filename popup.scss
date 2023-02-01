@@ -1,6 +1,7 @@
 :root {
     font-size: 16px;
     --app-spacing: 1rem;
+    --app-min-height: 350px;
 }
 
 body {
@@ -18,7 +19,7 @@ body {
 main {
     display: block;
     width: 300px;
-    min-height: 200px;
+    min-height: var(--app-min-height);
     .bstash-list-con {
         padding-bottom: 3rem; 
         ul {
@@ -104,7 +105,7 @@ main {
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 200px;
+        min-height: calc(var(--app-min-height) - 50px);
         // outline: 2px solid blue;
         div {
             text-align: center;
@@ -121,6 +122,7 @@ footer {
     left: 0;
     width: 100%;
     min-height: 1.5rem;
+    backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, .3);
     z-index: 1000;
     display: grid;

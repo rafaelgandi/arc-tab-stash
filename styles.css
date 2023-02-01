@@ -1,3 +1,16 @@
 body {
-   
+  --app-spacing: 16px;
+}
+
+body .__stash-toast {
+  font-size: 18px;
+  padding: calc(var(--app-spacing) / 2) var(--app-spacing);
+  border: 5px solid #fff;
+  border-radius: 10px;
+  opacity: 1;
+  text-shadow: 0px 1px 15px rgba(255, 255, 255, 1);
+}
+
+body .__stash-toast button {
+  display: none;
 }

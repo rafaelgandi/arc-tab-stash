@@ -15,9 +15,11 @@
                 "<all_urls>"
             ],
             "css": [
-                "styles.css"
+                "styles.css",
+                "lib/toastify.min.css"
             ],
             "js": [
+                "lib/toastify-js.js",
                 "content.js"
             ],
             "run_at": "document_end"
@@ -35,9 +37,7 @@
     ],
     "permissions": [
         "storage",
-        "tabs",
-        "unlimitedStorage",
-        "activeTab"
+        "tabs"
     ],
     "background": {
         "service_worker": "background.js",
