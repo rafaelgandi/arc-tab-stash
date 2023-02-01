@@ -23,7 +23,7 @@
             });
         }
         if (data.message === 'tab-added-to-stash') {
-            alert('Tab added to stash.');
+            // alert('Tab added to stash.');
         }
         if (data.message === 'log-please') {
             console.log(data.data);

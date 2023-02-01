@@ -8,6 +8,14 @@ body {
   background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
 }
 
+body * {
+  box-sizing: border-box;
+}
+
+body .hide {
+  display: none !important;
+}
+
 main {
   display: block;
   width: 300px;
@@ -94,6 +102,21 @@ main .bstash-list-con ul li .bstash-trash-icon {
   opacity: 0;
 }
 
+main .bstash-empty-con {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+}
+
+main .bstash-empty-con div {
+  text-align: center;
+  font-size: 1.5em;
+  opacity: .6;
+}
+
 footer {
   position: fixed;
   bottom: 0;
@@ -113,9 +136,14 @@ footer .bstash-footer-child {
   padding: .5rem;
 }
 
-footer img {
+footer .bstash-footer-child img.bstash-footer-control {
+  transition: transform .2s ease-out;
   opacity: .5;
   --size: 15px;
   width: var(--size);
   height: var(--size);
+}
+
+footer .bstash-footer-child img.bstash-footer-control:hover {
+  transform: rotate(90deg);
 }

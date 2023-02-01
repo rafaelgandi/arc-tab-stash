@@ -1,4 +1,4 @@
-import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet } from './lib/helpers.js';
+import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet, logThis } from './lib/helpers.js';
 
 
 (async () => {
@@ -32,13 +32,20 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
         (async () => {
             if (data.message === 'get-user-tab-stash-from-notion') {
-                const token = 'secret_7gjlSgBMJPbQdmfSUFP5ZsXFB7sl10RRgcefv7qHxq8';
-                const blockId = 'c5fcca844538418eb8666b63d9050543';
-                const blockContents = await getNotionCodeBlockContents(token, blockId);
-                console.log(JSON.parse(blockContents));
+                // const token = 'secret_7gjlSgBMJPbQdmfSUFP5ZsXFB7sl10RRgcefv7qHxq8';
+                // const blockId = 'c5fcca844538418eb8666b63d9050543';
+                // const blockContents = await getNotionCodeBlockContents(token, blockId);
+                // console.log(JSON.parse(blockContents));
                 sendResponse('heyyyyy');
             }
-        })();
+            else if (data.message === 'stash-current-tab') {
+                await handleStashingTab();
+                sendResponse({
+                    message: 'tab stashed!',
+                    success: true
+                });
+            }
+        })();       
         // Need to return true.
         // See: https://stackoverflow.com/a/57608759
         return true;
@@ -54,11 +61,24 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
             message: 'tab-added-to-stash',
             tabData: tab
         });
+        // Move the ordering by 1 so that the new link will be at the top //
+        STASH = STASH.map((item) => {
+            return {
+                ...item,
+                order: (Number(item.order) + 1)
+            }
+        });
         STASH.push({
             favIconUrl, title, url, 
             id: `_stash_${id}_${timestamp}`, 
-            order: STASH.length
+            order: 0
         });
         await storageSet('stash', STASH);
     }
+
+
+
+    logThis({
+        online: navigator.onLine
+    });
 })();
