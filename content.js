@@ -22,7 +22,7 @@
         };
     }
 
-    function presentToast(msg) {
+    function presentToast(msg, type = 'okay') {
         const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({
             text: msg,
@@ -31,7 +31,7 @@
             gravity: "top", // `top` or `bottom`
             position: "right", // `left`, `center` or `right`
             stopOnFocus: true, // Prevents dismissing of toast on hover
-            className: '__stash-toast',
+            className: (type === 'okay') ? '__stash-toast' : '__stash-toast--danger',
             style: {   
                 color: arcPaletteTitle ?? '#092609',            
                 background: `linear-gradient(140deg, ${arcBGGradients.filter((color) => !!color).join(', ')})`,
@@ -52,6 +52,9 @@
         }
         if (data.message === 'log-please') {
             console.log(data.data);
+        }
+        if (data.message === 'toast-this') {
+            presentToast(data.toast, data.type);
         }
     });
 

@@ -1,4 +1,13 @@
-import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet, logThis, saveToNotionCodeBlock } from './lib/helpers.js';
+import { 
+    getCurrentTabData, 
+    getNotionCodeBlockContents, 
+    sendMessageToActiveTab, 
+    storageSet, 
+    storageGet, 
+    logThis, 
+    saveToNotionCodeBlock,
+    sendErrorToast 
+} from './lib/helpers.js';
 
 
 (async () => {
@@ -90,7 +99,10 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
         await storageSet('stash', STASH);
         const notionToken = await storageGet('notionToken');
         const notionCodeBlock = await storageGet('notionCodeBlock');
-        await saveToNotionCodeBlock(notionToken, notionCodeBlock?.blockId ?? '', STASH);
+        const res = await saveToNotionCodeBlock(notionToken, notionCodeBlock?.blockId ?? '', STASH);
+        if (!res) {
+            sendErrorToast('Something went wrong while trying to save your stash to notion.');
+        }
     }
 
 

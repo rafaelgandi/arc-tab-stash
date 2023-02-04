@@ -190,4 +190,7 @@ function setEvents() {
     populateList();
     setArcTheme();
     setEvents();
+    // if (!$notionTokenInput.val().trim() || !$notionCodeBlockInput.val().trim()) {
+    //     toggleSettingsVisibility(true);
+    // }
 })();

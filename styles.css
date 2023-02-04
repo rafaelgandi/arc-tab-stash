@@ -2,7 +2,8 @@ body {
   --app-spacing: 16px;
 }
 
-body .__stash-toast {
+body .__stash-toast,
+body .__stash-toast--danger {
   background: rgb(170, 249, 164);
   background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
   font-size: 18px;
@@ -13,6 +14,11 @@ body .__stash-toast {
   text-shadow: 0px 1px 15px rgba(255, 255, 255, 1);
 }
 
-body .__stash-toast button {
+body .__stash-toast button,
+body .__stash-toast--danger button {
   display: none;
+}
+
+body .__stash-toast--danger {
+  color: hsl(8, 67%, 54%);
 }
