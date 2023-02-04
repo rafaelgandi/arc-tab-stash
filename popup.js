@@ -13,9 +13,40 @@ const $body = $('body');
 const $head = $('head');
 const $ul = $('.bstash-list-con ul');
 const $addCurrentPageButton = $('#bstash-footer-add-tab-button');
+const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
+const $settingsCon = $('.bstash-setting');
+const $settingSaveButton = $('#bstash-settings-save-button');
+const $notionTokenInput = $('#bstash-setting-notion-token-input');
+const $notionCodeBlockInput = $('#bstash-setting-notion-code-block-id');
 let dropDownCleanUpFunc = undefined;
 let STASH = [];
+
+function toggleSettingsVisibility(show = false) {
+    if (show) {
+        $settingsCon.removeClass('hide-settings');
+        return;
+    }
+    $settingsCon.addClass('hide-settings');
+}
+
+function _getBlockIdFromLink(url) {
+    // https://www.notion.so/rafaelgandi/Stash-Integration-1280c4fcdd48491ab480cf455d671517#b9e52f6019464db59307f8059104231e
+    return url.split(/\#/).pop();
+}
+
+async function saveSettingDetails() {   
+    if ($notionTokenInput.val().trim()) {
+        await storageSet('notionToken', $notionTokenInput.val().trim());
+    }
+    if ($notionCodeBlockInput.val().trim()) {
+        await storageSet('notionCodeBlock', {
+            link: $notionCodeBlockInput.val().trim(),
+            blockId: _getBlockIdFromLink($notionCodeBlockInput.val().trim())
+        });
+    }
+}
+
 
 function sortByOrderProp(arr) {
     let newArr = [...arr];
@@ -82,6 +113,13 @@ async function populateList() {
         $emptyListMessage.removeClass('hide');
         $ul.html('');
     }
+    const notionToken = await storageGet('notionToken');
+    $notionTokenInput.val(notionToken);
+    const notionCodeBlock = await storageGet('notionCodeBlock');
+    if (notionCodeBlock?.link) {
+        $notionCodeBlockInput.val(notionCodeBlock.link);
+    }
+
 }
 
 async function refreshList() {
@@ -133,10 +171,19 @@ function setEvents() {
         });
         refreshList();
     }
+    function onSettingsButtonClicked() {
+        toggleSettingsVisibility(true);
+    }
+    function onSettingSaved() {
+        saveSettingDetails();
+        toggleSettingsVisibility(false);
+    }
     $ul
         .on('click', 'a', handleOnLinkClick)
         .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
     $addCurrentPageButton.on('click', onAddCurrentTab);
+    $settingsButton.on('click', onSettingsButtonClicked);
+    $settingSaveButton.on('click', onSettingSaved);
 }
 
 (async () => {

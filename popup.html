@@ -17,6 +17,25 @@
         <div class="bstash-list-con">
             <ul></ul>
         </div>
+        <div class="bstash-setting hide-settings">
+            <section>
+                <header>
+                    <img src="./assets/notion-logo.svg" />
+                    <span>Notion Integration</span>
+                </header>
+                <input type="text" id="bstash-setting-notion-token-input" placeholder="secret_..." />
+                <p>This where you will place your Notion integration token.</p>
+            </section>
+            <section>
+                <header>
+                    <img src="./assets/notion-code.png" />
+                    <span>Link to Code Block</span>
+                </header>
+                <input type="text" id="bstash-setting-notion-code-block-id" placeholder="https://..." />
+                <p>This where you will place your Notion integration token.</p>
+            </section>
+            <button id="bstash-settings-save-button">Done</button>
+        </div>
         <footer>
             <div class="bstash-footer-child" title="Stash current tab.">
                 <img id="bstash-footer-add-tab-button" class="bstash-footer-control" src="./assets/add.svg" />
@@ -25,7 +44,7 @@
                 👋 hello
             </div>
             <div class="bstash-footer-child">
-                <img class="bstash-footer-control" src="./assets/settings.svg" />
+                <img id="bstash-footer-settings-button" class="bstash-footer-control" src="./assets/settings.svg" />
             </div>
         </footer>
     </main>

@@ -116,6 +116,96 @@ main {
             // outline: 2px solid blue;
         }
     }
+
+    .bstash-setting {
+        display: block;
+        transition: all .1s ease-out;
+        padding: var(--app-spacing);
+        position: fixed;
+        top: 1rem;
+        left: .5rem;
+        right: .5rem;
+        min-height: 200px;
+        // background-color: #fff;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, .9);
+        z-index: 90000;
+        border-radius: 10px;
+        box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
+        [--before] {
+            content: '';
+            position: absolute; 
+            top: -20px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            // outline: 2px solid yellow;
+            height: 100vh;
+        }
+        [SELF].hide-settings {
+            opacity: 0;
+            transform: scale(0);
+            // display: none;
+        }
+        section, button {
+            position: relative;
+            z-index: 5000 !important;
+        }
+        section {            
+            margin: calc(var(--app-spacing) * 1.5) 0;
+            // border-bottom: 1px solid #eee;
+            [-first-child] {
+                margin-top: 0;
+            }
+            header {
+                display: grid;
+                grid-template-columns: 10% 1fr;
+                align-items: center;
+                gap: 0;
+                margin-bottom: .5rem;
+                // * {
+                //     outline: 1px solid blue;
+                // }
+                img {
+                    --size: 20px;
+                    width: var(--size);
+                    height: var(--size);
+                    opacity: .7;
+                }
+                span {
+                    text-align: left;
+                    font-weight: 500;
+                    font-size: .8rem;
+                    opacity: .7;
+                }
+            }
+            input[type="text"] {
+                display: block;
+                padding: .5rem;
+                outline: none;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                width: 100%;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            p {
+                margin: .2rem 0;
+                font-size: .7rem;
+                opacity: .5;
+                // outline: 1px solid red;
+            }
+        }
+        #bstash-settings-save-button {
+            display: block;
+            width: 30%;
+            margin: 0 auto;
+            padding: .2rem .5rem;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            color: #000;
+        }
+    }
 }
 
 footer {

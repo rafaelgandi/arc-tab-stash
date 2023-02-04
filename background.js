@@ -1,4 +1,4 @@
-import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet, logThis } from './lib/helpers.js';
+import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, storageSet, storageGet, logThis, saveToNotionCodeBlock } from './lib/helpers.js';
 
 
 (async () => {
@@ -13,7 +13,18 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
             const res = await storageGet('stash');
             if (!res) {
                 storageSet('stash', []);
-            }           
+            }  
+            const notionToken = await storageGet('notionToken');
+            if (!notionToken) {
+                storageSet('notionToken', '');
+            } 
+            const notionCodeBlock = await storageGet('notionCodeBlock');
+            if (!notionCodeBlock) {
+                storageSet('notionCodeBlock', {
+                    link: '',
+                    blockId: ''
+                });
+            }         
         })();
     });
 
@@ -32,10 +43,13 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
         (async () => {
             if (data.message === 'get-user-tab-stash-from-notion') {
-                // const token = 'secret_7gjlSgBMJPbQdmfSUFP5ZsXFB7sl10RRgcefv7qHxq8';
-                // const blockId = 'c5fcca844538418eb8666b63d9050543';
-                // const blockContents = await getNotionCodeBlockContents(token, blockId);
-                // console.log(JSON.parse(blockContents));
+                const notionToken = await storageGet('notionToken');
+                const notionCodeBlock = await storageGet('notionCodeBlock');
+                const blockContents = await getNotionCodeBlockContents(notionToken, notionCodeBlock?.blockId ?? '');
+                
+                console.log(blockContents)
+                
+                console.log(JSON.parse(blockContents));
                 sendResponse('heyyyyy');
             }
             else if (data.message === 'stash-current-tab') {
@@ -74,6 +88,9 @@ import { getCurrentTabData, getNotionCodeBlockContents, sendMessageToActiveTab, 
             order: 0
         });
         await storageSet('stash', STASH);
+        const notionToken = await storageGet('notionToken');
+        const notionCodeBlock = await storageGet('notionCodeBlock');
+        await saveToNotionCodeBlock(notionToken, notionCodeBlock?.blockId ?? '', STASH);
     }
 
 
