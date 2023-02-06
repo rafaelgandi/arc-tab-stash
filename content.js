@@ -54,10 +54,11 @@
             console.log(data.data);
         }
         if (data.message === 'toast-this') {
-            presentToast(data.toast, data.type);
+            //console.log(data);
+            presentToast(data.data.toast, data.data.type);
         }
     });
 
-    const response = await helpers.sendMessageToBg({ message: "get-user-tab-stash-from-notion" });
+    // const response = await helpers.sendMessageToBg({ message: "get-user-tab-stash-from-notion" });
 
 })();

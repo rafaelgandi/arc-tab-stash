@@ -6,15 +6,14 @@ import {
     storageGet, 
     logThis, 
     saveToNotionCodeBlock,
-    sendErrorToast 
+    sendErrorToast,
+    getNotionCredsSaved 
 } from './lib/helpers.js';
 
 
 (async () => {
-    // console.log(chrome.runtime);
-    // setTimeout(() => {
-    //     chrome.runtime.sendMessage(chrome.runtime.id, {},  () => {});
-    // }, 1000);
+    let stashDebouncer = undefined;
+    const stashDebouncerDelay = 800; // ms
 
     chrome.runtime.onInstalled.addListener(() => {
         console.log('running on install listener');
@@ -39,10 +38,13 @@ import {
 
 
     // See: https://dev.to/paulasantamaria/adding-shortcuts-to-your-chrome-extension-2i20
-    chrome.commands.onCommand.addListener(async (command) => {
+    chrome.commands.onCommand.addListener((command) => {
         switch (command) {
             case 'stash-current-tab':
-                await handleStashingTab();
+                clearTimeout(stashDebouncer);
+                stashDebouncer = setTimeout(async () => {
+                    await handleStashingTab();
+                }, stashDebouncerDelay);              
                 break;
             default:
                 console.log(`Command ${command} not found`);
@@ -52,21 +54,21 @@ import {
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
         (async () => {
             if (data.message === 'get-user-tab-stash-from-notion') {
-                const notionToken = await storageGet('notionToken');
-                const notionCodeBlock = await storageGet('notionCodeBlock');
-                const blockContents = await getNotionCodeBlockContents(notionToken, notionCodeBlock?.blockId ?? '');
+                const notionCreds = await getNotionCredsSaved();
+                if (!notionCreds) {
+                    // sendErrorToast('Stash: Please set your notion integration.');
+                    return;
+                }
+                const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);               
                 
-                console.log(blockContents)
-                
+                console.log(blockContents)              
                 console.log(JSON.parse(blockContents));
-                sendResponse('heyyyyy');
             }
             else if (data.message === 'stash-current-tab') {
-                await handleStashingTab();
-                sendResponse({
-                    message: 'tab stashed!',
-                    success: true
-                });
+                clearTimeout(stashDebouncer);
+                stashDebouncer = setTimeout(async () => {
+                    await handleStashingTab();
+                }, stashDebouncerDelay);               
             }
         })();       
         // Need to return true.
@@ -104,10 +106,4 @@ import {
             sendErrorToast('Something went wrong while trying to save your stash to notion.');
         }
     }
-
-
-
-    logThis({
-        online: navigator.onLine
-    });
 })();

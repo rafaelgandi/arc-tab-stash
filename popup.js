@@ -6,7 +6,15 @@ import {
     openInNewTab, 
     removeFromStash, 
     logThis,
-    sendMessageToBg
+    sendMessageToBg,
+    sendErrorToast,
+    getNotionCredsSaved,
+    getNotionCodeBlockContents,
+    isValidJson,
+    saveToNotionCodeBlock,
+
+    getNotionCodeBlocks,
+    clearAllNotionPageCodeBlocks
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -30,21 +38,27 @@ function toggleSettingsVisibility(show = false) {
     $settingsCon.addClass('hide-settings');
 }
 
-function _getBlockIdFromLink(url) {
+function _getPageIdFromLink(url) {
     // https://www.notion.so/rafaelgandi/Stash-Integration-1280c4fcdd48491ab480cf455d671517#b9e52f6019464db59307f8059104231e
-    return url.split(/\#/).pop();
+    try {
+        const blockUrl = new URL(url);
+        return blockUrl?.pathname?.split(/\-/).pop();
+    }
+    catch (err) {
+        sendErrorToast('Looks like there is something wrong with your notion block link url.');
+        return undefined;
+    }
+    
 }
 
 async function saveSettingDetails() {   
-    if ($notionTokenInput.val().trim()) {
-        await storageSet('notionToken', $notionTokenInput.val().trim());
-    }
-    if ($notionCodeBlockInput.val().trim()) {
-        await storageSet('notionCodeBlock', {
-            link: $notionCodeBlockInput.val().trim(),
-            blockId: _getBlockIdFromLink($notionCodeBlockInput.val().trim())
-        });
-    }
+    await storageSet('notionToken', $notionTokenInput.val().trim());
+    const blockLink = $notionCodeBlockInput.val().trim()
+    await storageSet('notionCodeBlock', {
+        link: blockLink,
+        blockId: _getPageIdFromLink(blockLink)
+    });
+    //await getStashDataFromNotion();
 }
 
 
@@ -113,13 +127,6 @@ async function populateList() {
         $emptyListMessage.removeClass('hide');
         $ul.html('');
     }
-    const notionToken = await storageGet('notionToken');
-    $notionTokenInput.val(notionToken);
-    const notionCodeBlock = await storageGet('notionCodeBlock');
-    if (notionCodeBlock?.link) {
-        $notionCodeBlockInput.val(notionCodeBlock.link);
-    }
-
 }
 
 async function refreshList() {
@@ -186,11 +193,51 @@ function setEvents() {
     $settingSaveButton.on('click', onSettingSaved);
 }
 
+async function getStashDataFromNotion() {
+    const notionCreds = await getNotionCredsSaved();
+    if (typeof notionCreds === 'undefined') { return; }
+    const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);  
+    if (!isValidJson(blockContents)) {
+        sendErrorToast('Malformed data found on your notion code block, but I was able to fix it.');
+        const res = await saveToNotionCodeBlock(notionCreds.token, notionCreds?.codeBlock.blockId ?? '', STASH);
+        if (!res) {
+            sendErrorToast('Something went wrong while trying to save your stash to notion.');
+        }
+    }
+    else {
+        STASH = JSON.parse(blockContents);
+        await storageSet('stash', STASH);
+        logThis(['stash saved from notion']);
+    }
+    refreshList();  
+}
+
 (async () => {
-    populateList();
     setArcTheme();
+    await populateList();   
     setEvents();
-    // if (!$notionTokenInput.val().trim() || !$notionCodeBlockInput.val().trim()) {
-    //     toggleSettingsVisibility(true);
-    // }
+    const notionCreds = await getNotionCredsSaved();
+    if (typeof notionCreds !== 'undefined') {
+        $notionTokenInput.val(notionCreds.token);
+        $notionCodeBlockInput.val(notionCreds.codeBlock.link);  
+        // getStashDataFromNotion();
+    }
+    else {
+        // Show settings modal if notion integration is not set yet //
+        toggleSettingsVisibility(true);
+    }
+    
+
+    // logThis({
+    //     notionCreds
+    // })
+    // const codeBlocks = await getNotionCodeBlocks(notionCreds.token, notionCreds.codeBlock.blockId);
+    // logThis({
+    //     codeBlocks
+    // });
+    // const blockIdsArr = codeBlocks.map((b) => b.notionBlockId);
+    // const deletedCount = await clearAllNotionPageCodeBlocks(notionCreds.token, blockIdsArr);
+    // logThis({
+    //     blockIdsArr, deletedCount
+    // });
 })();
