@@ -11,7 +11,7 @@ import {
     getNotionCredsSaved,
     getNotionCodeBlockContents,
     isValidJson,
-    saveToNotionCodeBlock,
+    saveToNotion,
 
     getNotionCodeBlocks,
     clearAllNotionPageCodeBlocks
@@ -172,11 +172,12 @@ function setEvents() {
 
     async function onAddCurrentTab(e) {
         e.preventDefault();
-        // logThis(['clicked add tab']);
+        logThis(['clicked add tab']);
         await sendMessageToBg({
             message: 'stash-current-tab'
         });
         refreshList();
+        
     }
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
@@ -193,24 +194,24 @@ function setEvents() {
     $settingSaveButton.on('click', onSettingSaved);
 }
 
-async function getStashDataFromNotion() {
-    const notionCreds = await getNotionCredsSaved();
-    if (typeof notionCreds === 'undefined') { return; }
-    const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);  
-    if (!isValidJson(blockContents)) {
-        sendErrorToast('Malformed data found on your notion code block, but I was able to fix it.');
-        const res = await saveToNotionCodeBlock(notionCreds.token, notionCreds?.codeBlock.blockId ?? '', STASH);
-        if (!res) {
-            sendErrorToast('Something went wrong while trying to save your stash to notion.');
-        }
-    }
-    else {
-        STASH = JSON.parse(blockContents);
-        await storageSet('stash', STASH);
-        logThis(['stash saved from notion']);
-    }
-    refreshList();  
-}
+// async function getStashDataFromNotion() {
+//     const notionCreds = await getNotionCredsSaved();
+//     if (typeof notionCreds === 'undefined') { return; }
+//     const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);  
+//     if (!isValidJson(blockContents)) {
+//         sendErrorToast('Malformed data found on your notion code block, but I was able to fix it.');
+//         const res = await saveToNotionCodeBlock(notionCreds.token, notionCreds?.codeBlock.blockId ?? '', STASH);
+//         if (!res) {
+//             sendErrorToast('Something went wrong while trying to save your stash to notion.');
+//         }
+//     }
+//     else {
+//         STASH = JSON.parse(blockContents);
+//         await storageSet('stash', STASH);
+//         logThis(['stash saved from notion']);
+//     }
+//     refreshList();  
+// }
 
 (async () => {
     setArcTheme();
@@ -226,18 +227,4 @@ async function getStashDataFromNotion() {
         // Show settings modal if notion integration is not set yet //
         toggleSettingsVisibility(true);
     }
-    
-
-    // logThis({
-    //     notionCreds
-    // })
-    // const codeBlocks = await getNotionCodeBlocks(notionCreds.token, notionCreds.codeBlock.blockId);
-    // logThis({
-    //     codeBlocks
-    // });
-    // const blockIdsArr = codeBlocks.map((b) => b.notionBlockId);
-    // const deletedCount = await clearAllNotionPageCodeBlocks(notionCreds.token, blockIdsArr);
-    // logThis({
-    //     blockIdsArr, deletedCount
-    // });
 })();
