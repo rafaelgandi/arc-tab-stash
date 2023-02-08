@@ -1,14 +1,12 @@
 import {
     getCurrentTabData,
-    getNotionCodeBlockContents,
     sendMessageToActiveTab,
     storageSet,
     storageGet,
     logThis,
-    saveToNotion,
     sendErrorToast,
-    getNotionCredsSaved,
-    clearAllNotionPageCodeBlocks
+    getGitCredsSaved,
+    setGistContents
 } from './lib/helpers.js';
 
 
@@ -25,15 +23,15 @@ import {
             if (!res) {
                 storageSet('stash', []);
             }
-            const notionToken = await storageGet('notionToken');
-            if (!notionToken) {
-                storageSet('notionToken', '');
+            const gitToken = await storageGet('gitToken');
+            if (!gitToken) {
+                storageSet('gitToken', '');
             }
-            const notionCodeBlock = await storageGet('notionCodeBlock');
-            if (!notionCodeBlock) {
-                storageSet('notionCodeBlock', {
+            const gistLink = await storageGet('gistLink');
+            if (!gistLink) {
+                storageSet('gistLink', {
                     link: '',
-                    blockId: ''
+                    id: ''
                 });
             }
         })();
@@ -56,21 +54,30 @@ import {
 
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
         (async () => {
+            const gitCreds = await getGitCredsSaved();
             if (data.message === 'get-user-tab-stash-from-notion') {
-                const notionCreds = await getNotionCredsSaved();
-                if (!notionCreds) {
+                if (!gitCreds) {
                     // sendErrorToast('Stash: Please set your notion integration.');
                     return;
                 }
-                // const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);               
 
-                // console.log(blockContents)              
-                // console.log(JSON.parse(blockContents));
             }
             else if (data.message === 'stash-current-tab') {
                 clearTimeout(stashDebouncer);
                 stashDebouncer = setTimeout(async () => {
                     await handleStashingTab();
+                    sendResponse('done');
+                }, stashDebouncerDelay);
+            }
+            else if (data.message === 'stash-item-delete-happend') {
+                if (!gitCreds) { 
+                    sendResponse('done');
+                    return; 
+                }
+                clearTimeout(stashDebouncer);
+                stashDebouncer = setTimeout(async () => {
+                    let STASH = await storageGet('stash') ?? [];
+                    await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
                     sendResponse('done');
                 }, stashDebouncerDelay);
             }
@@ -104,16 +111,9 @@ import {
             order: 0
         });
         await storageSet('stash', STASH);
-        console.log('Notion save scheduled...');
-        notionSaveDebouncer = setTimeout(async () => {
-            console.log('Notion save started: ' + (new Date()).toLocaleTimeString());
-            const notionCreds = await getNotionCredsSaved();
-            const res = await saveToNotion(notionCreds.token, notionCreds.codeBlock.blockId, STASH);
-            if (!res) {
-                sendErrorToast('Something went wrong while trying to save your stash to notion.');
-            }
-        }, notionSaveDebouncerDelay);
+        const gitCreds = await getGitCredsSaved();
+        if (gitCreds) {
+            setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        }
     }
-
-
 })();

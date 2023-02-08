@@ -8,13 +8,9 @@ import {
     logThis,
     sendMessageToBg,
     sendErrorToast,
-    getNotionCredsSaved,
-    getNotionCodeBlockContents,
-    isValidJson,
-    saveToNotion,
-
-    getNotionCodeBlocks,
-    clearAllNotionPageCodeBlocks
+    getGitCredsSaved,
+    getGistContents,
+    isValidJson
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -25,8 +21,8 @@ const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
 const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
-const $notionTokenInput = $('#bstash-setting-notion-token-input');
-const $notionCodeBlockInput = $('#bstash-setting-notion-code-block-id');
+const $githubTokenInput = $('#bstash-setting-git-token-input');
+const $gistLinkInput = $('#bstash-setting-gist-link-input');
 let dropDownCleanUpFunc = undefined;
 let STASH = [];
 
@@ -38,27 +34,26 @@ function toggleSettingsVisibility(show = false) {
     $settingsCon.addClass('hide-settings');
 }
 
-function _getPageIdFromLink(url) {
-    // https://www.notion.so/rafaelgandi/Stash-Integration-1280c4fcdd48491ab480cf455d671517#b9e52f6019464db59307f8059104231e
+function _getGistIdFromLink(url) {
+    // https://gist.github.com/rafaelgandi/2c70b20207df04881db599367593916d
     try {
         const blockUrl = new URL(url);
-        return blockUrl?.pathname?.split(/\-/).pop();
+        return blockUrl?.pathname?.split(/\//).pop();
     }
     catch (err) {
-        sendErrorToast('Looks like there is something wrong with your notion block link url.');
+        sendErrorToast('Looks like there is something wrong with your gist url.');
         return undefined;
     }
     
 }
 
 async function saveSettingDetails() {   
-    await storageSet('notionToken', $notionTokenInput.val().trim());
-    const blockLink = $notionCodeBlockInput.val().trim()
-    await storageSet('notionCodeBlock', {
-        link: blockLink,
-        blockId: _getPageIdFromLink(blockLink)
+    await storageSet('gitToken', $githubTokenInput.val().trim());
+    const gistLink = $gistLinkInput.val().trim()
+    await storageSet('gistLink', {
+        link: gistLink,
+        id: _getGistIdFromLink(gistLink)
     });
-    //await getStashDataFromNotion();
 }
 
 
@@ -140,6 +135,9 @@ async function setArcTheme() {
         message: 'get-arc-colors'
     });
     if (response) {
+        logThis({
+            themeing: response
+        });
         //$body.html(JSON.stringify(response))
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
@@ -168,6 +166,9 @@ function setEvents() {
         STASH = removeFromStash(STASH, stashId);
         await storageSet('stash', STASH);
         refreshList();
+        sendMessageToBg({
+            message: 'stash-item-delete-happend'
+        });
     }
 
     async function onAddCurrentTab(e) {
@@ -194,34 +195,26 @@ function setEvents() {
     $settingSaveButton.on('click', onSettingSaved);
 }
 
-// async function getStashDataFromNotion() {
-//     const notionCreds = await getNotionCredsSaved();
-//     if (typeof notionCreds === 'undefined') { return; }
-//     const blockContents = await getNotionCodeBlockContents(notionCreds.token, notionCreds.codeBlock.blockId);  
-//     if (!isValidJson(blockContents)) {
-//         sendErrorToast('Malformed data found on your notion code block, but I was able to fix it.');
-//         const res = await saveToNotionCodeBlock(notionCreds.token, notionCreds?.codeBlock.blockId ?? '', STASH);
-//         if (!res) {
-//             sendErrorToast('Something went wrong while trying to save your stash to notion.');
-//         }
-//     }
-//     else {
-//         STASH = JSON.parse(blockContents);
-//         await storageSet('stash', STASH);
-//         logThis(['stash saved from notion']);
-//     }
-//     refreshList();  
-// }
 
 (async () => {
     setArcTheme();
     await populateList();   
     setEvents();
-    const notionCreds = await getNotionCredsSaved();
-    if (typeof notionCreds !== 'undefined') {
-        $notionTokenInput.val(notionCreds.token);
-        $notionCodeBlockInput.val(notionCreds.codeBlock.link);  
-        // getStashDataFromNotion();
+    const gitCreds = await getGitCredsSaved();
+    if (typeof gitCreds !== 'undefined') {
+        $githubTokenInput.val(gitCreds.token);
+        $gistLinkInput.val(gitCreds.gist.link);  
+        // get data from server gist
+        const stashFromGist = await getGistContents(gitCreds.gist.id);
+        if (stashFromGist && stashFromGist instanceof Array) {
+            await storageSet('stash', stashFromGist);
+            refreshList();
+            logThis({
+                msg: 'Refresh list with data from gist',
+                stashFromGist
+            });
+        }
+
     }
     else {
         // Show settings modal if notion integration is not set yet //
