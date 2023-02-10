@@ -176,14 +176,12 @@ main .bstash-setting section header img {
   --size: 20px;
   width: var(--size);
   height: var(--size);
-  opacity: .7;
 }
 
 main .bstash-setting section header span {
   text-align: left;
   font-weight: 500;
   font-size: .8rem;
-  opacity: .7;
 }
 
 main .bstash-setting section input[type="text"] {

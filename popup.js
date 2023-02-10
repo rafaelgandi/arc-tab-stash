@@ -135,9 +135,9 @@ async function setArcTheme() {
         message: 'get-arc-colors'
     });
     if (response) {
-        logThis({
-            themeing: response
-        });
+        // logThis({
+        //     themeing: response
+        // });
         //$body.html(JSON.stringify(response))
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
@@ -206,6 +206,10 @@ function setEvents() {
         $gistLinkInput.val(gitCreds.gist.link);  
         // get data from server gist
         const stashFromGist = await getGistContents(gitCreds.gist.id);
+        // logThis({
+        //     foo: 'aaaaaa',
+        //     'kekeke': stashFromGist
+        // });
         if (stashFromGist && stashFromGist instanceof Array) {
             await storageSet('stash', stashFromGist);
             refreshList();
