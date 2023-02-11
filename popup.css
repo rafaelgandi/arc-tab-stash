@@ -242,3 +242,7 @@ footer .bstash-footer-child img.bstash-footer-control {
 footer .bstash-footer-child img.bstash-footer-control:hover {
   transform: rotate(90deg);
 }
+
+footer #bstash-msg-con {
+  font-style: italic;
+}

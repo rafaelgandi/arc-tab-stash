@@ -29,7 +29,7 @@
             duration: 5000,
             close: true,
             gravity: "top", // `top` or `bottom`
-            position: "right", // `left`, `center` or `right`
+            position: "left", // `left`, `center` or `right`
             stopOnFocus: true, // Prevents dismissing of toast on hover
             className: (type === 'okay') ? '__stash-toast' : '__stash-toast--danger',
             style: {   
@@ -49,16 +49,17 @@
         if (data.message === 'tab-added-to-stash') {
             // alert('Tab added to stash.');
             presentToast('Added to stash 👍');
+            sendResponse('done');
         }
         if (data.message === 'log-please') {
             console.log(data.data);
+            sendResponse('done');
         }
         if (data.message === 'toast-this') {
             //console.log(data);
             presentToast(data.data.toast, data.data.type);
+            sendResponse('done');
         }
+        return true;
     });
-
-    // const response = await helpers.sendMessageToBg({ message: "get-user-tab-stash-from-notion" });
-
 })();

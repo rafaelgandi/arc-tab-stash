@@ -1,16 +1,16 @@
 
-import { 
-    sendMessageToActiveTab, 
-    storageSet, 
-    storageGet, 
-    openInNewTab, 
-    removeFromStash, 
+import {
+    sendMessageToActiveTab,
+    storageSet,
+    storageGet,
+    openInNewTab,
+    removeFromStash,
     logThis,
     sendMessageToBg,
     sendErrorToast,
     getGitCredsSaved,
     getGistContents,
-    isValidJson
+    isLessThanOneHourAgo
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -23,6 +23,7 @@ const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
 const $gistLinkInput = $('#bstash-setting-gist-link-input');
+const $msgCon = $('#bstash-msg-con');
 let dropDownCleanUpFunc = undefined;
 let STASH = [];
 
@@ -44,10 +45,10 @@ function _getGistIdFromLink(url) {
         sendErrorToast('Looks like there is something wrong with your gist url.');
         return undefined;
     }
-    
+
 }
 
-async function saveSettingDetails() {   
+async function saveSettingDetails() {
     await storageSet('gitToken', $githubTokenInput.val().trim());
     const gistLink = $gistLinkInput.val().trim()
     await storageSet('gistLink', {
@@ -166,19 +167,17 @@ function setEvents() {
         STASH = removeFromStash(STASH, stashId);
         await storageSet('stash', STASH);
         refreshList();
-        sendMessageToBg({
-            message: 'stash-item-delete-happend'
-        });
     }
 
     async function onAddCurrentTab(e) {
         e.preventDefault();
-        logThis(['clicked add tab']);
+        $msgCon.text('Stashing...');
         await sendMessageToBg({
             message: 'stash-current-tab'
         });
         refreshList();
-        
+        $msgCon.text('');
+
     }
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
@@ -196,29 +195,40 @@ function setEvents() {
 }
 
 
+// main //
 (async () => {
+    chrome.runtime.connect({ name: "popup" });
     setArcTheme();
-    await populateList();   
+    await populateList();
     setEvents();
     const gitCreds = await getGitCredsSaved();
-    if (typeof gitCreds !== 'undefined') {
+    if (typeof gitCreds !== 'undefined' && navigator.onLine) {
         $githubTokenInput.val(gitCreds.token);
-        $gistLinkInput.val(gitCreds.gist.link);  
-        // get data from server gist
+        $gistLinkInput.val(gitCreds.gist.link);
+
+        // Only do initial syncing of data if the last sync was more than an hour ago. //
+        const lastInitialSync = await storageGet('lastInitialSync');
+        if (lastInitialSync) {
+            const lastInitialSyncDate = new Date(Number(lastInitialSync));
+            if (isLessThanOneHourAgo(lastInitialSyncDate)) {
+                logThis(['No sync'])
+                return;
+            }
+        }
+        await storageSet('lastInitialSync', (new Date()).getTime().toString());
+        logThis(['Syncing data....'])
+        $msgCon.text('Syncing...');
+        // get data from server gist //
         const stashFromGist = await getGistContents(gitCreds.gist.id);
-        // logThis({
-        //     foo: 'aaaaaa',
-        //     'kekeke': stashFromGist
-        // });
         if (stashFromGist && stashFromGist instanceof Array) {
             await storageSet('stash', stashFromGist);
             refreshList();
+            $msgCon.text('');
             logThis({
                 msg: 'Refresh list with data from gist',
                 stashFromGist
             });
         }
-
     }
     else {
         // Show settings modal if notion integration is not set yet //
