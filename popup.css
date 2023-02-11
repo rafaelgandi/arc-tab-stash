@@ -123,6 +123,7 @@ main .bstash-setting {
   display: block;
   transition: all .1s ease-out;
   padding: var(--app-spacing);
+  padding-bottom: .1rem;
   position: fixed;
   top: 1rem;
   left: .5rem;
@@ -210,6 +211,24 @@ main .bstash-setting #bstash-settings-save-button {
   border: 1px solid #ccc;
   border-radius: 3px;
   color: #000;
+}
+
+main .bstash-setting .bstash-settings-branding {
+  text-align: left;
+  color: #939493;
+  width: 100%;
+  padding-top: .5rem;
+  padding-bottom: .2rem;
+  font-size: .6rem;
+}
+
+main .bstash-setting .bstash-settings-branding i {
+  font-size: .9rem;
+}
+
+main .bstash-setting .bstash-settings-branding a {
+  text-decoration: none;
+  color: #3dbafc;
 }
 
 footer {
