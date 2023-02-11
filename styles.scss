@@ -2,10 +2,12 @@ body {
     --app-spacing: 16px;
     .__stash-toast,
     .__stash-toast--danger {
-        background: rgba(170, 249, 164, 1);
-        background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
+        font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+        background: rgba(170, 249, 164, 1) !important;
+        color: #092609 !important;
+        // background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
         font-size: 16px;
-        padding: calc(var(--app-spacing) / 2) var(--app-spacing);
+        padding: calc(var(--app-spacing) / 2) calc(var(--app-spacing) * 3) !important;
         border: 5px solid #fff;
         border-radius: 10px;
         opacity: 1 !important;

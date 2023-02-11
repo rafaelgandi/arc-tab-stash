@@ -198,6 +198,7 @@ main .bstash-setting section p {
   margin: .2rem 0;
   font-size: .7rem;
   opacity: .5;
+  text-align: justify;
 }
 
 main .bstash-setting #bstash-settings-save-button {

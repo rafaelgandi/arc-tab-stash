@@ -10,7 +10,7 @@ import {
     sendErrorToast,
     getGitCredsSaved,
     getGistContents,
-    isLessThanOneHourAgo
+    isLessThan30MinAgo
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -206,11 +206,11 @@ function setEvents() {
         $githubTokenInput.val(gitCreds.token);
         $gistLinkInput.val(gitCreds.gist.link);
 
-        // Only do initial syncing of data if the last sync was more than an hour ago. //
+        // Only do initial syncing of data if the last sync was more than 30 mins ago. //
         const lastInitialSync = await storageGet('lastInitialSync');
         if (lastInitialSync) {
             const lastInitialSyncDate = new Date(Number(lastInitialSync));
-            if (isLessThanOneHourAgo(lastInitialSyncDate)) {
+            if (isLessThan30MinAgo(lastInitialSyncDate)) {
                 logThis(['No sync'])
                 return;
             }

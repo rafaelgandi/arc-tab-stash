@@ -26,15 +26,16 @@
         const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({
             text: msg,
-            duration: 5000,
+            duration: 500000,
             close: true,
             gravity: "top", // `top` or `bottom`
-            position: "left", // `left`, `center` or `right`
+            position: "center", // `left`, `center` or `right`
             stopOnFocus: true, // Prevents dismissing of toast on hover
             className: (type === 'okay') ? '__stash-toast' : '__stash-toast--danger',
             style: {   
-                color: arcPaletteTitle ?? '#092609',            
-                background: `linear-gradient(140deg, ${arcBGGradients.filter((color) => !!color).join(', ')})`,
+                padding: 'calc(1rem / 2) 1rem',
+                // color: arcPaletteTitle ?? '#092609',            
+                //background: `linear-gradient(140deg, ${arcBGGradients.filter((color) => !!color).join(', ')}) !important`,
             },
             onClick: function () { } // Callback after click
         }).showToast();
@@ -48,7 +49,7 @@
         }
         if (data.message === 'tab-added-to-stash') {
             // alert('Tab added to stash.');
-            presentToast('Added to stash 👍');
+            presentToast('Added to your stash 👍');
             sendResponse('done');
         }
         if (data.message === 'log-please') {
