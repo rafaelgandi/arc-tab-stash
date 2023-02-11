@@ -148,11 +148,15 @@ main {
             transform: scale(0);
             // display: none;
         }
-        section, button {
+        a {
+            text-decoration: none;
+            color: #3dbafc;
+        }
+        section, button, .bstash-settings-branding {
             position: relative;
             z-index: 5000 !important;
         }
-        section {            
+        section {          
             margin: calc(var(--app-spacing) * 1.5) 0;
             // border-bottom: 1px solid #eee;
             [-first-child] {
@@ -190,9 +194,10 @@ main {
             p {
                 margin: .2rem 0;
                 font-size: .7rem;
-                opacity: .5;
-                text-align: justify;
+                // opacity: .5;
+                // text-align: justify;
                 // outline: 1px solid red;
+                color: #939493;
             }
         }
         #bstash-settings-save-button {
@@ -211,14 +216,9 @@ main {
             width: 100%;
             padding-top: .5rem;
             padding-bottom: .2rem;
-            // outline: 1px solid red;
-            font-size: .6rem;
+            font-size: .5rem;
             i {
                 font-size: .9rem;
-            }
-            a {
-                text-decoration: none;
-                color: #3dbafc;
             }
         }
     }

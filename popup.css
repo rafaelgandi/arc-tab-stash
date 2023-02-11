@@ -151,8 +151,14 @@ main .bstash-setting.hide-settings {
   transform: scale(0);
 }
 
+main .bstash-setting a {
+  text-decoration: none;
+  color: #3dbafc;
+}
+
 main .bstash-setting section,
-main .bstash-setting button {
+main .bstash-setting button,
+main .bstash-setting .bstash-settings-branding {
   position: relative;
   z-index: 5000 !important;
 }
@@ -198,8 +204,7 @@ main .bstash-setting section input[type="text"] {
 main .bstash-setting section p {
   margin: .2rem 0;
   font-size: .7rem;
-  opacity: .5;
-  text-align: justify;
+  color: #939493;
 }
 
 main .bstash-setting #bstash-settings-save-button {
@@ -219,16 +224,11 @@ main .bstash-setting .bstash-settings-branding {
   width: 100%;
   padding-top: .5rem;
   padding-bottom: .2rem;
-  font-size: .6rem;
+  font-size: .5rem;
 }
 
 main .bstash-setting .bstash-settings-branding i {
   font-size: .9rem;
-}
-
-main .bstash-setting .bstash-settings-branding a {
-  text-decoration: none;
-  color: #3dbafc;
 }
 
 footer {
