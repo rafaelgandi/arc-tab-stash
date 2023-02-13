@@ -21,6 +21,7 @@ const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
 const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
+const $manuallySyncButton = $('#bstash-footer-sync-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
 const $gistLinkInput = $('#bstash-setting-gist-link-input');
 const $msgCon = $('#bstash-msg-con');
@@ -188,12 +189,20 @@ function setEvents() {
         refreshList();
         toggleSettingsVisibility(false);
     }
+    async function onManuallySync() {
+        $msgCon.text('Syncing...');
+        await updateLocalStashWithDataFromGist();
+        await storageSet('lastInitialSync', (new Date()).getTime().toString());
+        refreshList();
+        $msgCon.text('');
+    }
     $ul
         .on('click', 'a', handleOnLinkClick)
         .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
     $addCurrentPageButton.on('click', onAddCurrentTab);
     $settingsButton.on('click', onSettingsButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
+    $manuallySyncButton.on('click', onManuallySync);
 }
 
 
@@ -208,7 +217,7 @@ function setEvents() {
         $githubTokenInput.val(gitCreds.token);
         $gistLinkInput.val(gitCreds.gist.link);
 
-        // Only do initial syncing of data if the last sync was more than 30 mins ago. //
+        // Only do initial syncing of data if the last sync was more than 10 mins ago. //
         const lastInitialSync = await storageGet('lastInitialSync');
         if (lastInitialSync) {
             const lastInitialSyncDate = new Date(Number(lastInitialSync));

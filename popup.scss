@@ -148,7 +148,7 @@ main {
             transform: scale(0);
             // display: none;
         }
-        section, button {
+        section, button, .bstash-settings-branding {
             position: relative;
             z-index: 5000 !important;
         }
@@ -234,12 +234,13 @@ footer {
     background-color: rgba(255, 255, 255, .3);
     z-index: 1000;
     display: grid;
-    grid-template-columns: 15% 1fr 15%;
+    grid-template-columns: 15% 1fr 10% 10%;
     align-items: center;
     justify-content: center;
     .bstash-footer-child { 
+        // outline: 1px solid red;
         text-align: center;
-        padding: .5rem;
+        padding: .3rem;
         img.bstash-footer-control {
             transition: transform .2s ease-out;
             opacity: .5;
@@ -247,7 +248,7 @@ footer {
             width: var(--size);
             height: var(--size);
             [-hover] {
-                transform: rotate(90deg);
+                transform: rotate(180deg);
             }
         }
     }
