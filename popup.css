@@ -202,9 +202,10 @@ main .bstash-setting section input[type="text"] {
 }
 
 main .bstash-setting section p {
+  color: #939493;
   margin: .2rem 0;
   font-size: .7rem;
-  color: #939493;
+  text-align: justify;
 }
 
 main .bstash-setting #bstash-settings-save-button {
@@ -241,14 +242,14 @@ footer {
   background-color: rgba(255, 255, 255, .3);
   z-index: 1000;
   display: grid;
-  grid-template-columns: 15% 1fr 15%;
+  grid-template-columns: 15% 1fr 10% 10%;
   align-items: center;
   justify-content: center;
 }
 
 footer .bstash-footer-child {
   text-align: center;
-  padding: .5rem;
+  padding: .3rem;
 }
 
 footer .bstash-footer-child img.bstash-footer-control {
@@ -260,7 +261,7 @@ footer .bstash-footer-child img.bstash-footer-control {
 }
 
 footer .bstash-footer-child img.bstash-footer-control:hover {
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 footer #bstash-msg-con {

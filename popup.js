@@ -9,8 +9,8 @@ import {
     sendMessageToBg,
     sendErrorToast,
     getGitCredsSaved,
-    getGistContents,
-    isLessThan30MinAgo
+    isLessThan10MinAgo,
+    updateLocalStashWithDataFromGist
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -21,6 +21,7 @@ const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
 const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
+const $manuallySyncButton = $('#bstash-footer-sync-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
 const $gistLinkInput = $('#bstash-setting-gist-link-input');
 const $msgCon = $('#bstash-msg-con');
@@ -55,6 +56,7 @@ async function saveSettingDetails() {
         link: gistLink,
         id: _getGistIdFromLink(gistLink)
     });
+    await sendMessageToBg({message: 'get-stash-from-gist' });
 }
 
 
@@ -86,8 +88,6 @@ function getUpdatedListOrder() {
 
 async function populateList() {
     STASH = await storageGet('stash');
-    // $('#tester-span').text(STASH.length + '====');
-    // logThis({STASH});
     if (STASH && STASH.length) {
         $emptyListMessage.addClass('hide');
         let listHTML = [];
@@ -131,15 +131,10 @@ async function refreshList() {
 }
 
 async function setArcTheme() {
-    // logThis(['theme requested...']);
     const response = await sendMessageToActiveTab({
         message: 'get-arc-colors'
     });
     if (response) {
-        // logThis({
-        //     themeing: response
-        // });
-        //$body.html(JSON.stringify(response))
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
             $body.css('background', `linear-gradient(140deg, ${arcBGGradients.join(', ')})`);
@@ -182,9 +177,21 @@ function setEvents() {
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
     }
-    function onSettingSaved() {
-        saveSettingDetails();
+    async function onSettingSaved() {
+        await saveSettingDetails();
+        refreshList();
         toggleSettingsVisibility(false);
+    }
+    async function onManuallySync() {
+        $manuallySyncButton.css('transform', 'rotate(270deg)');
+        setTimeout(() => requestAnimationFrame(() => {
+            $manuallySyncButton.get(0).style.cssText = '';
+        }), 300)
+        $msgCon.text('Syncing...');
+        await updateLocalStashWithDataFromGist();
+        await storageSet('lastInitialSync', (new Date()).getTime().toString());
+        refreshList();
+        $msgCon.text('');
     }
     $ul
         .on('click', 'a', handleOnLinkClick)
@@ -192,6 +199,7 @@ function setEvents() {
     $addCurrentPageButton.on('click', onAddCurrentTab);
     $settingsButton.on('click', onSettingsButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
+    $manuallySyncButton.on('click', onManuallySync);
 }
 
 
@@ -206,11 +214,11 @@ function setEvents() {
         $githubTokenInput.val(gitCreds.token);
         $gistLinkInput.val(gitCreds.gist.link);
 
-        // Only do initial syncing of data if the last sync was more than 30 mins ago. //
+        // Only do initial syncing of data if the last sync was more than 10 mins ago. //
         const lastInitialSync = await storageGet('lastInitialSync');
         if (lastInitialSync) {
             const lastInitialSyncDate = new Date(Number(lastInitialSync));
-            if (isLessThan30MinAgo(lastInitialSyncDate)) {
+            if (isLessThan10MinAgo(lastInitialSyncDate)) {
                 logThis(['No sync'])
                 return;
             }
@@ -218,17 +226,9 @@ function setEvents() {
         await storageSet('lastInitialSync', (new Date()).getTime().toString());
         logThis(['Syncing data....'])
         $msgCon.text('Syncing...');
-        // get data from server gist //
-        const stashFromGist = await getGistContents(gitCreds.gist.id);
-        if (stashFromGist && stashFromGist instanceof Array) {
-            await storageSet('stash', stashFromGist);
-            refreshList();
-            $msgCon.text('');
-            logThis({
-                msg: 'Refresh list with data from gist',
-                stashFromGist
-            });
-        }
+        await updateLocalStashWithDataFromGist();
+        refreshList();
+        $msgCon.text('');
     }
     else {
         // Show settings modal if notion integration is not set yet //

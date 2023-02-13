@@ -24,7 +24,9 @@
                     <span>Github Access Token</span>
                 </header>
                 <input type="text" id="bstash-setting-git-token-input" placeholder="token..." />
-                <p>Follow these <a href="#">instructions</a> to generate one.</p>
+                <p>
+                    Place your github access token. Instructions on how to make one can be found <a href="#" target="_blank">here</a>.
+                </p>
             </section>
             <section>
                 <header>
@@ -41,11 +43,14 @@
         </div>
         <footer>
             <div class="bstash-footer-child" title="Stash current tab.">
-                <img id="bstash-footer-add-tab-button" class="bstash-footer-control" src="./assets/add.svg" />
+                <img title="Add current tab to stash [Shift + Opt + S]" id="bstash-footer-add-tab-button" class="bstash-footer-control" src="./assets/add.svg" />
             </div>
             <div id="bstash-msg-con" class="bstash-footer-child"></div>
             <div class="bstash-footer-child">
                 <img id="bstash-footer-settings-button" class="bstash-footer-control" src="./assets/settings.svg" />
+            </div>
+            <div class="bstash-footer-child">
+                <img title="Manually sync stash" id="bstash-footer-sync-button" class="bstash-footer-control" src="./assets/sync.svg" />
             </div>
         </footer>
     </main>

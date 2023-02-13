@@ -1,9 +1,5 @@
 /* This runs after a web page loads */
 (async () => {
-    // Importing from helper scripts
-    // See: https://stackoverflow.com/a/53033388
-    // const helpers = await import(chrome.runtime.getURL('lib/helpers.js'));
-
     function getArcColor(name) {
         return document.documentElement.style.getPropertyValue(name) ?? null;
     }
