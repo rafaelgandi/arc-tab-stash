@@ -4,10 +4,8 @@ import {
     storageSet,
     storageGet,
     logThis,
-    sendErrorToast,
     getGitCredsSaved,
     setGistContents,
-    getGistContents,
     updateLocalStashWithDataFromGist
 } from './lib/helpers.js';
 

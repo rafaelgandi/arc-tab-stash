@@ -88,8 +88,6 @@ function getUpdatedListOrder() {
 
 async function populateList() {
     STASH = await storageGet('stash');
-    // $('#tester-span').text(STASH.length + '====');
-    // logThis({STASH});
     if (STASH && STASH.length) {
         $emptyListMessage.addClass('hide');
         let listHTML = [];
@@ -133,15 +131,10 @@ async function refreshList() {
 }
 
 async function setArcTheme() {
-    // logThis(['theme requested...']);
     const response = await sendMessageToActiveTab({
         message: 'get-arc-colors'
     });
     if (response) {
-        // logThis({
-        //     themeing: response
-        // });
-        //$body.html(JSON.stringify(response))
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
             $body.css('background', `linear-gradient(140deg, ${arcBGGradients.join(', ')})`);
@@ -190,6 +183,10 @@ function setEvents() {
         toggleSettingsVisibility(false);
     }
     async function onManuallySync() {
+        $manuallySyncButton.css('transform', 'rotate(270deg)');
+        setTimeout(() => requestAnimationFrame(() => {
+            $manuallySyncButton.get(0).style.cssText = '';
+        }), 300)
         $msgCon.text('Syncing...');
         await updateLocalStashWithDataFromGist();
         await storageSet('lastInitialSync', (new Date()).getTime().toString());

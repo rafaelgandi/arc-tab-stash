@@ -148,6 +148,10 @@ main {
             transform: scale(0);
             // display: none;
         }
+        a {
+            text-decoration: none;
+            color: #3dbafc;
+        }
         section, button, .bstash-settings-branding {
             position: relative;
             z-index: 5000 !important;
@@ -188,9 +192,9 @@ main {
                 font-family: 'Courier New', Courier, monospace;
             }
             p {
+                color: #939493;
                 margin: .2rem 0;
                 font-size: .7rem;
-                opacity: .5;
                 text-align: justify;
                 // outline: 1px solid red;
             }
@@ -215,10 +219,6 @@ main {
             font-size: .6rem;
             i {
                 font-size: .9rem;
-            }
-            a {
-                text-decoration: none;
-                color: #3dbafc;
             }
         }
     }

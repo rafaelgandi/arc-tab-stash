@@ -151,6 +151,11 @@ main .bstash-setting.hide-settings {
   transform: scale(0);
 }
 
+main .bstash-setting a {
+  text-decoration: none;
+  color: #3dbafc;
+}
+
 main .bstash-setting section,
 main .bstash-setting button,
 main .bstash-setting .bstash-settings-branding {
@@ -197,9 +202,9 @@ main .bstash-setting section input[type="text"] {
 }
 
 main .bstash-setting section p {
+  color: #939493;
   margin: .2rem 0;
   font-size: .7rem;
-  opacity: .5;
   text-align: justify;
 }
 
@@ -225,11 +230,6 @@ main .bstash-setting .bstash-settings-branding {
 
 main .bstash-setting .bstash-settings-branding i {
   font-size: .9rem;
-}
-
-main .bstash-setting .bstash-settings-branding a {
-  text-decoration: none;
-  color: #3dbafc;
 }
 
 footer {
