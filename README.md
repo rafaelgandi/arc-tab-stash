@@ -13,3 +13,7 @@ Stash is a tiny browser extension that saves and syncs your favorite links acros
 * ♻️ Syncs your data on multiple browsers and accounts.
 * 🔮 If your an Arc Browser user, this extension supports your Arc theme colors.
 * 🌴 Free forever.
+
+
+#
+Feel free to reach out to me through email at rafaelgandi@gmail.com or at [rafaelgandi.com](www.rafaelgandi.com/contact) if you have any questions or feedback! Hope you find this useful 🤙
