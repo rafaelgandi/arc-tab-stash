@@ -17,8 +17,8 @@ Stash is a tiny browser extension that saves and syncs your favorite links acros
 
 
 #
-Feel free to reach out to me through email at rafaelgandi@gmail.com or at [rafaelgandi.com](www.rafaelgandi.com/contact) if you have any questions or feedback! Hope you find this useful 🚀
+Feel free to reach out to me through email at rafaelgandi@gmail.com or at [rafaelgandi.com](https://www.rafaelgandi.com/contact) if you have any questions or feedback! Hope you find this useful 🚀
 
 
 <br><br>
-Made with 🤙 by [Rafael G.](www.rafaelgandi.com)
+Made with 🤙 by [Rafael G.](https://www.rafaelgandi.com)
