@@ -6,7 +6,9 @@ import {
     logThis,
     sendErrorToast,
     getGitCredsSaved,
-    setGistContents
+    setGistContents,
+    getGistContents,
+    updateLocalStashWithDataFromGist
 } from './lib/helpers.js';
 
 
@@ -45,12 +47,14 @@ import {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
             port.onDisconnect.addListener(() => {
+                if (!navigator.onLine) { return; }
                 //    logThis(["popup has been closed"]);
                 (async () => {
+                    const lastInitialSync = await storageGet('lastInitialSync');
+                    if (!lastInitialSync) { return; } // If first time opening the popup, dont sync yet.
                     const gitCreds = await getGitCredsSaved();
                     let STASH = await storageGet('stash');
                     if (!gitCreds) { return; }
-                    if (!navigator.onLine) { return; }
                     await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
                 })();
             });
@@ -79,6 +83,10 @@ import {
                     await handleStashingTab();
                     sendResponse('done');
                 }, stashDebouncerDelay);
+            }
+            else if (data.message === 'get-stash-from-gist') {
+                await updateLocalStashWithDataFromGist();
+                sendResponse('done');
             }
         })();
         // Need to return true.
@@ -118,4 +126,11 @@ import {
             }
         }
     }
+
+    // Update local stash with data from gist every 5min //
+    const pollDelay = 1000 * 60 * 5; // 5min
+    setTimeout(async function pollStashData() {
+        await updateLocalStashWithDataFromGist();
+        setTimeout(pollStashData, pollDelay);
+    }, pollDelay);
 })();

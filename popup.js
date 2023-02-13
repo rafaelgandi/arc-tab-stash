@@ -9,8 +9,8 @@ import {
     sendMessageToBg,
     sendErrorToast,
     getGitCredsSaved,
-    getGistContents,
-    isLessThan30MinAgo
+    isLessThan10MinAgo,
+    updateLocalStashWithDataFromGist
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -55,6 +55,7 @@ async function saveSettingDetails() {
         link: gistLink,
         id: _getGistIdFromLink(gistLink)
     });
+    await sendMessageToBg({message: 'get-stash-from-gist' });
 }
 
 
@@ -182,8 +183,9 @@ function setEvents() {
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
     }
-    function onSettingSaved() {
-        saveSettingDetails();
+    async function onSettingSaved() {
+        await saveSettingDetails();
+        refreshList();
         toggleSettingsVisibility(false);
     }
     $ul
@@ -210,7 +212,7 @@ function setEvents() {
         const lastInitialSync = await storageGet('lastInitialSync');
         if (lastInitialSync) {
             const lastInitialSyncDate = new Date(Number(lastInitialSync));
-            if (isLessThan30MinAgo(lastInitialSyncDate)) {
+            if (isLessThan10MinAgo(lastInitialSyncDate)) {
                 logThis(['No sync'])
                 return;
             }
@@ -218,17 +220,9 @@ function setEvents() {
         await storageSet('lastInitialSync', (new Date()).getTime().toString());
         logThis(['Syncing data....'])
         $msgCon.text('Syncing...');
-        // get data from server gist //
-        const stashFromGist = await getGistContents(gitCreds.gist.id);
-        if (stashFromGist && stashFromGist instanceof Array) {
-            await storageSet('stash', stashFromGist);
-            refreshList();
-            $msgCon.text('');
-            logThis({
-                msg: 'Refresh list with data from gist',
-                stashFromGist
-            });
-        }
+        await updateLocalStashWithDataFromGist();
+        refreshList();
+        $msgCon.text('');
     }
     else {
         // Show settings modal if notion integration is not set yet //
