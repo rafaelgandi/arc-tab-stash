@@ -9,8 +9,7 @@ import {
     sendMessageToBg,
     sendErrorToast,
     getGitCredsSaved,
-    isLessThan10MinAgo,
-    updateLocalStashWithDataFromGist
+    sync
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -23,10 +22,11 @@ const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
 const $manuallySyncButton = $('#bstash-footer-sync-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
-const $gistLinkInput = $('#bstash-setting-gist-link-input');
+// const $gistLinkInput = $('#bstash-setting-gist-link-input');
 const $msgCon = $('#bstash-msg-con');
-let dropDownCleanUpFunc = undefined;
+let dragAndDropCleanUpFunc = undefined;
 let STASH = [];
+let debouncer = undefined;
 
 function toggleSettingsVisibility(show = false) {
     if (show) {
@@ -36,27 +36,18 @@ function toggleSettingsVisibility(show = false) {
     $settingsCon.addClass('hide-settings');
 }
 
-function _getGistIdFromLink(url) {
-    // https://gist.github.com/rafaelgandi/2c70b20207df04881db599367593916d
-    try {
-        const blockUrl = new URL(url);
-        return blockUrl?.pathname?.split(/\//).pop();
-    }
-    catch (err) {
-        sendErrorToast('Looks like there is something wrong with your gist url.');
-        return undefined;
-    }
-
-}
-
 async function saveSettingDetails() {
+    if ($githubTokenInput.val().trim() === '') { return; }
+    const savedToken = await storageGet('gitToken');
+    if (savedToken === $githubTokenInput.val().trim()) { return; }
     await storageSet('gitToken', $githubTokenInput.val().trim());
-    const gistLink = $gistLinkInput.val().trim()
-    await storageSet('gistLink', {
-        link: gistLink,
-        id: _getGistIdFromLink(gistLink)
+    await sendMessageToBg({ 
+        message: 'make-stash-gist',
+        data: {
+            gitToken: $githubTokenInput.val().trim()
+        } 
     });
-    await sendMessageToBg({message: 'get-stash-from-gist' });
+    
 }
 
 
@@ -113,7 +104,7 @@ async function populateList() {
         });
         $ul.html(listHTML.join(''));
         // Make draggable //
-        dropDownCleanUpFunc = slist($ul.get(0), async () => {
+        dragAndDropCleanUpFunc = slist($ul.get(0), async () => {
             STASH = getUpdatedListOrder();
             await storageSet('stash', STASH);
             refreshList();
@@ -126,7 +117,7 @@ async function populateList() {
 }
 
 async function refreshList() {
-    dropDownCleanUpFunc?.();
+    dragAndDropCleanUpFunc?.();
     return await populateList();
 }
 
@@ -172,26 +163,31 @@ function setEvents() {
         });
         refreshList();
         $msgCon.text('');
-
     }
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
     }
-    async function onSettingSaved() {
-        await saveSettingDetails();
-        refreshList();
-        toggleSettingsVisibility(false);
+    function onSettingSaved() {
+        if ($githubTokenInput.val().trim() === '') { return; }
+        clearTimeout(debouncer);
+        debouncer = setTimeout(async () => {
+            await saveSettingDetails();
+            refreshList();
+            toggleSettingsVisibility(false);
+        }, 300);
     }
-    async function onManuallySync() {
+    function onManuallySync() {
+        clearTimeout(debouncer);
         $manuallySyncButton.css('transform', 'rotate(270deg)');
         setTimeout(() => requestAnimationFrame(() => {
             $manuallySyncButton.get(0).style.cssText = '';
         }), 300)
-        $msgCon.text('Syncing...');
-        await updateLocalStashWithDataFromGist();
-        await storageSet('lastInitialSync', (new Date()).getTime().toString());
-        refreshList();
-        $msgCon.text('');
+        debouncer = setTimeout(async () => {
+            $msgCon.text('Syncing...');
+            await sendMessageToBg({ message: 'sync-stash-force' });
+            refreshList();
+            $msgCon.text('');
+        }, 500)
     }
     $ul
         .on('click', 'a', handleOnLinkClick)
@@ -212,21 +208,9 @@ function setEvents() {
     const gitCreds = await getGitCredsSaved();
     if (typeof gitCreds !== 'undefined' && navigator.onLine) {
         $githubTokenInput.val(gitCreds.token);
-        $gistLinkInput.val(gitCreds.gist.link);
-
-        // Only do initial syncing of data if the last sync was more than 10 mins ago. //
-        const lastInitialSync = await storageGet('lastInitialSync');
-        if (lastInitialSync) {
-            const lastInitialSyncDate = new Date(Number(lastInitialSync));
-            if (isLessThan10MinAgo(lastInitialSyncDate)) {
-                logThis(['No sync'])
-                return;
-            }
-        }
-        await storageSet('lastInitialSync', (new Date()).getTime().toString());
-        logThis(['Syncing data....'])
+        // $gistLinkInput.val(gitCreds.gist.link);
         $msgCon.text('Syncing...');
-        await updateLocalStashWithDataFromGist();
+        await sync();
         refreshList();
         $msgCon.text('');
     }

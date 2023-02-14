@@ -5,8 +5,9 @@ import {
     storageGet,
     logThis,
     getGitCredsSaved,
-    setGistContents,
-    updateLocalStashWithDataFromGist
+    sync,
+    makeStashGist,
+    sendErrorToast
 } from './lib/helpers.js';
 
 
@@ -32,11 +33,7 @@ import {
                     id: ''
                 });
             }
-            // LM: 2023-02-11 14:15:27 []
-            const lastInitialSync = await storageGet('lastInitialSync');
-            if (!lastInitialSync) {
-                storageSet('lastInitialSync', '');
-            }
+            storageSet('localLastUpdated', '0');
         })();
     });
 
@@ -44,16 +41,10 @@ import {
         if (port.name === "popup") {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
-            port.onDisconnect.addListener(() => {
-                if (!navigator.onLine) { return; }
-                //    logThis(["popup has been closed"]);
+            port.onDisconnect.addListener(() => {   
+                if (!navigator.onLine) { return; }          
                 (async () => {
-                    const lastInitialSync = await storageGet('lastInitialSync');
-                    if (!lastInitialSync) { return; } // If first time opening the popup, dont sync yet.
-                    const gitCreds = await getGitCredsSaved();
-                    let STASH = await storageGet('stash');
-                    if (!gitCreds) { return; }
-                    await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+                    await sync();
                 })();
             });
         }
@@ -82,8 +73,30 @@ import {
                     sendResponse('done');
                 }, stashDebouncerDelay);
             }
-            else if (data.message === 'get-stash-from-gist') {
-                await updateLocalStashWithDataFromGist();
+            else if (data.message === 'sync-stash') {
+                await sync();
+                sendResponse('done');
+            }
+            else if (data.message === 'sync-stash-force') {
+                await sync(true);
+                sendResponse('done');
+            }
+            else if (data.message === 'make-stash-gist') {
+                if (!navigator.onLine) { 
+                    sendResponse('failed');
+                    return; 
+                }               
+                const res = await makeStashGist(data.data.gitToken);
+                if (res?.id) {
+                    await storageSet('gistLink', {
+                        link: res?.url ?? 'none',
+                        id: res.id
+                    });                                   
+                }
+                else {
+                    sendErrorToast('Something went wrong. Please check your Github access token.');
+                }  
+                await sync(true);              
                 sendResponse('done');
             }
         })();
@@ -93,6 +106,8 @@ import {
     });
 
     async function handleStashingTab() {
+        const gitCreds = await getGitCredsSaved();
+        if (!navigator.onLine || !gitCreds) { return; }
         const tab = await getCurrentTabData();
         if (!tab) { return; }
         const { favIconUrl, title, url, id } = tab;
@@ -115,20 +130,6 @@ import {
         await sendMessageToActiveTab({
             message: 'tab-added-to-stash'
         });
-
-        if (navigator.onLine) {
-            const gitCreds = await getGitCredsSaved();
-            if (gitCreds) {
-                await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
-                logThis(['data saved to gist.', STASH]);
-            }
-        }
+        await sync();
     }
-
-    // Update local stash with data from gist every 5min //
-    const pollDelay = 1000 * 60 * 5; // 5min
-    setTimeout(async function pollStashData() {
-        await updateLocalStashWithDataFromGist();
-        setTimeout(pollStashData, pollDelay);
-    }, pollDelay);
 })();
