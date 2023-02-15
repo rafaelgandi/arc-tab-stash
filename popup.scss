@@ -22,6 +22,19 @@ main {
     display: block;
     width: 300px;
     min-height: var(--app-min-height);
+    #bstash-blocker {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999999;
+        background-color: rgba(255,255,255, .3);
+    }
+    .hide {
+        display: none !important;
+    }
     .bstash-list-con {
         padding-bottom: 3rem; 
         ul {
@@ -158,6 +171,7 @@ main {
         }
         section {          
             margin: calc(var(--app-spacing) * 1.5) 0;
+            margin-bottom: var(--app-spacing);
             // border-bottom: 1px solid #eee;
             [-first-child] {
                 margin-top: 0;
@@ -190,6 +204,9 @@ main {
                 border-radius: 5px;
                 width: 100%;
                 font-family: 'Courier New', Courier, monospace;
+                [SELF].error {
+                    border-color: #de5248;
+                }
             }
             p {
                 color: #939493;
@@ -214,6 +231,7 @@ main {
             text-align: left;
             color: #939493;
             width: 100%;
+            margin-top: var(--app-spacing);
             padding-top: .5rem;
             padding-bottom: .2rem;
             font-size: .5rem;

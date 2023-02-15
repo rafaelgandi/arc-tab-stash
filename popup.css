@@ -24,6 +24,21 @@ main {
   min-height: var(--app-min-height);
 }
 
+main #bstash-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999999;
+  background-color: rgba(255,255,255, .3);
+}
+
+main .hide {
+  display: none !important;
+}
+
 main .bstash-list-con {
   padding-bottom: 3rem;
 }
@@ -165,6 +180,7 @@ main .bstash-setting .bstash-settings-branding {
 
 main .bstash-setting section {
   margin: calc(var(--app-spacing) * 1.5) 0;
+  margin-bottom: var(--app-spacing);
 }
 
 main .bstash-setting section:first-child {
@@ -201,11 +217,16 @@ main .bstash-setting section input[type="text"] {
   font-family: 'Courier New', Courier, monospace;
 }
 
+main .bstash-setting section input[type="text"].error {
+  border-color: #de5248;
+}
+
 main .bstash-setting section p {
   color: #939493;
   margin: .2rem 0;
   font-size: .7rem;
   text-align: justify;
+  color: #939493;
 }
 
 main .bstash-setting #bstash-settings-save-button {
@@ -223,6 +244,7 @@ main .bstash-setting .bstash-settings-branding {
   text-align: left;
   color: #939493;
   width: 100%;
+  margin-top: var(--app-spacing);
   padding-top: .5rem;
   padding-bottom: .2rem;
   font-size: .5rem;

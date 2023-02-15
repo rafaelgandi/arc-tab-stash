@@ -7,7 +7,6 @@ import {
     removeFromStash,
     logThis,
     sendMessageToBg,
-    sendErrorToast,
     getGitCredsSaved,
     sync
 } from './lib/helpers.js';
@@ -22,11 +21,10 @@ const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
 const $manuallySyncButton = $('#bstash-footer-sync-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
-// const $gistLinkInput = $('#bstash-setting-gist-link-input');
 const $msgCon = $('#bstash-msg-con');
+const $blockElem = $('#bstash-blocker');
 let dragAndDropCleanUpFunc = undefined;
 let STASH = [];
-let debouncer = undefined;
 
 function toggleSettingsVisibility(show = false) {
     if (show) {
@@ -36,18 +34,24 @@ function toggleSettingsVisibility(show = false) {
     $settingsCon.addClass('hide-settings');
 }
 
+function block(doBlock = true) {
+    $blockElem[(doBlock) ? 'removeClass' : 'addClass']('hide');
+}
+
 async function saveSettingDetails() {
-    if ($githubTokenInput.val().trim() === '') { return; }
+    const tokenFromUser = $githubTokenInput.val().trim();
+    if (tokenFromUser === '') { return; }
     const savedToken = await storageGet('gitToken');
-    if (savedToken === $githubTokenInput.val().trim()) { return; }
-    await storageSet('gitToken', $githubTokenInput.val().trim());
+    if (savedToken === tokenFromUser) { return; }
+    block(true);
+    await storageSet('gitToken', tokenFromUser);
     await sendMessageToBg({ 
         message: 'make-stash-gist',
         data: {
-            gitToken: $githubTokenInput.val().trim()
+            gitToken: tokenFromUser
         } 
-    });
-    
+    }); 
+    block(false); 
 }
 
 
@@ -157,38 +161,43 @@ function setEvents() {
 
     async function onAddCurrentTab(e) {
         e.preventDefault();
+        block(true);
         $msgCon.text('Stashing...');
         await sendMessageToBg({
             message: 'stash-current-tab'
         });
         refreshList();
         $msgCon.text('');
+        block(false);
     }
+
     function onSettingsButtonClicked() {
         toggleSettingsVisibility(true);
     }
-    function onSettingSaved() {
-        if ($githubTokenInput.val().trim() === '') { return; }
-        clearTimeout(debouncer);
-        debouncer = setTimeout(async () => {
-            await saveSettingDetails();
-            refreshList();
-            toggleSettingsVisibility(false);
-        }, 300);
+
+    async function onSettingSaved() {
+        if ($githubTokenInput.val().trim() === '') { 
+            $githubTokenInput.addClass('error');
+            return; 
+        }
+        await saveSettingDetails();
+        refreshList();
+        toggleSettingsVisibility(false);
     }
-    function onManuallySync() {
-        clearTimeout(debouncer);
+
+    async function onManuallySync() {
         $manuallySyncButton.css('transform', 'rotate(270deg)');
         setTimeout(() => requestAnimationFrame(() => {
             $manuallySyncButton.get(0).style.cssText = '';
         }), 300)
-        debouncer = setTimeout(async () => {
-            $msgCon.text('Syncing...');
-            await sendMessageToBg({ message: 'sync-stash-force' });
-            refreshList();
-            $msgCon.text('');
-        }, 500)
+        block(true);
+        $msgCon.text('Syncing...');
+        await sendMessageToBg({ message: 'sync-stash-force' });
+        refreshList();
+        $msgCon.text('');
+        block(false);
     }
+    
     $ul
         .on('click', 'a', handleOnLinkClick)
         .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
@@ -196,6 +205,7 @@ function setEvents() {
     $settingsButton.on('click', onSettingsButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
     $manuallySyncButton.on('click', onManuallySync);
+    $githubTokenInput.on('focus', () => $githubTokenInput.removeClass('error'));
 }
 
 
@@ -208,7 +218,6 @@ function setEvents() {
     const gitCreds = await getGitCredsSaved();
     if (typeof gitCreds !== 'undefined' && navigator.onLine) {
         $githubTokenInput.val(gitCreds.token);
-        // $gistLinkInput.val(gitCreds.gist.link);
         $msgCon.text('Syncing...');
         await sync();
         refreshList();

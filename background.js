@@ -7,7 +7,8 @@ import {
     getGitCredsSaved,
     sync,
     makeStashGist,
-    sendErrorToast
+    sendErrorToast,
+    handleError
 } from './lib/helpers.js';
 
 
@@ -67,11 +68,8 @@ import {
     chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
         (async () => {
             if (data.message === 'stash-current-tab') {
-                clearTimeout(stashDebouncer);
-                stashDebouncer = setTimeout(async () => {
-                    await handleStashingTab();
-                    sendResponse('done');
-                }, stashDebouncerDelay);
+                await handleStashingTab();
+                sendResponse('done');
             }
             else if (data.message === 'sync-stash') {
                 await sync();
@@ -94,7 +92,7 @@ import {
                     });                                   
                 }
                 else {
-                    sendErrorToast('Something went wrong. Please check your Github access token.');
+                    handleError('Unable to make stash.json gist.');
                 }  
                 await sync(true);              
                 sendResponse('done');
@@ -132,4 +130,11 @@ import {
         });
         await sync();
     }
+
+    // Automatically sync links to gist every 15min //
+    const delay = (1000 * 60 * 15); // 15min
+    setTimeout(async function pollSync() {
+        await sync();
+        setTimeout(pollSync, delay)
+    }, delay);
 })();
