@@ -8,7 +8,8 @@ import {
     sync,
     makeStashGist,
     sendErrorToast,
-    handleError
+    handleError,
+    setGistContents
 } from './lib/helpers.js';
 
 
@@ -128,7 +129,8 @@ import {
         await sendMessageToActiveTab({
             message: 'tab-added-to-stash'
         });
-        await sync();
+        // await sync();
+        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
     }
 
     // Automatically sync links to gist every 15min //
