@@ -8,7 +8,7 @@ import {
     logThis,
     sendMessageToBg,
     getGitCredsSaved,
-    sync
+    getGistContents
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -19,7 +19,6 @@ const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
 const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
-const $manuallySyncButton = $('#bstash-footer-sync-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
 const $msgCon = $('#bstash-msg-con');
 const $blockElem = $('#bstash-blocker');
@@ -148,6 +147,7 @@ function setEvents() {
     function handleOnLinkClick(e) {
         e.preventDefault();
         openInNewTab(e.currentTarget.href);
+        //window.close();
     }
 
     async function handleOnDeleteItem(e) {
@@ -184,19 +184,6 @@ function setEvents() {
         refreshList();
         toggleSettingsVisibility(false);
     }
-
-    async function onManuallySync() {
-        $manuallySyncButton.css('transform', 'rotate(270deg)');
-        setTimeout(() => requestAnimationFrame(() => {
-            $manuallySyncButton.get(0).style.cssText = '';
-        }), 300)
-        block(true);
-        $msgCon.text('Syncing...');
-        await sendMessageToBg({ message: 'sync-stash-force' });
-        refreshList();
-        $msgCon.text('');
-        block(false);
-    }
     
     $ul
         .on('click', 'a', handleOnLinkClick)
@@ -204,7 +191,6 @@ function setEvents() {
     $addCurrentPageButton.on('click', onAddCurrentTab);
     $settingsButton.on('click', onSettingsButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
-    $manuallySyncButton.on('click', onManuallySync);
     $githubTokenInput.on('focus', () => $githubTokenInput.removeClass('error'));
 }
 
@@ -219,7 +205,8 @@ function setEvents() {
     if (typeof gitCreds !== 'undefined' && navigator.onLine) {
         $githubTokenInput.val(gitCreds.token);
         $msgCon.text('Syncing...');
-        await sync();
+        const stashFromGist = await getGistContents();
+        await storageSet('stash', stashFromGist.stash);
         refreshList();
         $msgCon.text('');
     }

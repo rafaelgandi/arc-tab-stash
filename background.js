@@ -5,11 +5,11 @@ import {
     storageGet,
     logThis,
     getGitCredsSaved,
-    sync,
     makeStashGist,
     sendErrorToast,
     handleError,
-    setGistContents
+    setGistContents,
+    getGistContents
 } from './lib/helpers.js';
 
 
@@ -35,7 +35,7 @@ import {
                     id: ''
                 });
             }
-            storageSet('localLastUpdated', '0');
+            storageSet('referenceStash', []);
         })();
     });
 
@@ -46,7 +46,15 @@ import {
             port.onDisconnect.addListener(() => {   
                 if (!navigator.onLine) { return; }          
                 (async () => {
-                    await sync();
+                    const gitCreds = await getGitCredsSaved();
+                    if (!gitCreds) { return; }
+                    const STASH = await storageGet('stash');
+                    const REF_STASH = await storageGet('referenceStash');
+                    if (JSON.stringify(STASH) !== JSON.stringify(REF_STASH)) {
+                        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+                        await storageSet('referenceStash', STASH);
+                        logThis(['Gist stash have been updated.']);
+                    }
                 })();
             });
         }
@@ -72,14 +80,6 @@ import {
                 await handleStashingTab();
                 sendResponse('done');
             }
-            else if (data.message === 'sync-stash') {
-                await sync();
-                sendResponse('done');
-            }
-            else if (data.message === 'sync-stash-force') {
-                await sync(true);
-                sendResponse('done');
-            }
             else if (data.message === 'make-stash-gist') {
                 if (!navigator.onLine) { 
                     sendResponse('failed');
@@ -95,7 +95,8 @@ import {
                 else {
                     handleError('Unable to make stash.json gist.');
                 }  
-                await sync(true);              
+                const stashFromGist = await getGistContents();
+                await storageSet('stash', stashFromGist.stash);            
                 sendResponse('done');
             }
         })();
@@ -136,7 +137,10 @@ import {
     // Automatically sync links to gist every 15min //
     const delay = (1000 * 60 * 15); // 15min
     setTimeout(async function pollSync() {
-        await sync();
+        const gitCreds = await getGitCredsSaved();
+        if (!gitCreds) { return; }
+        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        logThis(['Gist stash have been updated.']);
         setTimeout(pollSync, delay)
     }, delay);
 })();
