@@ -143,11 +143,9 @@ async function setArcTheme() {
 }
 
 function setEvents() {
-    // chrome.tabs.create({ url: newURL });
     function handleOnLinkClick(e) {
         e.preventDefault();
         openInNewTab(e.currentTarget.href);
-        //window.close();
     }
 
     async function handleOnDeleteItem(e) {

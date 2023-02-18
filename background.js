@@ -5,11 +5,11 @@ import {
     storageGet,
     logThis,
     getGitCredsSaved,
-    makeStashGist,
     sendErrorToast,
     handleError,
     setGistContents,
-    getGistContents
+    getGistContents,
+    makeStashGistWithToken
 } from './lib/helpers.js';
 
 
@@ -51,7 +51,7 @@ import {
                     const STASH = await storageGet('stash');
                     const REF_STASH = await storageGet('referenceStash');
                     if (JSON.stringify(STASH) !== JSON.stringify(REF_STASH)) {
-                        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+                        await setGistContents(STASH);
                         await storageSet('referenceStash', STASH);
                         logThis(['Gist stash have been updated.']);
                     }
@@ -85,7 +85,7 @@ import {
                     sendResponse('failed');
                     return; 
                 }               
-                const res = await makeStashGist(data.data.gitToken);
+                const res = await makeStashGistWithToken(data.data.gitToken);
                 if (res?.id) {
                     await storageSet('gistLink', {
                         link: res?.url ?? 'none',
@@ -94,6 +94,8 @@ import {
                 }
                 else {
                     handleError('Unable to make stash.json gist.');
+                    sendResponse('done');
+                    return;
                 }  
                 const stashFromGist = await getGistContents();
                 await storageSet('stash', stashFromGist.stash);            
@@ -131,7 +133,7 @@ import {
             message: 'tab-added-to-stash'
         });
         // await sync();
-        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        await setGistContents(STASH);
         await storageSet('referenceStash', STASH);
     }
 
@@ -140,7 +142,7 @@ import {
     setTimeout(async function pollSync() {
         const gitCreds = await getGitCredsSaved();
         if (!gitCreds) { return; }
-        await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        await setGistContents(STASH);
         await storageSet('referenceStash', STASH);
         logThis(['Gist stash have been updated.']);
         setTimeout(pollSync, delay)
