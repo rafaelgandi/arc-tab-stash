@@ -132,6 +132,7 @@ import {
         });
         // await sync();
         await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        await storageSet('referenceStash', STASH);
     }
 
     // Automatically sync links to gist every 15min //
@@ -140,6 +141,7 @@ import {
         const gitCreds = await getGitCredsSaved();
         if (!gitCreds) { return; }
         await setGistContents(gitCreds.token, gitCreds.gist.id, STASH);
+        await storageSet('referenceStash', STASH);
         logThis(['Gist stash have been updated.']);
         setTimeout(pollSync, delay)
     }, delay);
