@@ -179,6 +179,7 @@ main .bstash-setting .bstash-settings-branding {
 }
 
 main .bstash-setting section {
+  position: relative;
   margin: calc(var(--app-spacing) * 1.5) 0;
   margin-bottom: var(--app-spacing);
 }
@@ -193,6 +194,11 @@ main .bstash-setting section header {
   align-items: center;
   gap: 0;
   margin-bottom: .5rem;
+}
+
+main .bstash-setting section header.no-icon {
+  grid-template-columns: 1fr;
+  margin-bottom: 4.5rem;
 }
 
 main .bstash-setting section header img {
@@ -229,6 +235,15 @@ main .bstash-setting section p {
   color: #939493;
 }
 
+main .bstash-setting section #bstash-shortcut-key-img {
+  width: 100%;
+  margin: 0 auto;
+  position: absolute;
+  top: -3px;
+  left: -30px;
+  right: 0;
+}
+
 main .bstash-setting #bstash-settings-save-button {
   display: block;
   width: 30%;
@@ -244,7 +259,6 @@ main .bstash-setting .bstash-settings-branding {
   text-align: left;
   color: #939493;
   width: 100%;
-  margin-top: var(--app-spacing);
   padding-top: .5rem;
   padding-bottom: .2rem;
   font-size: .5rem;

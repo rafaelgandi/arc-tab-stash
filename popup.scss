@@ -169,7 +169,8 @@ main {
             position: relative;
             z-index: 5000 !important;
         }
-        section {          
+        section {  
+            position: relative;        
             margin: calc(var(--app-spacing) * 1.5) 0;
             margin-bottom: var(--app-spacing);
             // border-bottom: 1px solid #eee;
@@ -185,6 +186,10 @@ main {
                 // * {
                 //     outline: 1px solid blue;
                 // }
+                [SELF].no-icon {
+                    grid-template-columns: 1fr;
+                    margin-bottom: 4.5rem;
+                }
                 img {
                     --size: 20px;
                     width: var(--size);
@@ -216,6 +221,15 @@ main {
                 // outline: 1px solid red;
                 color: #939493;
             }
+            #bstash-shortcut-key-img {
+                width: 100%; 
+                margin: 0 auto;
+                position: absolute;
+                top: -3px;
+                left: -30px;
+                right: 0;
+                // outline: 1px solid red;
+            }
         }
         #bstash-settings-save-button {
             display: block;
@@ -231,7 +245,7 @@ main {
             text-align: left;
             color: #939493;
             width: 100%;
-            margin-top: var(--app-spacing);
+            // margin-top: var(--app-spacing);
             padding-top: .5rem;
             padding-bottom: .2rem;
             font-size: .5rem;

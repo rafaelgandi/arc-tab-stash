@@ -142,6 +142,7 @@ import {
     setTimeout(async function pollSync() {
         const gitCreds = await getGitCredsSaved();
         if (!gitCreds) { return; }
+        const STASH = await storageGet('stash')
         await setGistContents(STASH);
         await storageSet('referenceStash', STASH);
         logThis(['Gist stash have been updated.']);
