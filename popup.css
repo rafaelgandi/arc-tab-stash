@@ -273,7 +273,6 @@ footer {
   bottom: 0;
   left: 0;
   width: 100%;
-  min-height: 1.5rem;
   backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, .3);
   z-index: 1000;
@@ -281,11 +280,13 @@ footer {
   grid-template-columns: 15% 1fr 15%;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
 footer .bstash-footer-child {
   text-align: center;
   padding: .3rem;
+  padding-bottom: .2rem;
 }
 
 footer .bstash-footer-child img.bstash-footer-control {

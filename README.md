@@ -5,7 +5,7 @@
 A tiny browser extension that stashes and syncs your favorite websites across multiple browsers and accounts.
 
 <p align="center">
-    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/ba4a52f0-e861-438d-b2ab-6ca502ce5e17/Screenshot_2023-02-11_at_11.35.00_PM-removebg-preview.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230213%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230213T055614Z&X-Amz-Expires=86400&X-Amz-Signature=b9ddccd5fe7f296fe83fa211d1e8d8925706496c61c00e4517d89fa008351479&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Screenshot_2023-02-11_at_11.35.00_PM-removebg-preview.png%22&x-id=GetObject" />
+    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7c97273e-4aaa-41a0-a506-76a7b7b53b87/stash-ss.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45/20230218/us-west-2/s3/aws4_request&X-Amz-Date=20230218T094411Z&X-Amz-Expires=86400&X-Amz-Signature=c1cc533c73d466a6f4228f7720f0c472472dd42abc86e7f98566cc36d0be795e&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22stash-ss.png%22&x-id=GetObject" />
 </p>
 
 ## Features
