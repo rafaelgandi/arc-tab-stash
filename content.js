@@ -1,4 +1,7 @@
-/* This runs after a web page loads */
+/*
+    Stash
+    www.rafaelgandi.com
+*/
 (async () => {
     function getArcColor(name) {
         return document.documentElement.style.getPropertyValue(name) ?? null;

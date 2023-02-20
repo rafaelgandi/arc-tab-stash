@@ -1,4 +1,7 @@
-
+/*
+    Stash
+    www.rafaelgandi.com
+*/
 import {
     sendMessageToActiveTab,
     storageSet,
@@ -182,7 +185,16 @@ function setEvents() {
         toggleSettingsVisibility(false);
     }
 
-    function onSettingsCancelButtonClicked() {
+    async function onSettingsCancelButtonClicked() {
+        if ($githubTokenInput.val().trim() === '') { 
+            $githubTokenInput.addClass('error');
+            return; 
+        }
+        const gitToken = await storageGet('gitToken');
+        if (gitToken.trim() === '') {
+            $githubTokenInput.addClass('error');
+            return;
+        }
         toggleSettingsVisibility(false);
     }
     

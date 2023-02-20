@@ -1,3 +1,7 @@
+/*
+    Stash
+    www.rafaelgandi.com
+*/
 import {
     getCurrentTabData,
     sendMessageToActiveTab,
