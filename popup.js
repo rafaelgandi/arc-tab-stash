@@ -19,6 +19,7 @@ const $settingsButton = $('#bstash-footer-settings-button');
 const $emptyListMessage = $('.bstash-empty-con');
 const $settingsCon = $('.bstash-setting');
 const $settingSaveButton = $('#bstash-settings-save-button');
+const $settingCancelButton = $('#bstash-settings-cancel-button');
 const $githubTokenInput = $('#bstash-setting-git-token-input');
 const $msgCon = $('#bstash-msg-con');
 const $blockElem = $('#bstash-blocker');
@@ -40,8 +41,6 @@ function block(doBlock = true) {
 async function saveSettingDetails() {
     const tokenFromUser = $githubTokenInput.val().trim();
     if (tokenFromUser === '') { return; }
-    const savedToken = await storageGet('gitToken');
-    if (savedToken === tokenFromUser) { return; }
     block(true);
     await storageSet('gitToken', tokenFromUser);
     await sendMessageToBg({ 
@@ -182,12 +181,17 @@ function setEvents() {
         refreshList();
         toggleSettingsVisibility(false);
     }
+
+    function onSettingsCancelButtonClicked() {
+        toggleSettingsVisibility(false);
+    }
     
     $ul
         .on('click', 'a', handleOnLinkClick)
         .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
     $addCurrentPageButton.on('click', onAddCurrentTab);
     $settingsButton.on('click', onSettingsButtonClicked);
+    $settingCancelButton.on('click', onSettingsCancelButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
     $githubTokenInput.on('focus', () => $githubTokenInput.removeClass('error'));
 }
@@ -196,7 +200,10 @@ function setEvents() {
 // main //
 (async () => {
     chrome.runtime.connect({ name: "popup" });
-    setArcTheme();
+    // LM: 2023-02-20 13:58:37 [Add a little delay to make sure that the content script listenere is already setup]
+    setTimeout(() => {
+        setArcTheme();
+    });   
     await populateList();
     setEvents();
     const gitCreds = await getGitCredsSaved();

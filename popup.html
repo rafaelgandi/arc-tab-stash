@@ -17,6 +17,7 @@
         <div class="bstash-list-con">
             <ul></ul>
         </div>
+
         <div class="bstash-setting hide-settings">
             <section>
                 <header>
@@ -25,20 +26,15 @@
                 </header>
                 <input type="text" id="bstash-setting-git-token-input" placeholder="token..." />
                 <p>
-                    Your github access token. Instructions on how to make one can be found <a href="#" target="_blank">here</a>.
+                    Instructions on how to make one can be found <a href="#" target="_blank">here</a>.
                 </p>
             </section>
-            <section>
-                <header class="no-icon">
-                    <span>Adding To Your Stash</span>
-                </header>
-                <img id="bstash-shortcut-key-img"src="./assets/StashShortcutKeys.png" alt="Shift + Option + S"/>
-            </section>
-            <button id="bstash-settings-save-button">Done</button>
-            <div class="bstash-settings-branding">
-                Made with <i>🤙</i> by <a href="https://rafaelgandi.com" target="_blank">Rafael G.</a>
+            <div class="bstash-settings-button-con">
+                <button id="bstash-settings-save-button">Save</button>     
+                <button id="bstash-settings-cancel-button">Close</button>         
             </div>
         </div>
+
         <footer>
             <div class="bstash-footer-child" title="Stash current tab.">
                 <img title="Add current tab to stash [Shift + Opt + S]" id="bstash-footer-add-tab-button" class="bstash-footer-control" src="./assets/add.svg" />

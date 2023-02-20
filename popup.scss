@@ -139,12 +139,12 @@ main {
         top: 1rem;
         left: .5rem;
         right: .5rem;
-        min-height: 200px;
+        // min-height: 200px;
         // background-color: #fff;
         backdrop-filter: blur(10px);
         background-color: rgba(255, 255, 255, .9);
         z-index: 90000;
-        border-radius: 10px;
+        border-radius: 15px;
         box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
         [--before] {
             content: '';
@@ -174,7 +174,11 @@ main {
             margin: calc(var(--app-spacing) * 1.5) 0;
             margin-bottom: var(--app-spacing);
             // border-bottom: 1px solid #eee;
-            [-first-child] {
+            // * {
+            //     background-color: rgba(0, 255, 255, 0.2);
+            //     outline: 1px solid blue;
+            // }
+            [-first-child], [-last-child] {
                 margin-top: 0;
             }
             header {
@@ -183,13 +187,10 @@ main {
                 align-items: center;
                 gap: 0;
                 margin-bottom: .5rem;
+                user-select: none;
                 // * {
                 //     outline: 1px solid blue;
                 // }
-                [SELF].no-icon {
-                    grid-template-columns: 1fr;
-                    margin-bottom: 4.5rem;
-                }
                 img {
                     --size: 20px;
                     width: var(--size);
@@ -220,37 +221,37 @@ main {
                 text-align: justify;
                 // outline: 1px solid red;
                 color: #939493;
-            }
-            #bstash-shortcut-key-img {
-                width: 100%; 
-                margin: 0 auto;
-                position: absolute;
-                top: -3px;
-                left: -30px;
-                right: 0;
-                // outline: 1px solid red;
+                user-select: none;
             }
         }
-        #bstash-settings-save-button {
-            display: block;
-            width: 30%;
+        .bstash-settings-button-con {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            align-items: center;
+            justify-content: center;
+            width: 50%;
             margin: 0 auto;
-            padding: .2rem .5rem;
-            background-color: #fff;
-            border: 1px solid #ccc; 
-            border-radius: 3px;
-            color: #000;
-        }
-        .bstash-settings-branding {
-            text-align: left;
-            color: #939493;
-            width: 100%;
-            // margin-top: var(--app-spacing);
-            padding-top: .5rem;
-            padding-bottom: .2rem;
-            font-size: .5rem;
-            i {
-                font-size: .9rem;
+            margin-bottom: 1rem;
+            button {
+                display: block;
+                // width: 30%;
+                margin: 0 auto;
+                padding: .2rem .5rem;
+                color: #000;
+                width: 100%;
+            }
+            #bstash-settings-save-button {               
+                background-color: #fff;
+                border: 1px solid #ccc; 
+                border-radius: 3px;
+                
+            }
+            #bstash-settings-cancel-button {
+                background-color: transparent;
+                border: 0;
+                opacity: .5;
+                // font-size: .95em;
             }
         }
     }
