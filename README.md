@@ -21,7 +21,7 @@ A tiny browser extension that stashes and syncs your favorite websites across mu
 
 Quickly add a website to your stash using this handy key combination.
 <p align="center">
-    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/d05c6382-dead-4493-9d98-24a97813b0d0/Stash_Shortcut_Keys.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230218%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230218T074853Z&X-Amz-Expires=86400&X-Amz-Signature=1c92e498f0f68b4e8b29eefeae4a3e404dad2339b20054675429b7adfd38bd43&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22Stash%2520Shortcut%2520Keys.png%22&x-id=GetObject" />
+    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/680fe0ed-335c-41ac-ae6c-92c8f374e8dc/shortcutkeyssvg.svg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20230220%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230220T091648Z&X-Amz-Expires=86400&X-Amz-Signature=b3551365bb9007e37dbc3a4bcb60847f2f3be10e69a03436c7e0deea23e985c1&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22shortcutkeyssvg.svg%22&x-id=GetObject" />
 </p>
 
 *(For Windows use: **Shift + Alt + S**)*
