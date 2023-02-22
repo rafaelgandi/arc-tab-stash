@@ -27,9 +27,17 @@ Quickly add a website to your stash using this handy key combination.
 *(For Windows users: **Shift + Alt + S**)*
 
 
-## System Requirements
+## Requirements
 - A Github account. *— The extension uses a Github secret gist to store your encrypted data.*
 - A *Chromium* based browser.
+
+
+<p align="center">
+    <br>
+    <a href="https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517">
+        <img src="https://lh3.googleusercontent.com/pw/AMWts8AeZJKtK-wWKkTkDnQdQ_ggJ_fbtA1Hk5J4pmByPBRMCDiDVLdoVDovH1hbW1P-B2GiZALTmc2K_UJpZteflduvV4qYYTidWd13rCk95c3yL7eEKoau-mf385IsOAKyTStU4PlVnmRqyzhS9e4Fv4UKAQ=w272-h88-no?authuser=0" />
+    </a>
+</p>
 
 ## Feedback
 Feel free to reach out to me through email at [rafaelgandi@gmail.com](mailto:rafaelgandi@gmail.com) or at [rafaelgandi.com/contact](https://rafaelgandi.com/contact) if you have any questions or feedback! Hope you find this extension useful 🚀
