@@ -223,6 +223,11 @@ function setEvents() {
         $githubTokenInput.val(gitCreds.token);
         $msgCon.text('Syncing...');
         const stashFromGist = await getGistContents();
+        // logThis(['aaa', stashFromGist]);
+        if (!stashFromGist) {
+            $msgCon.text('🤕');
+            return;
+        }
         await storageSet('stash', stashFromGist.stash);
         refreshList();
         $msgCon.text('');
