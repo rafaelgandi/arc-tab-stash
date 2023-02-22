@@ -13,13 +13,15 @@ import {
     handleError,
     setGistContents,
     getGistContents,
-    makeStashGistWithToken
+    makeStashGistWithToken,
+    openInNewTab
 } from './lib/helpers.js';
 
 
 (async () => {
     let stashDebouncer = undefined;
     const stashDebouncerDelay = 800; // ms
+    const stashNotionPage = `https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517`;
 
     chrome.runtime.onInstalled.addListener(() => {
         console.log('Running on install listeners');
@@ -40,6 +42,7 @@ import {
                 });
             }
             storageSet('referenceStash', []);
+            openInNewTab(stashNotionPage);
         })();
     });
 

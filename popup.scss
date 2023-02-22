@@ -127,6 +127,12 @@ main {
             font-size: 1.5em;
             opacity: .6;
             // outline: 2px solid blue;
+            img {
+                display: block;
+                margin: 0 auto;
+                width: 80%;
+                margin-top: var(--app-spacing);
+            }
         }
     }
 

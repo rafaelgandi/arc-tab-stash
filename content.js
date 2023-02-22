@@ -22,7 +22,7 @@
     }
 
     function presentToast(msg, type = 'okay') {
-        const { arcPaletteTitle, arcBGGradients } = getArcPalette();
+        // const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({
             text: msg,
             duration: 5000,
@@ -62,4 +62,10 @@
         }
         return true;
     });
+
+    // Do something if we are at the Stash home notion page. //
+    if (window.location.href.indexOf('rafaelgandi.notion.site/Stash') !== -1) {
+        
+    }
+
 })();

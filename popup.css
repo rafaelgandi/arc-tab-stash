@@ -134,6 +134,13 @@ main .bstash-empty-con div {
   opacity: .6;
 }
 
+main .bstash-empty-con div img {
+  display: block;
+  margin: 0 auto;
+  width: 80%;
+  margin-top: var(--app-spacing);
+}
+
 main .bstash-setting {
   display: block;
   transition: all .1s ease-out;
