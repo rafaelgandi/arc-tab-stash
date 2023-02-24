@@ -1,7 +1,7 @@
 {
     "name": "Stash",
     "description": "A tiny browser extension that saves and syncs your favorite links across all your chromium browsers.",
-    "version": "0.0.0.2",
+    "version": "0.0.0.3",
     "manifest_version": 3,
     "minimum_chrome_version": "92",
     "icons": {
@@ -37,8 +37,10 @@
     ],
     "permissions": [
         "storage",
-        "tabs"
+        "tabs",
+        "scripting"
     ],
+    "host_permissions": ["*://*/"],
     "background": {
         "service_worker": "background.js",
         "type": "module"
@@ -46,8 +48,7 @@
     "action": {
         "default_popup": "popup.html"
     },
-    "commands": {
-       
+    "commands": {      
         "stash-current-tab": {
             "suggested_key": {
                 "default": "Alt+Shift+S",

@@ -3,24 +3,6 @@
     www.rafaelgandi.com
 */
 (async () => {
-    function getArcColor(name) {
-        return document.documentElement.style.getPropertyValue(name) ?? null;
-    }
-
-    function getArcPalette() {
-        return {
-            'arcPaletteTitle': getArcColor('--arc-palette-title'),
-            'arcBGGradients': [
-                getArcColor('--arc-background-gradient-color0'),
-                getArcColor('--arc-background-gradient-color1'),
-                getArcColor('--arc-background-gradient-color2'),
-                getArcColor('--arc-background-gradient-overlay-color0'),
-                getArcColor('--arc-background-gradient-overlay-color1'),
-                getArcColor('--arc-background-gradient-overlay-color2')
-            ]
-        };
-    }
-
     function presentToast(msg, type = 'okay') {
         // const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({
@@ -32,22 +14,13 @@
             stopOnFocus: true, // Prevents dismissing of toast on hover
             className: (type === 'okay') ? '__stash-toast' : '__stash-toast--danger',
             style: {   
-                padding: 'calc(1rem / 2) 1rem',
-                // color: arcPaletteTitle ?? '#092609',            
-                //background: `linear-gradient(140deg, ${arcBGGradients.filter((color) => !!color).join(', ')}) !important`,
-            },
-            onClick: function () { } // Callback after click
+                padding: 'calc(1rem / 2) 1rem'
+            }
         }).showToast();
     }
 
-    chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
-        // console.log(data, 'hohoho');
-        if (data.message === 'get-arc-colors') {
-            // See: https://arc.net/colors.html
-            sendResponse(getArcPalette());
-        }
+    function messageHandler(data, sender, sendResponse) {
         if (data.message === 'tab-added-to-stash') {
-            // alert('Tab added to stash.');
             presentToast('Added to your stash 👍');
             sendResponse('done');
         }
@@ -56,16 +29,19 @@
             sendResponse('done');
         }
         if (data.message === 'toast-this') {
-            //console.log(data);
             presentToast(data.data.toast, data.data.type);
             sendResponse('done');
         }
         return true;
-    });
-
+    }
+    
+    function listen() {
+        chrome?.runtime?.onMessage?.removeListener(messageHandler);
+        chrome?.runtime?.onMessage?.addListener(messageHandler);
+    }
+    listen();
     // Do something if we are at the Stash home notion page. //
     if (window.location.href.indexOf('rafaelgandi.notion.site/Stash') !== -1) {
         
     }
-
 })();

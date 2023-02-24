@@ -3,7 +3,6 @@
     www.rafaelgandi.com
 */
 import {
-    sendMessageToActiveTab,
     storageSet,
     storageGet,
     openInNewTab,
@@ -11,7 +10,8 @@ import {
     logThis,
     sendMessageToBg,
     getGitCredsSaved,
-    getGistContents
+    getGistContents,
+    getCurrentTabData
 } from './lib/helpers.js';
 
 const $body = $('body');
@@ -46,13 +46,13 @@ async function saveSettingDetails() {
     if (tokenFromUser === '') { return; }
     block(true);
     await storageSet('gitToken', tokenFromUser);
-    await sendMessageToBg({ 
+    await sendMessageToBg({
         message: 'make-stash-gist',
         data: {
             gitToken: tokenFromUser
-        } 
-    }); 
-    block(false); 
+        }
+    });
+    block(false);
 }
 
 
@@ -126,10 +126,43 @@ async function refreshList() {
     return await populateList();
 }
 
-async function setArcTheme() {
-    const response = await sendMessageToActiveTab({
-        message: 'get-arc-colors'
+// LM: 2023-02-24 11:16:10 [Use scripting instead of messages for accessing active tabs colors]
+async function getArcSpaceColors() {
+    const tab = await getCurrentTabData();
+    if (tab.url.startsWith('chrome://') || tab.url.startsWith('arc://')) {
+        return;
+    }
+    // See: https://developer.chrome.com/docs/extensions/reference/scripting/#manifest
+    const res = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => { 
+            function getArcColor(name) {
+                // return document.documentElement.style.getPropertyValue(name) ?? null;
+                return window.getComputedStyle(document.documentElement).getPropertyValue(name) ?? null;
+            }
+            
+            function getArcPalette() {
+                return {
+                    'arcPaletteTitle': getArcColor('--arc-palette-title'),
+                    'arcBGGradients': [
+                        getArcColor('--arc-background-gradient-color0'),
+                        getArcColor('--arc-background-gradient-color1'),
+                        getArcColor('--arc-background-gradient-color2'),
+                        getArcColor('--arc-background-gradient-overlay-color0'),
+                        getArcColor('--arc-background-gradient-overlay-color1'),
+                        getArcColor('--arc-background-gradient-overlay-color2')
+                    ]
+                };
+            }
+            return getArcPalette();
+        }
     });
+    return res?.[0]?.result;
+}
+
+
+async function setArcTheme() {
+    const response = await getArcSpaceColors();
     if (response) {
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
@@ -176,9 +209,9 @@ function setEvents() {
     }
 
     async function onSettingSaved() {
-        if ($githubTokenInput.val().trim() === '') { 
+        if ($githubTokenInput.val().trim() === '') {
             $githubTokenInput.addClass('error');
-            return; 
+            return;
         }
         await saveSettingDetails();
         refreshList();
@@ -186,9 +219,9 @@ function setEvents() {
     }
 
     async function onSettingsCancelButtonClicked() {
-        if ($githubTokenInput.val().trim() === '') { 
+        if ($githubTokenInput.val().trim() === '') {
             $githubTokenInput.addClass('error');
-            return; 
+            return;
         }
         const gitToken = await storageGet('gitToken');
         if (gitToken.trim() === '') {
@@ -197,7 +230,7 @@ function setEvents() {
         }
         toggleSettingsVisibility(false);
     }
-    
+
     $ul
         .on('click', 'a', handleOnLinkClick)
         .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
@@ -215,7 +248,7 @@ function setEvents() {
     // LM: 2023-02-20 13:58:37 [Add a little delay to make sure that the content script listenere is already setup]
     setTimeout(() => {
         setArcTheme();
-    });   
+    });
     await populateList();
     setEvents();
     const gitCreds = await getGitCredsSaved();
@@ -236,4 +269,5 @@ function setEvents() {
         // Show settings modal if notion integration is not set yet //
         toggleSettingsVisibility(true);
     }
+
 })();
