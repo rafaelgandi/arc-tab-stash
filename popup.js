@@ -144,6 +144,7 @@ async function getArcSpaceColors() {
             function getArcPalette() {
                 return {
                     'arcPaletteTitle': getArcColor('--arc-palette-title'),
+                    'arcBGSimpleColor': getArcColor('--arc-background-simple-color'),
                     'arcBGGradients': [
                         getArcColor('--arc-background-gradient-color0'),
                         getArcColor('--arc-background-gradient-color1'),
@@ -167,6 +168,11 @@ async function setArcTheme() {
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
             $body.css('background', `linear-gradient(140deg, ${arcBGGradients.join(', ')})`);
+        }
+        else {
+            if (response.arcBGSimpleColor) {
+                $body.css('background', response.arcBGSimpleColor);
+            }
         }
         const $style = $('<style />');
         $style.text(`

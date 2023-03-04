@@ -236,6 +236,7 @@ main .bstash-setting section p {
   font-size: .7rem;
   color: #939493;
   user-select: none;
+  line-height: 1rem;
 }
 
 main .bstash-setting .bstash-settings-button-con {
