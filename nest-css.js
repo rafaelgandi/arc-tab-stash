@@ -1,4 +1,11 @@
-// LM: 2023-01-30 10:07:47 [Used so that I can write nested css without installing any complicated libraries.]
+/*
+    🌈 Nest CSS (https://github.com/rafaelgandi/nest-css)
+    Used so that I can write nested css without installing any complicated libraries and build process.
+    Uses https://github.com/multiprocessio/cssplus as a primary parser.
+*/
+
+
+// LM: 2023-03-07 14:35:56 []
 const { watch, readFileSync, writeFileSync, readdirSync, lstatSync} = require('fs');
 const path = require('path');
 
@@ -52,13 +59,13 @@ watch(srcDir,(eventType, filename) => {
 
 function fixPseudoSelectors(css) {
     const oneColonRegExp = /(\[\-)/gm;
-    const twoColonRegExp = /(\:\-)/gm;  
+    const twoColonRegExp = /(\[\:\-)/gm;  
     const pseuRegExp = /(\s+)(\[)(.+)(\])/gm;
     const selfRegExp = /(\s+\[SELF\])/gm;
     return css
     .replace(selfRegExp, '')
     .replace(oneColonRegExp, '[:')
-    .replace(twoColonRegExp, '::')
+    .replace(twoColonRegExp, '[::')
     .replace(pseuRegExp, "$3");
 }
 
