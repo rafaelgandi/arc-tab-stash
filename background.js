@@ -33,6 +33,8 @@ import {
             const gitToken = await storageGet('gitToken');
             if (!gitToken) {
                 storageSet('gitToken', '');
+                // LM: 2023-03-10 13:34:22 [Only open notion page if token does not exist. This means that its a fresh install.]
+                openInNewTab(stashNotionPage);
             }
             const gistLink = await storageGet('gistLink');
             if (!gistLink) {
@@ -42,7 +44,6 @@ import {
                 });
             }
             storageSet('referenceStash', []);
-            openInNewTab(stashNotionPage);
         })();
     });
 

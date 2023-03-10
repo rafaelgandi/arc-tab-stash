@@ -144,14 +144,13 @@ main .bstash-empty-con div img {
 main .bstash-setting {
   display: block;
   transition: all .1s ease-out;
-  padding: var(--app-spacing);
-  padding-bottom: .1rem;
+  padding: 5px;
   position: fixed;
   top: 1rem;
   left: .5rem;
   right: .5rem;
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, .9);
+  background-color: rgba(255, 255, 255, .6);
   z-index: 90000;
   border-radius: 15px;
   box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
@@ -178,24 +177,30 @@ main .bstash-setting a {
 }
 
 main .bstash-setting section,
-main .bstash-setting button,
-main .bstash-setting .bstash-settings-branding {
+main .bstash-setting button {
   position: relative;
   z-index: 5000 !important;
 }
 
-main .bstash-setting section {
+main .bstash-setting .bstash-setting-border {
+  padding: var(--app-spacing);
+  padding-bottom: .1rem;
+  border-radius: 11px;
+  box-shadow: -1px -1px 10px 1px rgba(0,0,0,0.16);
+}
+
+main .bstash-setting .bstash-setting-border section {
   position: relative;
   margin: calc(var(--app-spacing) * 1.5) 0;
   margin-bottom: var(--app-spacing);
 }
 
-main .bstash-setting section:first-child,
-main .bstash-setting section:last-child {
+main .bstash-setting .bstash-setting-border section:first-child,
+main .bstash-setting .bstash-setting-border section:last-child {
   margin-top: 0;
 }
 
-main .bstash-setting section header {
+main .bstash-setting .bstash-setting-border section header {
   display: grid;
   grid-template-columns: 10% 1fr;
   align-items: center;
@@ -204,19 +209,20 @@ main .bstash-setting section header {
   user-select: none;
 }
 
-main .bstash-setting section header img {
+main .bstash-setting .bstash-setting-border section header img {
   --size: 20px;
   width: var(--size);
   height: var(--size);
 }
 
-main .bstash-setting section header span {
+main .bstash-setting .bstash-setting-border section header span {
   text-align: left;
   font-weight: 500;
   font-size: .8rem;
 }
 
-main .bstash-setting section input[type="text"] {
+main .bstash-setting .bstash-setting-border section input[type="text"] {
+  background-color: #fff;
   display: block;
   padding: .5rem;
   outline: none;
@@ -226,47 +232,45 @@ main .bstash-setting section input[type="text"] {
   font-family: 'Courier New', Courier, monospace;
 }
 
-main .bstash-setting section input[type="text"].error {
-  border-color: #de5248;
+main .bstash-setting .bstash-setting-border section input[type="text"].error {
+  border: 1px dashed #de5248;
 }
 
-main .bstash-setting section p {
+main .bstash-setting .bstash-setting-border section p {
   color: #939493;
   margin: .2rem 0;
   font-size: .7rem;
-  color: #939493;
   user-select: none;
   line-height: 1rem;
 }
 
-main .bstash-setting .bstash-settings-button-con {
+main .bstash-setting .bstash-setting-border .bstash-settings-button-con {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
   align-items: center;
   justify-content: center;
-  width: 50%;
+  width: 70%;
   margin: 0 auto;
   margin-bottom: 1rem;
 }
 
-main .bstash-setting .bstash-settings-button-con button {
+main .bstash-setting .bstash-setting-border .bstash-settings-button-con button {
   display: block;
   margin: 0 auto;
   padding: .2rem .5rem;
   color: #000;
   width: 100%;
-}
-
-main .bstash-setting .bstash-settings-button-con #bstash-settings-save-button {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-}
-
-main .bstash-setting .bstash-settings-button-con #bstash-settings-cancel-button {
   background-color: transparent;
   border: 0;
+  cursor: pointer;
+}
+
+main .bstash-setting .bstash-setting-border .bstash-settings-button-con #bstash-settings-save-button:hover {
+  text-shadow: 1px 0px 9px rgba(233,228,40,0.6);
+}
+
+main .bstash-setting .bstash-setting-border .bstash-settings-button-con #bstash-settings-cancel-button {
   opacity: .5;
 }
 

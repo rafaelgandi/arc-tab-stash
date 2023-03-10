@@ -103,7 +103,11 @@ async function populateList() {
                         <img src="${item.favIconUrl}" />
                         <span class="bstash-title">${item.title}</span>
                     </a>
-                    <img class="bstash-trash-icon" src="./assets/trash.svg" data-stash-id="${item.id}" />
+                    <img 
+                        class="bstash-trash-icon" 
+                        src="./assets/trash.svg" 
+                        data-stash-id="${item.id}" 
+                    />
                 </li>
             `);
         });
@@ -237,11 +241,22 @@ function setEvents() {
         toggleSettingsVisibility(false);
     }
 
+    function onTrashIconHover(e) {
+        logThis([e])
+        if (e.currentTarget.src.indexOf('warn') === -1) {
+            e.currentTarget.src = './assets/trash-warn.svg';
+            return;
+        }
+        e.currentTarget.src = './assets/trash.svg';
+    }
+
     $ul
         .on('click', 'a', handleOnLinkClick)
-        .on('click', 'img.bstash-trash-icon', handleOnDeleteItem);
-    $addCurrentPageButton.on('click', onAddCurrentTab);
-    $settingsButton.on('click', onSettingsButtonClicked);
+        .on('click', 'img.bstash-trash-icon', handleOnDeleteItem)
+        .on('mouseover', 'img.bstash-trash-icon', onTrashIconHover)
+        .on('mouseout', 'img.bstash-trash-icon', onTrashIconHover);
+    $addCurrentPageButton.on('mousedown', onAddCurrentTab);
+    $settingsButton.on('mousedown', onSettingsButtonClicked);
     $settingCancelButton.on('click', onSettingsCancelButtonClicked);
     $settingSaveButton.on('click', onSettingSaved);
     $githubTokenInput.on('focus', () => $githubTokenInput.removeClass('error'));
