@@ -242,9 +242,9 @@ function setEvents() {
     }
 
     function onTrashIconHover(e) {
-        logThis([e])
-        if (e.currentTarget.src.indexOf('warn') === -1) {
-            e.currentTarget.src = './assets/trash-warn.svg';
+        // logThis([e])
+        if (e.currentTarget.src.indexOf('-open') === -1) {
+            e.currentTarget.src = './assets/trash-open.svg';
             return;
         }
         e.currentTarget.src = './assets/trash.svg';
