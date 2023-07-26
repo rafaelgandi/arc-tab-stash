@@ -54,8 +54,9 @@ main .bstash-list-con ul li {
   display: block;
   margin-top: calc(var(--app-spacing) / 2);
   padding: calc(var(--app-spacing) / 2);
+  padding-left: calc(var(--app-spacing) / 1.3);
   background-color: rgba(255, 255, 255, .5);
-  border-radius: 5px;
+  border-radius: 13px;
   transition: all .3s linear;
 }
 

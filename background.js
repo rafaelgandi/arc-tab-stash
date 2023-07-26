@@ -8,22 +8,17 @@ import {
     storageSet,
     storageGet,
     logThis,
-    getGitCredsSaved,
-    sendErrorToast,
     handleError,
-    setGistContents,
-    getGistContents,
-    makeStashGistWithToken,
     openInNewTab
 } from './lib/helpers.js';
-
+import * as api from './lib/api.js';
 
 (async () => {
     let stashDebouncer = undefined;
     const stashDebouncerDelay = 800; // ms
     const stashNotionPage = `https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517`;
 
-    chrome.runtime.onInstalled.addListener(() => {
+    chrome.runtime.onInstalled.addListener(function onStashExtensionInstall() {
         console.log('Running on install listeners');
         (async () => {
             const res = await storageGet('stash');
@@ -43,33 +38,27 @@ import {
                     id: ''
                 });
             }
-            storageSet('referenceStash', []);
         })();
     });
 
+    // Save stash to gist on popup close
     chrome.runtime.onConnect.addListener((port) => {
         if (port.name === "popup") {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
-            port.onDisconnect.addListener(() => {   
-                if (!navigator.onLine) { return; }          
+            port.onDisconnect.addListener(function onPopUpClose() {   
+                if (!navigator.onLine) { return; }        
                 (async () => {
-                    const gitCreds = await getGitCredsSaved();
-                    if (!gitCreds) { return; }
+                    if (!await api.getGitCredsSaved()) { return; }
                     const STASH = await storageGet('stash');
-                    const REF_STASH = await storageGet('referenceStash');
-                    if (JSON.stringify(STASH) !== JSON.stringify(REF_STASH)) {
-                        await setGistContents(STASH);
-                        await storageSet('referenceStash', STASH);
-                        logThis(['Gist stash have been updated.']);
-                    }
+                    await api.setGistContents(STASH);
                 })();
             });
         }
     });
 
     // See: https://dev.to/paulasantamaria/adding-shortcuts-to-your-chrome-extension-2i20
-    chrome.commands.onCommand.addListener((command) => {
+    chrome.commands.onCommand.addListener(function setKeyboardShortcut(command) {
         switch (command) {
             case 'stash-current-tab':
                 clearTimeout(stashDebouncer);
@@ -82,7 +71,7 @@ import {
         }
     });
 
-    chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener(function onExtensionMessaging(data, sender, sendResponse) {
         (async () => {
             if (data.message === 'stash-current-tab') {
                 await handleStashingTab();
@@ -93,19 +82,12 @@ import {
                     sendResponse('failed');
                     return; 
                 }               
-                const res = await makeStashGistWithToken(data.data.gitToken);
-                if (res?.id) {
-                    await storageSet('gistLink', {
-                        link: res?.url ?? 'none',
-                        id: res.id
-                    });                                   
+                const gistId = await api.makeStashGistWithToken(data.data.gitToken);
+                if (!gistId) {
+                    sendResponse('failed');
+                    return; 
                 }
-                else {
-                    handleError('Unable to make stash.json gist.');
-                    sendResponse('done');
-                    return;
-                }  
-                const stashFromGist = await getGistContents();
+                const stashFromGist = await api.getGistContents();
                 await storageSet('stash', stashFromGist.stash);            
                 sendResponse('done');
             }
@@ -116,14 +98,14 @@ import {
     });
 
     async function handleStashingTab() {
-        const gitCreds = await getGitCredsSaved();
+        const gitCreds = await api.getGitCredsSaved();
         if (!navigator.onLine || !gitCreds) { return; }
         const tab = await getCurrentTabData();
         if (!tab) { return; }
         const { favIconUrl, title, url, id } = tab;
         let STASH = await storageGet('stash') ?? [];
         const timestamp = (new Date()).getTime();
-        // Move the ordering by 1 so that the new link will be at the top //
+        // Incerment the ordering by 1 so that the new link will be at the top with an order of 0 //
         STASH = STASH.map((item) => {
             return {
                 ...item,
@@ -140,20 +122,6 @@ import {
         await sendMessageToActiveTab({
             message: 'tab-added-to-stash'
         });
-        // await sync();
-        await setGistContents(STASH);
-        await storageSet('referenceStash', STASH);
+        await api.setGistContents(STASH);
     }
-
-    // Automatically sync links to gist every 15min //
-    const delay = (1000 * 60 * 15); // 15min
-    setTimeout(async function pollSync() {
-        const gitCreds = await getGitCredsSaved();
-        if (!gitCreds) { return; }
-        const STASH = await storageGet('stash')
-        await setGistContents(STASH);
-        await storageSet('referenceStash', STASH);
-        logThis(['Gist stash have been updated.']);
-        setTimeout(pollSync, delay)
-    }, delay);
 })();

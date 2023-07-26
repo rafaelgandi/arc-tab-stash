@@ -9,10 +9,9 @@ import {
     removeFromStash,
     logThis,
     sendMessageToBg,
-    getGitCredsSaved,
-    getGistContents,
     getCurrentTabData
 } from './lib/helpers.js';
+import * as api from './lib/api.js';
 
 const $body = $('body');
 const $head = $('head');
@@ -28,6 +27,7 @@ const $msgCon = $('#bstash-msg-con');
 const $blockElem = $('#bstash-blocker');
 let dragAndDropCleanUpFunc = undefined;
 let STASH = [];
+let updateStashOnGistServerDebouncer = undefined;
 
 function toggleSettingsVisibility(show = false) {
     if (show) {
@@ -53,6 +53,18 @@ async function saveSettingDetails() {
         }
     });
     block(false);
+}
+
+function updateGistStashDataOnServer(wait = 1300) {
+    clearTimeout(updateStashOnGistServerDebouncer);
+    updateStashOnGistServerDebouncer = setTimeout(async () => {
+        const STASH = await storageGet('stash');
+        await api.setGistContents(STASH);
+        // $msgCon.text('Saved!');
+        // setTimeout(() => {
+        //     $msgCon.text('');
+        // }, 800);
+    }, wait);         
 }
 
 
@@ -116,6 +128,7 @@ async function populateList() {
         dragAndDropCleanUpFunc = slist($ul.get(0), async () => {
             STASH = getUpdatedListOrder();
             await storageSet('stash', STASH);
+            updateGistStashDataOnServer();
             refreshList();
         });
     }
@@ -196,9 +209,9 @@ function setEvents() {
     async function handleOnDeleteItem(e) {
         const stashId = e.currentTarget.getAttribute('data-stash-id');
         if (!stashId) { return; }
-        //logThis({stashId})
         STASH = removeFromStash(STASH, stashId);
         await storageSet('stash', STASH);
+        updateGistStashDataOnServer();
         refreshList();
     }
 
@@ -264,20 +277,17 @@ function setEvents() {
 
 
 // main //
-(async () => {
+(async function main() {
     chrome.runtime.connect({ name: "popup" });
-    // LM: 2023-02-20 13:58:37 [Add a little delay to make sure that the content script listenere is already setup]
-    setTimeout(() => {
-        setArcTheme();
-    });
+    // LM: 2023-02-20 13:58:37 [Add a little delay to make sure that the content script listeners are already setup]
+    setTimeout(() => setArcTheme());
     await populateList();
     setEvents();
-    const gitCreds = await getGitCredsSaved();
+    const gitCreds = await api.getGitCredsSaved();
     if (typeof gitCreds !== 'undefined' && navigator.onLine) {
         $githubTokenInput.val(gitCreds.token);
-        $msgCon.text('Syncing...');
-        const stashFromGist = await getGistContents();
-        // logThis(['aaa', stashFromGist]);
+        // $msgCon.text('Syncing...');
+        const stashFromGist = await api.getGistContents();
         if (!stashFromGist) {
             $msgCon.text('🤕');
             return;
