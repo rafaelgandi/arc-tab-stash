@@ -302,3 +302,13 @@ footer {
         font-style: italic;
     }
 }
+
+
+// Arc Browser specific styles
+.is-arc-browser {
+    .bstash-list-con {
+        li {
+            border: 1px dashed red;
+        }
+    }
+}

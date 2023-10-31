@@ -6,4 +6,25 @@ export type StashItem = {
     order?: number;
 };
 
+export type StashItemArray = StashItem[];
 
+
+
+// Component Property Types //
+export type StashLinkItemProps = {
+    item: StashItem; 
+    onDelete?: (stashId: string) => void;
+};
+
+export type EmptyProps = {
+    show: boolean
+};
+
+export type SettingsModalProps = {
+    show: boolean;
+};
+
+export type FooterControlsProps = {
+    onAddCurrentTabToStash?: () => void;
+    onToggleSettings?: () => void;
+};

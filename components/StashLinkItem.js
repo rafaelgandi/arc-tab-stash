@@ -3,9 +3,8 @@ import { html } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 
 /**
- * @typedef {import("../types/types.d.ts").StashItem} StashItem
  * 
- * @param {{item: StashItem, onDelete: Function | undefined}} props 
+ * @param {import("../types/types.d.ts").StashLinkItemProps} props 
  */
 export default function StashLinkItem(props) {
     const { item } = props;

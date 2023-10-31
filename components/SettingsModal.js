@@ -1,8 +1,14 @@
 import { html } from '../lib/preact-htm.js';
 
-export default function SettingsModal() {
+/**
+ * 
+ * @param {import("../types/types.d.ts").SettingsModalProps} props 
+ * @returns 
+ */
+export default function SettingsModal(props) {
+    
     return html`
-        <div class="bstash-setting hide-settings">
+        <div class=${`bstash-setting ${(!props?.show) ? 'hide-settings' : ''}`}>
             <div class="bstash-setting-border">
                 <section>
                     <header>

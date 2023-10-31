@@ -2,13 +2,11 @@ import { html } from '../lib/preact-htm.js';
 
 
 /**
- * @typedef {{show: boolean}} EmptyProps
  * 
- * @param {EmptyProps} props 
+ * @param {import("../types/types.d.ts").EmptyProps} props 
  * @returns 
  */
 export default function Empty(props) {
-    
     return html`
         <div class="bstash-empty-con ${(!!props?.show) ? '' : 'hide'}">
             <div>
