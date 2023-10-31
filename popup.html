@@ -9,50 +9,7 @@
 </head>
 
 <body>
-    <main id="arc-bookmark-stash-main">
-        <span id="tester-span"></span>
-        <div class="bstash-empty-con hide">
-            <div>
-                It&apos;s kinda lonely here 
-                <img src="./assets/shortcutkeys.svg" />
-            </div>
-        </div>
-        <div class="bstash-list-con">
-            <ul></ul>
-        </div>
-
-        <div class="bstash-setting hide-settings">
-            <div class="bstash-setting-border">
-                <section>
-                    <header>
-                        <img src="./assets/github-mark.svg" />
-                        <span>Github Access Token</span>
-                    </header>
-                    <input type="text" id="bstash-setting-git-token-input" placeholder="token..." />
-                    <p>
-                        Instructions on how to make one can be found 
-                        <a href="https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517#5ac05adc78d646f8bdbfbde1fbe907b9" target="_blank">here</a>. 
-                        If you already have a token used on Stash in another browser, paste it here to sync your data.
-                    </p>
-                </section>
-                <div class="bstash-settings-button-con">
-                    <button id="bstash-settings-save-button">⚡️ Connect</button>     
-                    <button id="bstash-settings-cancel-button">Close</button>         
-                </div>
-            </div>         
-        </div>
-
-        <footer>
-            <div class="bstash-footer-child" title="Stash current tab.">
-                <img title="Add current tab to stash (shift + opt + s)" id="bstash-footer-add-tab-button" class="bstash-footer-control" src="./assets/add.svg" />
-            </div>
-            <div id="bstash-msg-con" class="bstash-footer-child"></div>
-            <div class="bstash-footer-child">
-                <img id="bstash-footer-settings-button" class="bstash-footer-control" src="./assets/settings.svg" />
-            </div>
-        </footer>
-        <div id="bstash-blocker" class="hide"></div>
-    </main>
+    <main id="arc-bookmark-stash-main"></main>
     <script src="./lib/zepto.min.js"></script>
     <script src="./lib/slist-drag.js"></script>
     <script src="./popup.js" type="module"></script>
