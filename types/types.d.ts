@@ -22,6 +22,9 @@ export type EmptyProps = {
 
 export type SettingsModalProps = {
     show: boolean;
+    onDidDismiss: () => void;
+    onTokenSaved: () => void;
+    doBlock?: (block: boolean) => void;
 };
 
 export type FooterControlsProps = {

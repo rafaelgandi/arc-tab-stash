@@ -5,7 +5,6 @@
 import {
     storageSet,
     storageGet,
-    openInNewTab,
     removeFromStash,
     logThis,
     sendMessageToBg,
@@ -96,7 +95,7 @@ function sortByOrderProp(arr) {
     return newArr;
 }
 
-function updateGistStashDataOnServer(wait = 1300) {
+function updateGistStashDataOnServer(wait = 1000) {
     clearTimeout(updateStashOnGistServerDebouncer);
     updateStashOnGistServerDebouncer = setTimeout(async () => {
         await api.setGistContents(await storageGet('stash'));
@@ -106,6 +105,7 @@ function updateGistStashDataOnServer(wait = 1300) {
 function Stash() {
     const [stashArr, setStashArr] = useState([]);
     const [showSettings, setShowSettings] = useState(false);
+    const [block, setBlock] = useState(false);
     const ulRef = useRef(null);
     const sortableRef = useRef(null);
 
@@ -128,9 +128,34 @@ function Stash() {
         return orderedList;
     }, []);
 
+    const onAddCurrentTabToStash = useCallback(async () => {
+        setBlock(true);
+        await sendMessageToBg({
+            message: 'stash-current-tab'
+        });
+        await getFreshStashData();
+        setBlock(false);
+    }, [getFreshStashData]);
+
+    const onToggleSettings = useCallback(() => {
+        setShowSettings((prev) => !prev);
+    }, []);
+
     useSfx(async function init() {
         setArcTheme();
-        getFreshStashData();
+        await getFreshStashData(); // Show saved copy first.
+        const gitCreds = await api.getGitCredsSaved();
+        if (typeof gitCreds !== 'undefined' && navigator.onLine) {
+            const stashFromGist = await api.getGistContents(); // Make sure to query fresh data from github api
+            if (!stashFromGist) {
+                return;
+            }
+            await storageSet('stash', stashFromGist.stash);
+            getFreshStashData();
+        }
+        else {
+            setShowSettings(true);
+        }
     }, false);
 
     useSfx(async function makeListSortable() {
@@ -138,6 +163,7 @@ function Stash() {
             // See: https://github.com/SortableJS/Sortable
             const { Sortable } = await import('./lib/sortable.js');
             sortableRef.current = new Sortable(ulRef.current, {
+                ghostClass: 'drag-in-place',
                 onEnd() {
                     const newOrderedList = getUpdatedListOrder();
                     setStashArr(newOrderedList);
@@ -165,7 +191,7 @@ function Stash() {
             <ul ref=${ulRef}>
             ${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item) => {
                 return html`
-                    <li key=${item.id}>
+                    <li key=${item.id} class="">
                         <${StashLinkItem} 
                             item=${item} 
                             onDelete=${onStashItemDelete}
@@ -176,11 +202,19 @@ function Stash() {
             </ul>
         </div>
 
-        <${SettingsModal} show=${showSettings} />
+        <${SettingsModal} 
+            show=${showSettings} 
+            onDidDismiss=${() => setShowSettings(false)}
+            doBlock=${(b) => setBlock(b)}
+            onTokenSaved=${() => getFreshStashData()}
+        />
 
-        <${FooterControls} />
+        <${FooterControls} 
+            onAddCurrentTabToStash=${onAddCurrentTabToStash} 
+            onToggleSettings=${onToggleSettings}
+        />
 
-        <div id="bstash-blocker" class="hide"></div>
+        <div id="bstash-blocker" class=${(!block) ? 'hide' : ''}></div>
     `;
 }
 

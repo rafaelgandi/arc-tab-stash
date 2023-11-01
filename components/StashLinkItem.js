@@ -1,6 +1,8 @@
 
-import { html } from '../lib/preact-htm.js';
+import { html, useState } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
+import useSfx from '../hooks/useSfx.js';
+const defaultFavicon = './assets/empty_favicon.ico';
 
 /**
  * 
@@ -8,6 +10,18 @@ import { openInNewTab } from '../lib/helpers.js';
  */
 export default function StashLinkItem(props) {
     const { item } = props;
+    const [faviconPath, setFaviconPath] = useState(defaultFavicon);
+
+    useSfx(function setProperFavicon() {
+        if (item.favIconUrl) {   
+            setFaviconPath(item.favIconUrl);        
+            const img = new Image();
+            img.src = item.favIconUrl;
+            img.error = () => { // Make sure the favicon loads
+                setFaviconPath(defaultFavicon);
+            };
+        }
+    }, false);
 
     function handleOnLinkClick(e) {
         e.preventDefault();
@@ -35,11 +49,11 @@ export default function StashLinkItem(props) {
             title="${item.title}"
             data-stash-id="${item.id}" 
             data-stash-order="${item?.order ?? ''}"
-            data-stash-favicon="${item.favIconUrl}"
+            data-stash-favicon=${item.favIconUrl}
             draggable="false"
             onClick=${handleOnLinkClick}
         >
-            <img src="${item.favIconUrl}" />
+            <img src=${faviconPath} loading="eager" />
             <span class="bstash-title">${item.title}</span>
         </a>
         <img 

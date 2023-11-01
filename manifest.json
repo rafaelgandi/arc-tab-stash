@@ -56,6 +56,13 @@
                 "mac": "Alt+Shift+S"
             },
             "description": "Add current tab to my stash."
+        },
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Alt+Shift+O",
+                "mac": "Alt+Shift+O"
+            },
+            "description": "Open stash window."
         }
     }
 }

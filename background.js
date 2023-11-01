@@ -46,8 +46,8 @@ import * as api from './lib/api.js';
         if (port.name === "popup") {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
-            port.onDisconnect.addListener(function onPopUpClose() {   
-                if (!navigator.onLine) { return; }        
+            port.onDisconnect.addListener(function onPopUpClose() {
+                if (!navigator.onLine) { return; }
                 (async () => {
                     if (!await api.getGitCredsSaved()) { return; }
                     const STASH = await storageGet('stash');
@@ -78,17 +78,17 @@ import * as api from './lib/api.js';
                 sendResponse('done');
             }
             else if (data.message === 'make-stash-gist') {
-                if (!navigator.onLine) { 
+                if (!navigator.onLine) {
                     sendResponse('failed');
-                    return; 
-                }               
+                    return;
+                }
                 const gistId = await api.makeStashGistWithToken(data.data.gitToken);
                 if (!gistId) {
                     sendResponse('failed');
-                    return; 
+                    return;
                 }
                 const stashFromGist = await api.getGistContents();
-                await storageSet('stash', stashFromGist.stash);            
+                await storageSet('stash', stashFromGist.stash);
                 sendResponse('done');
             }
         })();
