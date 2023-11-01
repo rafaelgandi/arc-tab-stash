@@ -53,7 +53,7 @@ export default function StashLinkItem(props) {
             draggable="false"
             onClick=${handleOnLinkClick}
         >
-            <img src=${faviconPath} loading="eager" />
+            <img src=${faviconPath} />
             <span class="bstash-title">${item.title}</span>
         </a>
         <img 

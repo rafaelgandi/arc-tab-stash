@@ -1,17 +1,19 @@
+import styled from './lib/styled.js';
+
+export default styled`
 :root {
-    font-size: 16px;
-    
     --app-spacing: 1rem;
     --app-min-height: 350px;
+}
+
+body * {
+    box-sizing: border-box;
 }
 
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background: rgb(170, 249, 164);
     background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
-    * {
-        box-sizing: border-box;
-    }
 
     .hide {
         display: none !important;
@@ -22,7 +24,7 @@ main {
     display: block;
     width: 300px;
     min-height: var(--app-min-height);
-    #bstash-blocker {
+    & #bstash-blocker {
         position: fixed;
         top: 0;
         left: 0;
@@ -37,11 +39,11 @@ main {
     }
     .bstash-list-con {
         padding-bottom: 3rem; 
-        ul {
+        & ul {
             list-style: none;
             margin: 0;
             padding: 0;
-            li {
+            & li {
                 position: relative;
                 display: block;
                 margin-top: calc(var(--app-spacing) / 2);
@@ -50,21 +52,21 @@ main {
                 background-color: rgba(255, 255, 255, .5);
                 transition: all .3s linear;
                 border-radius: 13px;
-                [-hover] {
+                &:hover {
                     background-color: rgba(255, 255, 255, 1);
                     box-shadow: 0px 6px 12px 2px rgba(0, 0, 0, 0.18);
-                    a span {
+                    & a span {
                         width: 90%;
                     }
                     .bstash-trash-icon {
                         opacity: .5;                       
                     }
                 }  
-                [SELF].drag-in-place {
+                &.drag-in-place {
                     opacity: 0;
                 }
                 
-                a {
+                & a {
                     color: #092609;
                     cursor: default;
                     display: grid;
@@ -72,18 +74,18 @@ main {
                     align-items: center;
                     text-decoration: none;
                     position: relative;
-                    img {
+                    & img {
                         width: 20px;
                         height: 20px;
                     }
-                    span {
+                    & span {
                         width: 95%;
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
-                    [SELF], 
-                    * {
+                    &,
+                    & * {
                         /* See: https://stackoverflow.com/questions/33309632/prevent-link-dragging-but-still-allow-text-highlighting */
                         user-select: none;
                         -webkit-user-drag: none;
@@ -112,13 +114,11 @@ main {
         justify-content: center;
         width: 100%;
         min-height: calc(var(--app-min-height) - 50px);
-        // outline: 2px solid blue;
-        div {
+        & div {
             text-align: center;
             font-size: 1.5em;
             opacity: .6;
-            // outline: 2px solid blue;
-            img {
+            & img {
                 display: block;
                 margin: 0 auto;
                 width: 80%;
@@ -135,76 +135,64 @@ main {
         top: 1rem;
         left: .5rem;
         right: .5rem;
-        // min-height: 200px;
-        // background-color: #fff;
         backdrop-filter: blur(10px);
         background-color: rgba(255, 255, 255, .6);
         z-index: 90000;
         border-radius: 15px;
         box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
-        [--before] {
+        &::before {
             content: '';
             position: absolute; 
             top: -20px;
             left: 0;
             right: 0;
             bottom: 0;
-            // outline: 2px solid yellow;
             height: 100vh;
         }
-        [SELF].hide-settings {
+        &.hide-settings {
             opacity: 0;
             transform: scale(0);
-            // display: none;
         }
-        a {
+        & a {
             text-decoration: none;
             color: #3dbafc;
         }
-        section, button {
+        & section, 
+        & button {
             position: relative;
             z-index: 5000 !important;
         }
         .bstash-setting-border {
             padding: var(--app-spacing);
             padding-bottom: .1rem;
-            // outline: 1px solid rgba(0,0,0,0.20); 
             border-radius: 11px;
             box-shadow: -1px -1px 10px 1px rgba(0,0,0,0.16);
-            section {  
+            & section {  
                 position: relative;        
                 margin: calc(var(--app-spacing) * 1.5) 0;
                 margin-bottom: var(--app-spacing);
-                // border-bottom: 1px solid #eee;
-                // * {
-                //     background-color: rgba(0, 255, 255, 0.2);
-                //     outline: 1px solid blue;
-                // }
-                [-first-child], [-last-child] {
+                &:first-child, &:last-child {
                     margin-top: 0;
                 }
-                header {
+                & header {
                     display: grid;
                     grid-template-columns: 10% 1fr;
                     align-items: center;
                     gap: 0;
                     margin-bottom: .5rem;
                     user-select: none;
-                    // * {
-                    //     outline: 1px solid blue;
-                    // }
-                    img {
+                    & img {
                         --size: 20px;
                         width: var(--size);
                         height: var(--size);
                     }
-                    span {
+                    & span {
                         text-align: left;
                         font-weight: 500;
                         font-size: .8rem;
                     }
                 }
-                input[type="text"] {
+                & input[type="text"] {
                     background-color: #fff;
                     display: block;
                     padding: .5rem;
@@ -213,11 +201,11 @@ main {
                     border-radius: 5px;
                     width: 100%;
                     font-family: 'Courier New', Courier, monospace;
-                    [SELF].error {
+                    &.error {
                         border:1px dashed #de5248;
                     }
                 }
-                p {
+                & p {
                     color: #939493;
                     margin: .2rem 0;
                     font-size: .7rem;                    
@@ -234,9 +222,8 @@ main {
                 width: 70%;
                 margin: 0 auto;
                 margin-bottom: 1rem;
-                button {
+                & button {
                     display: block;
-                    // width: 30%;
                     margin: 0 auto;
                     padding: .2rem .5rem;
                     color: #000;
@@ -245,12 +232,12 @@ main {
                     border: 0;
                     cursor: pointer;
                 }
-                #bstash-settings-save-button {               
-                    [-hover] {
+                & #bstash-settings-save-button {               
+                    &:hover {
                         text-shadow: 1px 0px 9px rgba(233,228,40,0.6);
                     }
                 }
-                #bstash-settings-cancel-button {             
+                & #bstash-settings-cancel-button {             
                     opacity: .5;
                 }
             }
@@ -262,8 +249,7 @@ footer {
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
-    // min-height: 1rem;
+    width: 100%;  
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, .3);
     z-index: 1000;
@@ -273,24 +259,23 @@ footer {
     justify-content: center;
     padding: 0;
     .bstash-footer-child { 
-        // outline: 1px solid green;
         text-align: center;
         padding: .3rem;
         padding-bottom: .2rem;
-        img.bstash-footer-control {
-            //  outline: 1px solid red;
+        & img.bstash-footer-control {
             transition: transform .2s ease-out;
             opacity: .5;
             --size: 15px;
             width: var(--size);
             height: var(--size);
-            [-hover] {
+            &:hover {
                 transform: rotate(180deg);
             }
         }
     }
-    #bstash-msg-con {
+    & #bstash-msg-con {
         font-style: italic;
     }
 }
 
+`;

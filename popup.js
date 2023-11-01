@@ -2,6 +2,7 @@
     Stash
     www.rafaelgandi.com
 */
+import './popup.styles.js';
 import {
     storageSet,
     storageGet,
@@ -21,7 +22,6 @@ import FooterControls from './components/FooterControls.js';
 const $head = document.querySelector('head');
 const $body = document.querySelector('body');
 let updateStashOnGistServerDebouncer = null;
-
 
 // LM: 2023-02-24 11:16:10 [Use scripting instead of messages for accessing active tabs colors]
 async function getArcSpaceColors() {
