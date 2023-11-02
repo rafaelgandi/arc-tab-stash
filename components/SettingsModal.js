@@ -23,9 +23,6 @@ export default function SettingsModal(props) {
         if (typeof gitCreds !== 'undefined' && navigator.onLine) {
             setTokenValue(gitCreds.token);
         }
-        else {
-            setForceOpenModal(true);
-        }
     }, false);
 
     async function onSettingSaved() {
@@ -43,14 +40,13 @@ export default function SettingsModal(props) {
             }
         });
         props?.doBlock?.(false);
-        setForceOpenModal(false);
         props?.onTokenSaved?.();
         props?.onDidDismiss?.();
     }
 
 
     return html`
-        <div class=${`bstash-setting ${(!props?.show && !forceOpenModal) ? 'hide-settings' : ''}`}>
+        <div class=${`bstash-setting ${(!props?.show) ? 'hide-settings' : ''}`}>
             <div class="bstash-setting-border">
                 <section>
                     <header>
@@ -69,6 +65,8 @@ export default function SettingsModal(props) {
                     <p>
                         Instructions on how to make one can be found <a href=${instructionsUri} target="_blank">here</a>. 
                         If you already have a token used on Stash in another browser, paste it here to sync your data.
+                        <br /> 
+                        Your current version is at ${chrome.runtime.getManifest().version}
                     </p>
                 </section>
                 <div class="bstash-settings-button-con">
@@ -83,9 +81,8 @@ export default function SettingsModal(props) {
                         id="bstash-settings-cancel-button" 
                         onClick=${(e) => {
                             e.preventDefault();
-                            if (forceOpenModal || tokenValue.trim() === '') { return; }
+                            if (tokenValue.trim() === '') { return; }
                             props?.onDidDismiss?.();
-                            setForceOpenModal(false);
                         }}
                     >Close</button>         
                 </div>

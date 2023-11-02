@@ -4,6 +4,7 @@ export default styled`
 :root {
     --app-spacing: 1rem;
     --app-min-height: 350px;
+    --stash-default-gradient: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
 }
 
 body * {
@@ -13,7 +14,8 @@ body * {
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background: rgb(170, 249, 164);
-    background: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
+    background: var(--stash-default-gradient);
+    /* overscroll-behavior: none; */
 
     .hide {
         display: none !important;
@@ -49,9 +51,10 @@ main {
                 margin-top: calc(var(--app-spacing) / 2);
                 padding: calc(var(--app-spacing) / 2);
                 padding-left: calc(var(--app-spacing) / 1.3);
-                background-color: rgba(255, 255, 255, .5);
+                background-color: rgba(255, 255, 255, .4);
                 transition: all .3s linear;
-                border-radius: 13px;
+                /* border-radius: 13px; */
+                border-radius: 7px;
                 &:hover {
                     background-color: rgba(255, 255, 255, 1);
                     box-shadow: 0px 6px 12px 2px rgba(0, 0, 0, 0.18);

@@ -14,6 +14,7 @@ export type StashItemArray = StashItem[];
 export type StashLinkItemProps = {
     item: StashItem; 
     onDelete?: (stashId: string) => void;
+    tabIndex?: number;
 };
 
 export type EmptyProps = {

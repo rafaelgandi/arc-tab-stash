@@ -52,6 +52,7 @@ export default function StashLinkItem(props) {
             data-stash-favicon=${item.favIconUrl}
             draggable="false"
             onClick=${handleOnLinkClick}
+            tabIndex=${props?.tabIndex ?? 0}
         >
             <img src=${faviconPath} />
             <span class="bstash-title">${item.title}</span>

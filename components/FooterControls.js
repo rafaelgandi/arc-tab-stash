@@ -13,9 +13,9 @@ export default function FooterControls(props) {
                     class="bstash-footer-control" 
                     src="./assets/add.svg" 
                     onClick=${(e) => {
-            e.preventDefault();
-            props?.onAddCurrentTabToStash?.();
-        }}
+                        e.preventDefault();
+                        props?.onAddCurrentTabToStash?.();
+                    }}
                 />
             </div>
             <div id="bstash-msg-con" class="bstash-footer-child"></div>

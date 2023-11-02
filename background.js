@@ -17,9 +17,16 @@ import * as api from './lib/api.js';
     let stashDebouncer = undefined;
     const stashDebouncerDelay = 800; // ms
     const stashNotionPage = `https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517`;
+    const onStashUpdateNotionPage = `https://rafaelgandi.notion.site/Thanks-for-your-support-2a0e39ac7f154c14beb513d2e8b467e9?pvs=4`;
 
-    chrome.runtime.onInstalled.addListener(function onStashExtensionInstall() {
+    chrome.runtime.onInstalled.addListener(function onStashExtensionInstall(details) {
+        console.log(details);
         console.log('Running on install listeners');
+        // LM: 2023-11-02 16:01:23 [If user has updated the extension.]
+        // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
+        if (details?.reason === 'update') {
+            openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+        }
         (async () => {
             const res = await storageGet('stash');
             if (!res) {

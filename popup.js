@@ -18,6 +18,7 @@ import Empty from './components/Empty.js';
 import useSfx from './hooks/useSfx.js';
 import StashLinkItem from './components/StashLinkItem.js';
 import FooterControls from './components/FooterControls.js';
+import useIsMountedRef from './hooks/useIsMountedRef.js';
 
 const $head = document.querySelector('head');
 const $body = document.querySelector('body');
@@ -108,10 +109,11 @@ function Stash() {
     const [block, setBlock] = useState(false);
     const ulRef = useRef(null);
     const sortableRef = useRef(null);
+    const isMountedRef = useIsMountedRef();
 
     const getFreshStashData = useCallback(async () => {
-        setStashArr(sortByOrderProp(await storageGet('stash')));
-    }, []);
+        isMountedRef.current && setStashArr(sortByOrderProp(await storageGet('stash')));
+    }, [isMountedRef]);
 
     const getUpdatedListOrder = useCallback(() => {
         if (!ulRef.current) { return null; }
@@ -154,6 +156,7 @@ function Stash() {
             getFreshStashData();
         }
         else {
+            // Show settings modal if notion integration is not set yet //
             setShowSettings(true);
         }
     }, false);
@@ -189,12 +192,13 @@ function Stash() {
         <${Empty} show=${stashArr.length < 1} />
         <div class="bstash-list-con">
             <ul ref=${ulRef}>
-            ${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item) => {
+            ${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
                 return html`
-                    <li key=${item.id} class="">
+                    <li key=${item.id}>
                         <${StashLinkItem} 
                             item=${item} 
                             onDelete=${onStashItemDelete}
+                            tabIndex=${index}
                         />
                     </li>
                 `;
