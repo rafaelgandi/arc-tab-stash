@@ -12,7 +12,7 @@ import {
     getCurrentTabData
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
-import { html, render, useState, useCallback, useRef } from './lib/preact-htm.js';
+import { html, render, useState, useCallback, useRef} from './lib/preact-htm.js';
 import SettingsModal from './components/SettingsModal.js';
 import Empty from './components/Empty.js';
 import useSfx from './hooks/useSfx.js';
@@ -23,6 +23,7 @@ import useIsMountedRef from './hooks/useIsMountedRef.js';
 const $head = document.querySelector('head');
 const $body = document.querySelector('body');
 let updateStashOnGistServerDebouncer = null;
+
 
 // LM: 2023-02-24 11:16:10 [Use scripting instead of messages for accessing active tabs colors]
 async function getArcSpaceColors() {
@@ -205,19 +206,16 @@ function Stash() {
             })}
             </ul>
         </div>
-
         <${SettingsModal} 
             show=${showSettings} 
             onDidDismiss=${() => setShowSettings(false)}
             doBlock=${(b) => setBlock(b)}
             onTokenSaved=${() => getFreshStashData()}
         />
-
         <${FooterControls} 
             onAddCurrentTabToStash=${onAddCurrentTabToStash} 
             onToggleSettings=${onToggleSettings}
         />
-
         <div id="bstash-blocker" class=${(!block) ? 'hide' : ''}></div>
     `;
 }
