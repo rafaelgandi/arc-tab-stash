@@ -5,8 +5,8 @@ body {
 body .__stash-toast,
 body .__stash-toast--danger {
   font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  background: rgba(170, 249, 164, 1) !important;
-  color: #092609 !important;
+  background: rgba(170, 249, 164, 1);
+  color: #092609;
   font-size: 16px;
   padding: calc(var(--app-spacing) / 2) calc(var(--app-spacing) * 3) !important;
   border: 5px solid #fff;
@@ -21,5 +21,6 @@ body .__stash-toast--danger button {
 }
 
 body .__stash-toast--danger {
-  color: hsl(8, 67%, 54%) !important;
+  color: #fff !important;
+  background: hsl(8, 67%, 54%) !important;
 }

@@ -9,7 +9,8 @@ import {
     removeFromStash,
     logThis,
     sendMessageToBg,
-    getCurrentTabData
+    getCurrentTabData,
+    isValidJson
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
 import { html, render, useState, useCallback, useRef} from './lib/preact-htm.js';
@@ -60,10 +61,11 @@ async function getArcSpaceColors() {
     return res?.[0]?.result;
 }
 
-async function setArcTheme() {
-    const response = await getArcSpaceColors();
+async function setArcTheme(colors = null) {
+    const response = (!!colors) ? colors: await getArcSpaceColors();
 
     if (response) {
+        storageSet('arcColors', JSON.stringify(response));
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
             $body.style.background = `linear-gradient(140deg, ${arcBGGradients.join(', ')})`;
@@ -80,6 +82,13 @@ async function setArcTheme() {
         `;
         $head.appendChild($style);
         $body.classList.add('is-arc-browser');
+    }
+    else {
+        const arcColors = await storageGet('arcColors');
+        if (!!arcColors && isValidJson(arcColors)) {
+            // console.log(arcColors, 'arc colors');
+            setArcTheme(JSON.parse(arcColors));
+        }
     }
 }
 
