@@ -25,9 +25,9 @@ export default function FooterControls(props) {
                     class="bstash-footer-control" 
                     src="./assets/settings.svg" 
                     onClick=${(e) => {
-            e.preventDefault();
-            props?.onToggleSettings?.();
-        }}
+                        e.preventDefault();
+                        props?.onToggleSettings?.();
+                    }}
                 />
             </div>
         </footer>

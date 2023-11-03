@@ -139,7 +139,7 @@ main {
         left: .5rem;
         right: .5rem;
         backdrop-filter: blur(10px);
-        background-color: rgba(255, 255, 255, .6);
+        background-color: rgba(255, 255, 255, .4);
         z-index: 90000;
         border-radius: 15px;
         box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
@@ -209,7 +209,7 @@ main {
                     }
                 }
                 & p {
-                    color: #939493;
+                    color: #7c7c7c;
                     margin: .2rem 0;
                     font-size: .7rem;                    
                     user-select: none;
@@ -255,6 +255,7 @@ footer {
     width: 100%;  
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, .3);
+    border-top: 1px outset #e2e2e2;
     z-index: 1000;
     display: grid;
     grid-template-columns: 15% 1fr 15%;

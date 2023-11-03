@@ -65,7 +65,7 @@ async function setArcTheme(colors = null) {
     const response = (!!colors) ? colors: await getArcSpaceColors();
 
     if (response) {
-        storageSet('arcColors', JSON.stringify(response));
+        storageSet('arcColors', JSON.stringify(response)); // Save a copy of Arc's space color to reference when for some reason we can't get it.
         const arcBGGradients = response.arcBGGradients.filter((color) => !!color);
         if (arcBGGradients.length) {
             $body.style.background = `linear-gradient(140deg, ${arcBGGradients.join(', ')})`;

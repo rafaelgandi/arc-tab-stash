@@ -1,26 +1,48 @@
 body {
-  --app-spacing: 16px;
+    --app-spacing: 16px;
 }
 
 body .__stash-toast,
 body .__stash-toast--danger {
-  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
-  background: rgba(170, 249, 164, 1);
-  color: #092609;
-  font-size: 16px;
-  padding: calc(var(--app-spacing) / 2) calc(var(--app-spacing) * 3) !important;
-  border: 5px solid #fff;
-  border-radius: 10px;
-  opacity: 1 !important;
-  text-shadow: 0px 1px 15px rgba(255, 255, 255, 1);
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    background: rgba(170, 249, 164, 1);
+    color: #092609;
+    font-size: 16px;
+    padding: calc(var(--app-spacing) / 2) calc(var(--app-spacing) * 3) !important;
+    border: 5px solid #fff;
+    border-radius: 10px;
+    opacity: 1 !important;
+    text-shadow: 0px 1px 15px rgba(255, 255, 255, 1);
+    animation: stash-jiggle .7s;
 }
 
 body .__stash-toast button,
 body .__stash-toast--danger button {
-  display: none;
+    display: none;
 }
 
 body .__stash-toast--danger {
-  color: #fff !important;
-  background: hsl(8, 67%, 54%) !important;
+    color: #fff !important;
+    background: hsl(8, 67%, 54%) !important;
+}
+
+
+
+@keyframes stash-jiggle {
+    from,
+    to {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(0.9, 1.1);
+    }
+
+    50% {
+        transform: scale(1.1, 0.9);
+    }
+
+    75% {
+        transform: scale(0.95, 1.05);
+    }
 }

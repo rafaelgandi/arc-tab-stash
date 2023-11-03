@@ -66,7 +66,7 @@ export default function SettingsModal(props) {
                         Instructions on how to make one can be found <a href=${instructionsUri} target="_blank">here</a>. 
                         If you already have a token used on Stash in another browser, paste it here to sync your data.
                         <br /> 
-                        Your current version of Stash is at ${chrome.runtime.getManifest().version}
+                        Your current version of Stash is ${chrome.runtime.getManifest().version}
                     </p>
                 </section>
                 <div class="bstash-settings-button-con">
