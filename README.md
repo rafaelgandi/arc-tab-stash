@@ -5,7 +5,7 @@
 A tiny browser extension that stashes and syncs your favorite websites across multiple browsers and accounts.
 
 <p align="center">
-    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7c97273e-4aaa-41a0-a506-76a7b7b53b87/stash-ss.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45/20230314/us-west-2/s3/aws4_request&X-Amz-Date=20230314T074234Z&X-Amz-Expires=86400&X-Amz-Signature=17cf424cf52c3dc41d8d9864f7d9ea8860f2df853d9c4611fa8f37ff18157efa&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22stash-ss.png%22&x-id=GetObject" />
+    <img src="https://lh3.googleusercontent.com/pw/ADCreHdtcGcTggMf667991hhqp8lbdQZJNFdRONiVrWxSpATFQyycGvz250N08qcgKE57OH_pMaYK3R4fUiEY5TNbnsb5YURll9WIOqkF05Q9rIQ-hWfrK50HYBMMT9TX9_M_BhkfMuw2HtKSGkqsMmaBVIDFw=w375-h665-s-no-gm?authuser=0" />
 </p>
 
 ## Features
@@ -21,7 +21,7 @@ A tiny browser extension that stashes and syncs your favorite websites across mu
 
 Quickly add a website to your stash using this handy key combination.
 <p align="center">
-    <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/680fe0ed-335c-41ac-ae6c-92c8f374e8dc/shortcutkeyssvg.svg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45/20230314/us-west-2/s3/aws4_request&X-Amz-Date=20230314T074330Z&X-Amz-Expires=86400&X-Amz-Signature=093aaf943d551d624d6108ea575710f30eb651da9a90e90c6c021b50b446700f&X-Amz-SignedHeaders=host&response-content-disposition=filename%3D%22shortcutkeyssvg.svg%22&x-id=GetObject" />
+    <img src="https://lh3.googleusercontent.com/pw/ADCreHeVDCPk82BtJZZr3SOHRDdyKS0AI3h3N0ICsFKDbIfICHWyYbQj5vQsgeGYt7M8GTv83hTX2fIQrv3XKfARJoesUlC1xGY75VpBulNfP1ab_blQC-CFHh7g6WaNEWPnpzQdMCZWYgrb0WzR8u1TqO8KOg=w519-h86-s-no-gm?authuser=0" />
 </p>
 
 *(For Windows users: **Shift + Alt + S**)*
