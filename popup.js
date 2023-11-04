@@ -229,5 +229,6 @@ function Stash() {
     `;
 }
 
-
-render(html`<${Stash} />`, document.getElementById('arc-bookmark-stash-main'));
+const main = document.getElementById('arc-bookmark-stash-main');
+render(html`<${Stash} />`, main);
+main.style.opacity = 1;

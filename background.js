@@ -25,7 +25,9 @@ import * as api from './lib/api.js';
         // LM: 2023-11-02 16:01:23 [If user has updated the extension.]
         // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
         if (details?.reason === 'update') {
-            openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+            if (details?.previousVersion !== chrome.runtime.getManifest().version) {
+                openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+            }           
         }
         (async () => {
             const res = await storageGet('stash');
