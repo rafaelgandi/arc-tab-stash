@@ -7,6 +7,10 @@ export default styled`
     --stash-default-gradient: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
 }
 
+html {
+    scrollbar-gutter: stable;
+}
+
 body * {
     box-sizing: border-box;
 }
