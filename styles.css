@@ -13,7 +13,6 @@ body .__stash-toast--danger {
     border-radius: 10px;
     opacity: 1 !important;
     text-shadow: 0px 1px 15px rgba(255, 255, 255, 1);
-    animation: stash-jiggle .7s;
 }
 
 body .__stash-toast button,
@@ -26,23 +25,3 @@ body .__stash-toast--danger {
     background: hsl(8, 67%, 54%) !important;
 }
 
-
-
-@keyframes stash-jiggle {
-    from,
-    to {
-        transform: scale(1, 1);
-    }
-
-    25% {
-        transform: scale(0.9, 1.1);
-    }
-
-    50% {
-        transform: scale(1.1, 0.9);
-    }
-
-    75% {
-        transform: scale(0.95, 1.05);
-    }
-}
