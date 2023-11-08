@@ -13,11 +13,11 @@ export default function StashLinkItem(props) {
     const [faviconPath, setFaviconPath] = useState(defaultFavicon);
 
     useSfx(function setProperFavicon() {
-        if (item.favIconUrl) {   
-            setFaviconPath(item.favIconUrl);        
+        if (item.favIconUrl) {  
+            setFaviconPath(item.favIconUrl);             
             const img = new Image();
             img.src = item.favIconUrl;
-            img.error = () => { // Make sure the favicon loads
+            img.onerror = () => { // Make sure the favicon loads
                 setFaviconPath(defaultFavicon);
             };
         }
