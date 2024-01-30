@@ -50,6 +50,22 @@ import * as api from './lib/api.js';
         })();
     });
 
+    // LM: 2024-01-31 04:33:28
+    // Make sure to query fresh data from github api on browser startup //
+    chrome.runtime.onStartup.addListener(function onBrowserStartUp() {
+        (async () => {
+            const gitCreds = await api.getGitCredsSaved();
+            if (typeof gitCreds !== 'undefined' && navigator.onLine) {
+                const stashFromGist = await api.getGistContents(); 
+                if (!stashFromGist) {
+                    return;
+                }
+                await storageSet('stash', stashFromGist.stash);
+                console.log('Hello, local stash updated at ' + (new Date()).toString(), stashFromGist.stash);
+            }
+        })();
+    });
+
     // Save stash to gist on popup close
     chrome.runtime.onConnect.addListener((port) => {
         if (port.name === "popup") {
