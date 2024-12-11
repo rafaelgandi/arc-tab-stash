@@ -19,6 +19,8 @@ import * as api from './lib/api.js';
     const stashNotionPage = `https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517`;
     const onStashUpdateNotionPage = `https://rafaelgandi.notion.site/Thanks-for-your-support-2a0e39ac7f154c14beb513d2e8b467e9?pvs=4`;
 
+    let SOMETHING_HAS_CHANGED_FLAG = false;
+
     chrome.runtime.onInstalled.addListener(function onStashExtensionInstall(details) {
         // console.log(details);
         console.log('Running on install listeners');
@@ -67,7 +69,7 @@ import * as api from './lib/api.js';
     });
 
     // Save stash to gist on popup close
-    chrome.runtime.onConnect.addListener((port) => {
+    chrome.runtime.onConnect.addListener(function handlePopUpVisibility(port) {
         if (port.name === "popup") {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
@@ -75,12 +77,16 @@ import * as api from './lib/api.js';
                 if (!navigator.onLine) { return; }
                 (async () => {
                     if (!await api.getGitCredsSaved()) { return; }
-                    const STASH = await storageGet('stash');
-                    await api.setGistContents(STASH);
+                    if (SOMETHING_HAS_CHANGED_FLAG) {
+                        const STASH = await storageGet('stash');
+                        await api.setGistContents(STASH);
+                    }                    
+                    SOMETHING_HAS_CHANGED_FLAG = false;
                 })();
             });
         }
     });
+
 
     // See: https://dev.to/paulasantamaria/adding-shortcuts-to-your-chrome-extension-2i20
     chrome.commands.onCommand.addListener(function setKeyboardShortcut(command) {
@@ -115,6 +121,9 @@ import * as api from './lib/api.js';
                 const stashFromGist = await api.getGistContents();
                 await storageSet('stash', stashFromGist.stash);
                 sendResponse('done');
+            }
+            else if (data.message === 'something-has-changed') {
+                SOMETHING_HAS_CHANGED_FLAG = true;
             }
         })();
         // Need to return true.
