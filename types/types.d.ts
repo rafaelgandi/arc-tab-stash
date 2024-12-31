@@ -8,8 +8,6 @@ export type StashItem = {
 
 export type StashItemArray = StashItem[];
 
-
-
 // Component Property Types //
 export type StashLinkItemProps = {
     item: StashItem; 
@@ -30,5 +28,6 @@ export type SettingsModalProps = {
 
 export type FooterControlsProps = {
     onAddCurrentTabToStash?: () => void;
+    onSectionAddButtonClicked?: () => void;
     onToggleSettings?: () => void;
 };

@@ -259,7 +259,7 @@ footer {
     border-top: 1px outset #e2e2e2;
     z-index: 1000;
     display: grid;
-    grid-template-columns: 15% 1fr 15%;
+    grid-template-columns: 15% 1fr 20%;
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -273,8 +273,24 @@ footer {
             --size: 15px;
             width: var(--size);
             height: var(--size);
+            display: inline-block;
+            position: relative;
+            margin-right: .7rem;
+            &:last-child {
+                margin-right: 0;
+            }
             &:hover {
                 transform: rotate(180deg);
+            }
+            &#bstash-section-button {
+                --size: 17px;
+                transform: rotate(45deg);
+                &:hover {
+                    transform: rotate(225deg) !important;
+                }
+            }
+            &#bstash-footer-settings-button {
+                
             }
         }
     }

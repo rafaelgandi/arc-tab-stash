@@ -137,6 +137,27 @@ function Stash() {
 		setShowSettings((prev) => !prev);
 	}, []);
 
+    const onSectionAddButtonClicked = useCallback(() => {
+
+        // (2024-12-31) rTODO: Add section to stash.
+        setStashArr((prev) => {
+            return [
+                {
+                    url: 'about:blank',
+                    title: 'This is a Section',
+                    id: 'section-id',
+                    favIconUrl: '',
+                    order: 0,
+                    section: true,
+                    sectionShow: true
+                },
+                ...prev
+            ];
+        });
+
+        console.log('section add');
+    }, []);
+
 	useSfx(async function init() {
 		setArcTheme();
 		await getFreshStashData(); // Show saved copy first.
@@ -201,7 +222,11 @@ function Stash() {
 			doBlock=${(b) => setBlock(b)}
 			onTokenSaved=${() => getFreshStashData()}
 		/>
-		<${FooterControls} onAddCurrentTabToStash=${onAddCurrentTabToStash} onToggleSettings=${onToggleSettings} />
+		<${FooterControls} 
+            onAddCurrentTabToStash=${onAddCurrentTabToStash} 
+            onToggleSettings=${onToggleSettings} 
+            onSectionAddButtonClicked=${onSectionAddButtonClicked}
+        />
 		<div id="bstash-blocker" class=${!block ? "hide" : ""}></div>
 	`;
 }
