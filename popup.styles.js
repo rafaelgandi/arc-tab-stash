@@ -39,6 +39,9 @@ main {
     .hide {
         display: none !important;
     }
+    .invisible {
+        visibility: hidden !important;
+    }
     .bstash-list-con {
         padding-bottom: 3rem; 
         & ul {

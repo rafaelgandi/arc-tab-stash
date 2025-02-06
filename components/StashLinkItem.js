@@ -2,6 +2,7 @@
 import { html, useState } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
+import posthog from '../lib/posthog-js/dist/module.full.no-external.js';
 const defaultFavicon = './assets/empty_favicon.ico';
 
 /**
@@ -26,12 +27,14 @@ export default function StashLinkItem(props) {
     function handleOnLinkClick(e) {
         e.preventDefault();
         openInNewTab(e.currentTarget.href);
+        posthog.capture('sh-stash-link-opened');
     }
 
     async function handleOnDeleteItem(e) {
         const stashId = e.currentTarget.getAttribute('data-stash-id');
         if (!stashId) { return; }
-        props?.onDelete?.(stashId)
+        props?.onDelete?.(stashId);
+        posthog.capture('sh-stash-link-deleted');
     }
 
     function onTrashIconHover(e) {

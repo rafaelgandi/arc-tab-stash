@@ -7,6 +7,8 @@ import {
 } from '../lib/helpers.js';
 import * as api from '../lib/api.js';
 import useSfx from '../hooks/useSfx.js';
+import posthog from '../lib/posthog-js/dist/module.full.no-external.js';
+
 /**
  * 
  * @param {import("../types/types.d.ts").SettingsModalProps} props 
@@ -39,6 +41,7 @@ export default function SettingsModal(props) {
                 gitToken: tokenValue
             }
         });
+        posthog.capture('sh-git-token-saved');
         props?.doBlock?.(false);
         props?.onTokenSaved?.();
         props?.onDidDismiss?.();

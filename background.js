@@ -12,6 +12,7 @@ import {
     openInNewTab
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
+import posthog from './lib/posthog-js/dist/module.full.no-external.js';
 
 (async () => {
     let stashDebouncer = undefined;
@@ -28,7 +29,11 @@ import * as api from './lib/api.js';
         // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
         if (details?.reason === 'update') {
             if (details?.previousVersion !== chrome.runtime.getManifest().version) {
-                openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+                // (2025-02-06) rTODO: uncomment below when sections feature is ready.
+                // openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+                posthog.capture('sh-update-happend', {
+                    version: chrome.runtime.getManifest().version
+                });
             }           
         }
         (async () => {
@@ -157,5 +162,8 @@ import * as api from './lib/api.js';
             message: 'tab-added-to-stash'
         });
         await api.setGistContents(STASH);
+        posthog.capture('sh-tab-added-to-user-stash', {
+            title: title ?? 'Untitled'
+        })
     }
 })();

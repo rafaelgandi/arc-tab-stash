@@ -3,6 +3,8 @@
     www.rafaelgandi.com
 */
 import "./popup.styles.js";
+import posthog from './lib/posthog-js/dist/module.full.no-external.js';
+import "./lib/posthog-init.js";
 import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef } from "./lib/preact-htm.js";
@@ -15,11 +17,11 @@ import useIsMountedRef from "./hooks/useIsMountedRef.js";
 
 const $head = document.querySelector("head");
 const $body = document.querySelector("body");
-let updateStashOnGistServerDebouncer = null;
 
 // LM: 2023-02-24 11:16:10 [Use scripting instead of messages for accessing active tabs colors]
 async function getArcSpaceColors() {
 	const tab = await getCurrentTabData();
+    if (!tab) { return; }
 	if (tab.url.startsWith("chrome://") || tab.url.startsWith("arc://")) {
 		return;
 	}
@@ -126,6 +128,7 @@ function Stash() {
 
 	const onAddCurrentTabToStash = useCallback(async () => {
 		setBlock(true);
+        posthog.capture('sh-button-was-used-for-stashing');
 		await sendMessageToBg({
 			message: "stash-current-tab"
 		});
@@ -140,22 +143,22 @@ function Stash() {
     const onSectionAddButtonClicked = useCallback(() => {
 
         // (2024-12-31) rTODO: Add section to stash.
-        setStashArr((prev) => {
-            return [
-                {
-                    url: 'about:blank',
-                    title: 'This is a Section',
-                    id: 'section-id',
-                    favIconUrl: '',
-                    order: 0,
-                    section: true,
-                    sectionShow: true
-                },
-                ...prev
-            ];
-        });
+        // setStashArr((prev) => {
+        //     return [
+        //         {
+        //             url: 'about:blank',
+        //             title: 'This is a Section',
+        //             id: 'section-id',
+        //             favIconUrl: '',
+        //             order: 0,
+        //             section: true,
+        //             sectionShow: true
+        //         },
+        //         ...prev
+        //     ];
+        // });
 
-        console.log('section add');
+        // console.log('section add');
     }, []);
 
 	useSfx(async function init() {
