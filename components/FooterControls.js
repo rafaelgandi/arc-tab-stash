@@ -20,7 +20,7 @@ export default function FooterControls(props) {
 			<div class="bstash-footer-child">
 				<img
 					id="bstash-section-button"
-					class="bstash-footer-control invisible"
+					class="bstash-footer-control"
 					src="./assets/tag-outline.svg"
 					onClick=${(e) => {
 						e.preventDefault();
