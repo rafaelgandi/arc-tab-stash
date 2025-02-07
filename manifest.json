@@ -4,8 +4,11 @@
     
     
     
-    "version": "1.4.2",
-    
+    "---version": "1.4.2",
+    "version": "0.0.0",
+    "debug": true,
+
+
 
 
     "manifest_version": 3,
