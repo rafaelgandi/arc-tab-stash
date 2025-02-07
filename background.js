@@ -7,12 +7,13 @@ import {
     sendMessageToActiveTab,
     storageSet,
     storageGet,
-    logThis,
+    getVersionFromManifest,
     handleError,
     openInNewTab
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
 import posthog from './lib/posthog-js/dist/module.full.no-external.js';
+import "./lib/posthog-init.js";
 
 (async () => {
     let stashDebouncer = undefined;
@@ -28,11 +29,11 @@ import posthog from './lib/posthog-js/dist/module.full.no-external.js';
         // LM: 2023-11-02 16:01:23 [If user has updated the extension.]
         // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
         if (details?.reason === 'update') {
-            if (details?.previousVersion !== chrome.runtime.getManifest().version) {
+            if (details?.previousVersion !== getVersionFromManifest()) {
                 // (2025-02-06) rTODO: uncomment below when sections feature is ready.
                 // openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
                 posthog.capture('sh-update-happend', {
-                    version: chrome.runtime.getManifest().version
+                    updatedVersion: getVersionFromManifest()
                 });
             }           
         }

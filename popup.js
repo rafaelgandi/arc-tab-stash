@@ -143,22 +143,22 @@ function Stash() {
     const onSectionAddButtonClicked = useCallback(() => {
 
         // (2024-12-31) rTODO: Add section to stash.
-        // setStashArr((prev) => {
-        //     return [
-        //         {
-        //             url: 'about:blank',
-        //             title: 'This is a Section',
-        //             id: 'section-id',
-        //             favIconUrl: '',
-        //             order: 0,
-        //             section: true,
-        //             sectionShow: true
-        //         },
-        //         ...prev
-        //     ];
-        // });
+        setStashArr((prev) => {
+            return [
+                {
+                    url: 'about:blank',
+                    title: 'This is a Section',
+                    id: 'section-id',
+                    favIconUrl: '',
+                    order: 0,
+                    section: true,
+                    sectionShow: true
+                },
+                ...prev
+            ];
+        });
 
-        // console.log('section add');
+        console.log('section add');
     }, []);
 
 	useSfx(async function init() {

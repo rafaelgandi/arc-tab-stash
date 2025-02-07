@@ -1,8 +1,7 @@
 import { html, useState } from '../lib/preact-htm.js';
 import {
     storageSet,
-    storageGet,
-    logThis,
+    getVersionFromManifest,
     sendMessageToBg
 } from '../lib/helpers.js';
 import * as api from '../lib/api.js';
@@ -69,7 +68,7 @@ export default function SettingsModal(props) {
                         Instructions on how to make one can be found <a href=${instructionsUri} target="_blank">here</a>. 
                         If you already have a token used on Stash in another browser, paste it here to sync your data.
                         <br /> 
-                        Your current version of Stash is ${chrome.runtime.getManifest().version}
+                        Your current version of Stash is ${getVersionFromManifest()}
                     </p>
                 </section>
                 <div class="bstash-settings-button-con">
