@@ -6,7 +6,8 @@ import {
 } from '../lib/helpers.js';
 import * as api from '../lib/api.js';
 import useSfx from '../hooks/useSfx.js';
-import posthog from '../lib/posthog-js/dist/module.full.no-external.js';
+import posthog from '../lib/posthog-js/dist/ph-full.js';
+
 
 /**
  * 

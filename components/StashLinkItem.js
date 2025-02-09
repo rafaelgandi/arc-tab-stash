@@ -2,7 +2,8 @@
 import { html, useState } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
-import posthog from '../lib/posthog-js/dist/module.full.no-external.js';
+import posthog from '../lib/posthog-js/dist/ph-full.js';
+
 const defaultFavicon = './assets/empty_favicon.ico';
 
 /**

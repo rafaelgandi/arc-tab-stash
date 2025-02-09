@@ -12,7 +12,7 @@ import {
     openInNewTab
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
-import posthog from './lib/posthog-js/dist/module.full.no-external.js';
+import posthog from './lib/posthog-js/dist/ph-full.js';
 import "./lib/posthog-init.js";
 
 (async () => {
