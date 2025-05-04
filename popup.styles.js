@@ -71,6 +71,21 @@ main {
                 &.drag-in-place {
                     opacity: 0;
                 }
+
+                &[data-isSection="yes"] {
+                    background-color: transparent !important;
+                    font-weight: 500;
+                    font-size: 1.2em;
+                    &:hover {
+                        background-color: transparent;
+                        box-shadow: none;
+                    }
+                    & a {
+                        grid-template-columns: 1fr;
+                        padding-bottom: 0.5rem;
+                        border-bottom: 1px solid #092609;
+                    }
+                }
                 
                 & a {
                     color: #092609;

@@ -27,6 +27,9 @@ export default function StashLinkItem(props) {
 
     function handleOnLinkClick(e) {
         e.preventDefault();
+        if (!!item?.section) {
+            return;
+        }
         openInNewTab(e.currentTarget.href);
         posthog.capture('sh-stash-link-opened');
     }
@@ -58,7 +61,8 @@ export default function StashLinkItem(props) {
             onClick=${handleOnLinkClick}
             tabIndex=${props?.tabIndex ?? 0}
         >
-            <img src=${faviconPath} />
+            
+            ${(!item?.section) ? html`<img src=${faviconPath} />` : null}
             <span class="bstash-title">${item.title}</span>
         </a>
         <img 

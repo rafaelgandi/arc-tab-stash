@@ -3,7 +3,7 @@
     www.rafaelgandi.com
 */
 import "./popup.styles.js";
-import posthog from './lib/posthog-js/dist/ph-full.js';
+import posthog from "./lib/posthog-js/dist/ph-full.js";
 
 import "./lib/posthog-init.js";
 import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson } from "./lib/helpers.js";
@@ -22,7 +22,9 @@ const $body = document.querySelector("body");
 // LM: 2023-02-24 11:16:10 [Use scripting instead of messages for accessing active tabs colors]
 async function getArcSpaceColors() {
 	const tab = await getCurrentTabData();
-    if (!tab) { return; }
+	if (!tab) {
+		return;
+	}
 	if (tab.url.startsWith("chrome://") || tab.url.startsWith("arc://")) {
 		return;
 	}
@@ -116,12 +118,15 @@ function Stash() {
 		}
 		const orderedList = [];
 		ulRef.current.querySelectorAll("a[data-stash-id]").forEach((a, index) => {
+			const parentLi = a.parentElement;
 			orderedList.push({
 				title: a.title,
 				url: a.href,
 				id: a.getAttribute("data-stash-id"),
 				favIconUrl: a.getAttribute("data-stash-favicon"),
-				order: index
+				order: index,
+				section: parentLi.getAttribute("data-isSection") === "yes",
+				sectionShow: parentLi.getAttribute("data-isShowSection") === "yes"
 			});
 		});
 		return orderedList;
@@ -129,7 +134,7 @@ function Stash() {
 
 	const onAddCurrentTabToStash = useCallback(async () => {
 		setBlock(true);
-        posthog.capture('sh-button-was-used-for-stashing');
+		posthog.capture("sh-button-was-used-for-stashing");
 		await sendMessageToBg({
 			message: "stash-current-tab"
 		});
@@ -141,26 +146,26 @@ function Stash() {
 		setShowSettings((prev) => !prev);
 	}, []);
 
-    const onSectionAddButtonClicked = useCallback(() => {
+	const makeSectionId = useCallback(() => {
+		return "sec-" + new Date().getTime().toString();
+	}, []);
 
-        // (2024-12-31) rTODO: Add section to stash.
-        // setStashArr((prev) => {
-        //     return [
-        //         {
-        //             url: 'about:blank',
-        //             title: 'This is a Section',
-        //             id: 'section-id',
-        //             favIconUrl: '',
-        //             order: 0,
-        //             section: true,
-        //             sectionShow: true
-        //         },
-        //         ...prev
-        //     ];
-        // });
-
-        // console.log('section add');
-    }, []);
+	const onSectionAddButtonClicked = useCallback(() => {
+		setStashArr((prev) => {
+			return [
+				{
+					url: "about:blank",
+					title: "Untitled Section",
+					id: makeSectionId(),
+					favIconUrl: "",
+					order: 0,
+					section: true,
+					sectionShow: true
+				},
+				...prev
+			];
+		});
+	}, [makeSectionId]);
 
 	useSfx(async function init() {
 		setArcTheme();
@@ -180,17 +185,50 @@ function Stash() {
 	}, false);
 
 	useSfx(async function makeListSortable() {
+
+        function ifSectionBeingDraggedDoThisToChildItems(e, callback) {
+             // console.log(e.item, e.item?.getAttribute?.('data-isSection'));
+             if (e.item?.getAttribute?.('data-isSection') === 'yes' && e.item?.getAttribute?.('data-sectionId')) {
+                const sectionId = e.item?.getAttribute?.('data-sectionId');
+                const childItems = ulRef.current.querySelectorAll(`li[data-myParentSectionId="${sectionId}"]`);
+                if (childItems.length) {
+                    console.log(childItems);
+                    childItems.forEach((item) => {
+                        // Sortable.utils.select(item);
+                        callback(item);
+                    });
+                }
+                
+            }
+        }
+
 		if (ulRef.current) {
 			// See: https://github.com/SortableJS/Sortable
-			const { Sortable } = await import("./lib/sortable.js");
+			const { Sortable, MultiDrag } = await import("./lib/sortable.js");
+            Sortable.mount(new MultiDrag());
 			sortableRef.current = new Sortable(ulRef.current, {
+				multiDrag: true, // Enable the plugin
+				selectedClass: "sortable-selected", // Class name for selected item
+				// multiDragKey: null, // Key that must be down for items to be selected
+
 				ghostClass: "drag-in-place",
-				async onEnd() {
+                
+                onStart(e) {
+                    ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
+                        // console.log(item);
+                        item.classList.add('hide');
+                    });
+                },
+				async onEnd(e) {
+                    ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
+                        // console.log(item);
+                        item.classList.remove('hide');
+                    });
 					const newOrderedList = getUpdatedListOrder();
-                    await storageSet("stash", newOrderedList);
-					setStashArr(newOrderedList);					
+					await storageSet("stash", newOrderedList);
+					setStashArr(newOrderedList);
 					sendMessageToBg({
-					    message: 'something-has-changed'
+						message: "something-has-changed"
 					});
 				}
 			});
@@ -198,13 +236,15 @@ function Stash() {
 	}, false);
 
 	async function onStashItemDelete(stashId) {
-        const updatedStashArray = removeFromStash(stashArr, stashId);
-        await storageSet("stash", updatedStashArray);
+		const updatedStashArray = removeFromStash(stashArr, stashId);
+		await storageSet("stash", updatedStashArray);
 		setStashArr(updatedStashArray);
 		sendMessageToBg({
-            message: 'something-has-changed'
-        });
+			message: "something-has-changed"
+		});
 	}
+
+	let parentSectionIdContainer = null;
 
 	return html`
 		<span id="tester-span"></span>
@@ -212,8 +252,15 @@ function Stash() {
 		<div class="bstash-list-con">
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
+					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;
 					return html`
-						<li key=${item.id}>
+						<li
+							key=${item.id}
+							data-sectionId=${!!item?.section ? item.id : ""}
+							data-isSection=${!!item?.section ? "yes" : ""}
+							data-isShowSection=${!!item?.sectionShow ? "yes" : ""}
+							data-myParentSectionId=${!item?.section && !!parentSectionIdContainer ? parentSectionIdContainer : "none"}
+						>
 							<${StashLinkItem} item=${item} onDelete=${onStashItemDelete} tabIndex=${index} />
 						</li>
 					`;
@@ -226,11 +273,11 @@ function Stash() {
 			doBlock=${(b) => setBlock(b)}
 			onTokenSaved=${() => getFreshStashData()}
 		/>
-		<${FooterControls} 
-            onAddCurrentTabToStash=${onAddCurrentTabToStash} 
-            onToggleSettings=${onToggleSettings} 
-            onSectionAddButtonClicked=${onSectionAddButtonClicked}
-        />
+		<${FooterControls}
+			onAddCurrentTabToStash=${onAddCurrentTabToStash}
+			onToggleSettings=${onToggleSettings}
+			onSectionAddButtonClicked=${onSectionAddButtonClicked}
+		/>
 		<div id="bstash-blocker" class=${!block ? "hide" : ""}></div>
 	`;
 }
@@ -240,7 +287,7 @@ render(html`<${Stash} />`, main);
 main.style.opacity = 1;
 
 // LM: 2024-12-11 17:55:13 [Make sure the background.js script knows when the popup closes]
-const port = chrome.runtime.connect({ name: 'popup' });
+const port = chrome.runtime.connect({ name: "popup" });
 window.addEventListener("unload", (e) => {
-    port.disconnect();
+	port.disconnect();
 });
