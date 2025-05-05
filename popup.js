@@ -107,6 +107,7 @@ function Stash() {
 	const ulRef = useRef(null);
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
+	const draggedChildItemsRef = useRef([]);
 
 	const getFreshStashData = useCallback(async () => {
 		isMountedRef.current && setStashArr(sortByOrderProp(await storageGet("stash")));
@@ -185,45 +186,45 @@ function Stash() {
 	}, false);
 
 	useSfx(async function makeListSortable() {
-
-        function ifSectionBeingDraggedDoThisToChildItems(e, callback) {
-             // console.log(e.item, e.item?.getAttribute?.('data-isSection'));
-             if (e.item?.getAttribute?.('data-isSection') === 'yes' && e.item?.getAttribute?.('data-sectionId')) {
-                const sectionId = e.item?.getAttribute?.('data-sectionId');
-                const childItems = ulRef.current.querySelectorAll(`li[data-myParentSectionId="${sectionId}"]`);
-                if (childItems.length) {
-                    console.log(childItems);
-                    childItems.forEach((item) => {
-                        // Sortable.utils.select(item);
-                        callback(item);
-                    });
-                }
-                
-            }
-        }
+		function ifSectionBeingDraggedDoThisToChildItems(e, callback) {
+			// console.log(e.item, e.item?.getAttribute?.('data-isSection'));
+			if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
+				const sectionId = e.item?.getAttribute?.("data-sectionId");
+				const childItems = ulRef.current.querySelectorAll(`li[data-myParentSectionId="${sectionId}"]`);
+				if (childItems.length) {
+					// console.log(childItems);
+					childItems.forEach((item) => {
+						// Sortable.utils.select(item);
+						callback(item);
+					});
+				}
+			}
+		}
 
 		if (ulRef.current) {
 			// See: https://github.com/SortableJS/Sortable
-			const { Sortable, MultiDrag } = await import("./lib/sortable.js");
-            Sortable.mount(new MultiDrag());
+			const { Sortable } = await import("./lib/sortable.js");
 			sortableRef.current = new Sortable(ulRef.current, {
-				multiDrag: true, // Enable the plugin
-				selectedClass: "sortable-selected", // Class name for selected item
-				// multiDragKey: null, // Key that must be down for items to be selected
-
 				ghostClass: "drag-in-place",
-                
-                onStart(e) {
-                    ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
-                        // console.log(item);
-                        item.classList.add('hide');
-                    });
-                },
+				onStart(e) {
+					ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
+						draggedChildItemsRef.current.push(item);
+						item.remove();
+					});
+				},
 				async onEnd(e) {
-                    ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
-                        // console.log(item);
-                        item.classList.remove('hide');
-                    });
+					const sectionElement = e.item;
+                    if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
+                        if (draggedChildItemsRef.current.length) {
+                            let sibling = sectionElement;
+                            draggedChildItemsRef.current.forEach((childItem) => {
+                                sibling.insertAdjacentElement("afterend", childItem);
+                                sibling = childItem;
+                            });
+                        }
+                        draggedChildItemsRef.current = [];
+                    }
+					
 					const newOrderedList = getUpdatedListOrder();
 					await storageSet("stash", newOrderedList);
 					setStashArr(newOrderedList);
