@@ -117,6 +117,18 @@ main {
                         & span {
                             text-shadow: 2px 0px 9px #fffdad94;
                         }
+                        & .bstash-title-input {
+                            background-color: bisque;
+                            border: 0px;
+                            color: inherit;
+                            font: inherit;
+                            padding: 0px;
+                            border-radius: 3px;
+                            outline: none;
+                            display: inline-block;
+                            width: 88%;
+                            cursor: default;
+                        }
                         & .section-toggle-icon {
                             transition: transform .2s ease-out;
                             transform: rotate(180deg);

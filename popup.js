@@ -203,6 +203,17 @@ function Stash() {
         _setListUpdated(newOrderedList);
     }, []);
 
+    const onTitleEdit = useCallback(async (itemId, newTitle) => {
+        // console.log(itemId, newTitle);
+        const updatedStashArray = stashArr.map(item => {
+            if (item.id === itemId) {
+                return { ...item, title: newTitle };
+            }
+            return item;
+        });
+        _setListUpdated(updatedStashArray);
+    }, [stashArr, _setListUpdated]);
+
 	useSfx(async function init() {
 		setArcTheme();
 		await getFreshStashData(); // Show saved copy first.
@@ -298,6 +309,7 @@ function Stash() {
                                 onDelete=${onStashItemDelete} 
                                 tabIndex=${index} 
                                 onSectionToggle=${onSectionToggle}
+                                onTitleEdit=${onTitleEdit}
                             />
 						</li>
 					`;

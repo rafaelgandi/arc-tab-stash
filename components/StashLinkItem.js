@@ -1,4 +1,3 @@
-
 import { html, useState } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
@@ -14,6 +13,8 @@ const defaultFavicon = './assets/empty_favicon.ico';
 export default function StashLinkItem(props) {
     const { item, onSectionToggle } = props;
     const [faviconPath, setFaviconPath] = useState(defaultFavicon);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(item.title);
 
     useSfx(function setProperFavicon() {
         if (item.favIconUrl) {  
@@ -61,6 +62,59 @@ export default function StashLinkItem(props) {
         e.currentTarget.src = './assets/trash.svg';
     }
 
+    function handleTitleDoubleClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsEditing(true);
+        setEditTitle(item.title);
+        // Focus the input after a short delay to ensure it's rendered
+        setTimeout(() => {
+            const input = e.target.parentElement?.querySelector?.('.bstash-title-input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 100);
+    }
+
+    function handleTitleInputBlur(e) {
+        const newTitle = e.target.value.trim();
+        setIsEditing(false);
+        
+        if (!newTitle) {
+            // If empty, revert to original title
+            setEditTitle(item.title);
+            return;
+        }
+        
+        if (newTitle !== item.title) {
+            props?.onTitleEdit?.(item.id, newTitle);
+        }
+    }
+
+    function handleTitleInputKeyDown(e) {
+        if (e.key === 'Enter') {
+            const newTitle = e.target.value.trim();
+            
+            if (!newTitle) {
+                // If empty, revert to original title and exit editing
+                setEditTitle(item.title);
+                setIsEditing(false);
+                return;
+            }
+            
+            e.target.blur(); // This will trigger the blur handler
+        }
+        if (e.key === 'Escape') {
+            setIsEditing(false);
+            setEditTitle(item.title);
+        }
+    }
+
+    function handleTitleInputChange(e) {
+        setEditTitle(e.target.value);
+    }
+
     return html`
          <a 
             href="${item.url}" 
@@ -83,7 +137,22 @@ export default function StashLinkItem(props) {
                         }} 
                     />`
             }
-            <span class="bstash-title">${item.title}</span>
+            ${
+                isEditing 
+                    ? html`<input 
+                        class="bstash-title-input"
+                        value=${editTitle}
+                        onInput=${handleTitleInputChange}
+                        onBlur=${handleTitleInputBlur}
+                        onKeyDown=${handleTitleInputKeyDown}
+                        spellCheck="false"
+                    />`
+                    : html`<span 
+                        class="bstash-title" 
+                        onDblClick=${handleTitleDoubleClick}
+                        title="${(!item?.section) ? item.title : 'Double click to edit section title.'}"
+                    >${item.title}</span>`
+            }
         </a>
         <img 
             class="bstash-trash-icon" 
