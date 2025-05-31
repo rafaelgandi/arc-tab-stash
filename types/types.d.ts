@@ -13,6 +13,7 @@ export type StashLinkItemProps = {
     item: StashItem; 
     onDelete?: (stashId: string) => void;
     tabIndex?: number;
+    onSectionToggle?: (sectionId: string) => void;
 };
 
 export type EmptyProps = {

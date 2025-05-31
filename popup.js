@@ -4,9 +4,8 @@
 */
 import "./popup.styles.js";
 import posthog from "./lib/posthog-js/dist/ph-full.js";
-
 import "./lib/posthog-init.js";
-import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson } from "./lib/helpers.js";
+import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef } from "./lib/preact-htm.js";
 import SettingsModal from "./components/SettingsModal.js";
@@ -168,6 +167,42 @@ function Stash() {
 		});
 	}, [makeSectionId]);
 
+    const hideSectionContents = useCallback((sectionId, hide) => {
+        toggleStyleElement(sectionId, hide, /* css */`
+            li[data-myParentSectionId="${sectionId}"] {
+                display: none !important;
+            }
+            li[data-sectionId="${sectionId}"] {
+                & .section-toggle-icon {
+                    transform: rotate(90deg) !important;
+                }
+            }
+        `);    
+    }, []);
+
+    const _setListUpdated = useCallback(async (updatedList) => {
+        await storageSet("stash", updatedList);
+        setStashArr(updatedList);
+        sendMessageToBg({
+            message: "something-has-changed"
+        });
+    }, []);
+
+    const onSectionToggle = useCallback(async (sectionId) => {
+        const sectionElement = document.querySelector(`li[data-sectionId="${sectionId}"]`);
+        if (!sectionElement) { return; }
+        const isSectionShown = sectionElement.getAttribute('data-isShowSection') === 'yes';
+        if (isSectionShown) {
+            sectionElement.setAttribute('data-isShowSection', '');
+        }
+        else {
+            sectionElement.setAttribute('data-isShowSection', 'yes');
+        }
+        hideSectionContents(sectionId, !isSectionShown);
+        const newOrderedList = getUpdatedListOrder();
+        _setListUpdated(newOrderedList);
+    }, []);
+
 	useSfx(async function init() {
 		setArcTheme();
 		await getFreshStashData(); // Show saved copy first.
@@ -226,11 +261,7 @@ function Stash() {
                     }
 					
 					const newOrderedList = getUpdatedListOrder();
-					await storageSet("stash", newOrderedList);
-					setStashArr(newOrderedList);
-					sendMessageToBg({
-						message: "something-has-changed"
-					});
+					_setListUpdated(newOrderedList);
 				}
 			});
 		}
@@ -238,11 +269,7 @@ function Stash() {
 
 	async function onStashItemDelete(stashId) {
 		const updatedStashArray = removeFromStash(stashArr, stashId);
-		await storageSet("stash", updatedStashArray);
-		setStashArr(updatedStashArray);
-		sendMessageToBg({
-			message: "something-has-changed"
-		});
+		_setListUpdated(updatedStashArray);
 	}
 
 	let parentSectionIdContainer = null;
@@ -254,6 +281,10 @@ function Stash() {
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
 					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;
+                    if (!!item?.section) {
+                        console.log(item.id, item.sectionShow);
+                        hideSectionContents(item.id, item.sectionShow ? false : true);
+                    }
 					return html`
 						<li
 							key=${item.id}
@@ -262,7 +293,12 @@ function Stash() {
 							data-isShowSection=${!!item?.sectionShow ? "yes" : ""}
 							data-myParentSectionId=${!item?.section && !!parentSectionIdContainer ? parentSectionIdContainer : "none"}
 						>
-							<${StashLinkItem} item=${item} onDelete=${onStashItemDelete} tabIndex=${index} />
+							<${StashLinkItem} 
+                                item=${item} 
+                                onDelete=${onStashItemDelete} 
+                                tabIndex=${index} 
+                                onSectionToggle=${onSectionToggle}
+                            />
 						</li>
 					`;
 				})}

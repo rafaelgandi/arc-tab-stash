@@ -7,15 +7,45 @@ export default styled`
     --stash-default-gradient: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
 }
 
+@keyframes gradientRotate {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(90deg) scale(1.1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1);
+    }
+    75% {
+        transform: rotate(270deg) scale(1.2);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
 body * {
     box-sizing: border-box;
 }
 
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    background: rgb(170, 249, 164);
-    background: var(--stash-default-gradient);
+    position: relative;
+    overflow: hidden;
     /* overscroll-behavior: none; */
+
+    &::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%);
+        animation: gradientRotate 60s linear infinite;
+        z-index: -1;
+    }
 
     .hide {
         display: none !important;
@@ -81,9 +111,20 @@ main {
                         box-shadow: none;
                     }
                     & a {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: 8% 1fr;
                         padding-bottom: 0.5rem;
                         border-bottom: 1px solid #092609;
+                        & span {
+                            text-shadow: 2px 0px 9px #fffdad94;
+                        }
+                        & .section-toggle-icon {
+                            transition: transform .2s ease-out;
+                            transform: rotate(180deg);
+                            --size: 13px;
+                            width: var(--size);
+                            height: var(--size);
+                            opacity: .5;
+                        }
                     }
                 }
                 
