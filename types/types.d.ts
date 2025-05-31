@@ -31,4 +31,5 @@ export type FooterControlsProps = {
     onAddCurrentTabToStash?: () => void;
     onSectionAddButtonClicked?: () => void;
     onToggleSettings?: () => void;
+    sectionCount: number;
 };

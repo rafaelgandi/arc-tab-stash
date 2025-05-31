@@ -7,7 +7,7 @@ import posthog from "./lib/posthog-js/dist/ph-full.js";
 import "./lib/posthog-init.js";
 import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
-import { html, render, useState, useCallback, useRef } from "./lib/preact-htm.js";
+import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
 import SettingsModal from "./components/SettingsModal.js";
 import Empty from "./components/Empty.js";
 import useSfx from "./hooks/useSfx.js";
@@ -107,6 +107,10 @@ function Stash() {
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
 	const draggedChildItemsRef = useRef([]);
+    const sectionCount = useMemo(() => {
+        return stashArr.filter(item => !!item?.section).length;
+    }, [stashArr]);
+
 
 	const getFreshStashData = useCallback(async () => {
 		isMountedRef.current && setStashArr(sortByOrderProp(await storageGet("stash")));
@@ -293,7 +297,7 @@ function Stash() {
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
 					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;
                     if (!!item?.section) {
-                        console.log(item.id, item.sectionShow);
+                        // console.log(item.id, item.sectionShow);
                         hideSectionContents(item.id, item.sectionShow ? false : true);
                     }
 					return html`
@@ -326,6 +330,7 @@ function Stash() {
 			onAddCurrentTabToStash=${onAddCurrentTabToStash}
 			onToggleSettings=${onToggleSettings}
 			onSectionAddButtonClicked=${onSectionAddButtonClicked}
+			sectionCount=${sectionCount}
 		/>
 		<div id="bstash-blocker" class=${!block ? "hide" : ""}></div>
 	`;

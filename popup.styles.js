@@ -43,7 +43,7 @@ body {
         width: 200%;
         height: 200%;
         background: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%);
-        animation: gradientRotate 60s linear infinite;
+        animation: gradientRotate 40s linear infinite;
         z-index: -1;
     }
 
@@ -106,6 +106,8 @@ main {
                     background-color: transparent !important;
                     font-weight: 500;
                     font-size: 1.2em;
+                    padding-left: 0;
+                    padding-right: 0;
                     &:hover {
                         background-color: transparent;
                         box-shadow: none;
@@ -113,7 +115,8 @@ main {
                     & a {
                         grid-template-columns: 8% 1fr;
                         padding-bottom: 0.5rem;
-                        border-bottom: 1px solid #092609;
+                        border-bottom: 1px solid rgba(9, 38, 9, 0.3);
+                        outline: none;
                         & span {
                             text-shadow: 2px 0px 9px #fffdad94;
                         }

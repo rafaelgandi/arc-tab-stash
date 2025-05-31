@@ -45,6 +45,9 @@ import "./lib/posthog-init.js";
             const gitToken = await storageGet('gitToken');
             if (!gitToken) {
                 storageSet('gitToken', '');
+                posthog.capture('sh-fresh-install-happend', {
+                    version: getVersionFromManifest()
+                });
                 // LM: 2023-03-10 13:34:22 [Only open notion page if token does not exist. This means that its a fresh install.]
                 openInNewTab(stashNotionPage);
             }

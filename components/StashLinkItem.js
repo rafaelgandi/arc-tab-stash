@@ -1,6 +1,7 @@
-import { html, useState } from '../lib/preact-htm.js';
+import { html, useState, useRef, useEffect } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
+import useHighlightFade from '../hooks/useHighlightFade.js';
 import posthog from '../lib/posthog-js/dist/ph-full.js';
 import Toggle from './Toggle.js';
 
@@ -15,6 +16,8 @@ export default function StashLinkItem(props) {
     const [faviconPath, setFaviconPath] = useState(defaultFavicon);
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
+    const inputRef = useRef(null);
+    const { triggerHighlight, getHighlightStyles } = useHighlightFade();
 
     useSfx(function setProperFavicon() {
         if (item.favIconUrl) {  
@@ -30,6 +33,13 @@ export default function StashLinkItem(props) {
             };
         }
     }, false);
+
+    useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditing]);
 
     function handleOnLinkClick(e) {
         e.preventDefault();
@@ -67,14 +77,6 @@ export default function StashLinkItem(props) {
         e.stopPropagation();
         setIsEditing(true);
         setEditTitle(item.title);
-        // Focus the input after a short delay to ensure it's rendered
-        setTimeout(() => {
-            const input = e.target.parentElement?.querySelector?.('.bstash-title-input');
-            if (input) {
-                input.focus();
-                input.select();
-            }
-        }, 100);
     }
 
     function handleTitleInputBlur(e) {
@@ -89,6 +91,7 @@ export default function StashLinkItem(props) {
         
         if (newTitle !== item.title) {
             props?.onTitleEdit?.(item.id, newTitle);
+            triggerHighlight(); // Trigger highlight effect
         }
     }
 
@@ -140,6 +143,7 @@ export default function StashLinkItem(props) {
             ${
                 isEditing 
                     ? html`<input 
+                        ref=${inputRef}
                         class="bstash-title-input"
                         value=${editTitle}
                         onInput=${handleTitleInputChange}
@@ -150,7 +154,8 @@ export default function StashLinkItem(props) {
                     : html`<span 
                         class="bstash-title" 
                         onDblClick=${handleTitleDoubleClick}
-                        title="${(!item?.section) ? item.title : 'Double click to edit section title.'}"
+                        title="${(!item?.section) ? item.title : 'Double click to edit title.'}"
+                        style=${getHighlightStyles()}
                     >${item.title}</span>`
             }
         </a>
@@ -161,7 +166,7 @@ export default function StashLinkItem(props) {
             onClick=${handleOnDeleteItem}
             onMouseOver=${onTrashIconHover}
             onMouseOut=${onTrashIconHover}
-            title=${item.section ? 'Delete section header only. Items under this section will not be deleted.' : 'Delete item'}
+            title=${item.section ? 'Deletes section header only. Items under this section will not be deleted.' : 'Delete item'}
         />
     `;
 }
