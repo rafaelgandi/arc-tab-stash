@@ -3,8 +3,8 @@
     www.rafaelgandi.com
 */
 import "./popup.styles.js";
-import posthog from "./lib/posthog-js/dist/ph-full.js";
 import "./lib/posthog-init.js";
+import * as analytics from './lib/analytics.js';
 import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
@@ -138,7 +138,7 @@ function Stash() {
 
 	const onAddCurrentTabToStash = useCallback(async () => {
 		setBlock(true);
-		posthog.capture("sh-button-was-used-for-stashing");
+		analytics.capture("sh-button-was-used-for-stashing");
 		await sendMessageToBg({
 			message: "stash-current-tab"
 		});
@@ -256,6 +256,7 @@ function Stash() {
 			const { Sortable } = await import("./lib/sortable.js");
 			sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
+                dragClass: 'item-currently-dragging',
 				onStart(e) {
 					ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
 						draggedChildItemsRef.current.push(item);

@@ -2,8 +2,8 @@ import { html, useState, useRef, useEffect } from '../lib/preact-htm.js';
 import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
 import useHighlightFade from '../hooks/useHighlightFade.js';
-import posthog from '../lib/posthog-js/dist/ph-full.js';
 import Toggle from './Toggle.js';
+import * as analytics from '../lib/analytics.js';
 
 const defaultFavicon = './assets/empty_favicon.ico';
 
@@ -53,14 +53,14 @@ export default function StashLinkItem(props) {
             return;
         }
         openInNewTab(e.currentTarget.href);
-        posthog.capture('sh-stash-link-opened');
+        analytics.capture('sh-stash-link-opened');
     }
 
     async function handleOnDeleteItem(e) {
         const stashId = e.currentTarget.getAttribute('data-stash-id');
         if (!stashId) { return; }
         props?.onDelete?.(stashId);
-        posthog.capture('sh-stash-link-deleted');
+        analytics.capture('sh-stash-link-deleted');
     }
 
     function onTrashIconHover(e) {

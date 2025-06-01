@@ -6,7 +6,7 @@ import {
 } from '../lib/helpers.js';
 import * as api from '../lib/api.js';
 import useSfx from '../hooks/useSfx.js';
-import posthog from '../lib/posthog-js/dist/ph-full.js';
+import * as analytics from '../lib/analytics.js';
 
 
 /**
@@ -41,7 +41,7 @@ export default function SettingsModal(props) {
                 gitToken: tokenValue
             }
         });
-        posthog.capture('sh-git-token-saved');
+        analytics.capture('sh-git-token-saved');
         props?.doBlock?.(false);
         props?.onTokenSaved?.();
         props?.onDidDismiss?.();

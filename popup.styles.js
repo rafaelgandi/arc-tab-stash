@@ -25,6 +25,24 @@ export default styled`
     }
 }
 
+@keyframes subtleBlur {
+    0% {
+        filter: blur(0px);
+    }
+    25% {
+        filter: blur(0.5px);
+    }
+    50% {
+        filter: blur(1px);
+    }
+    75% {
+        filter: blur(0.5px);
+    }
+    100% {
+        filter: blur(0px);
+    }
+}
+
 body * {
     box-sizing: border-box;
 }
@@ -43,7 +61,7 @@ body {
         width: 200%;
         height: 200%;
         background: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%);
-        animation: gradientRotate 40s linear infinite;
+        animation: gradientRotate 40s linear infinite, subtleBlur 8s ease-in-out infinite;
         z-index: -1;
     }
 
@@ -100,6 +118,13 @@ main {
                 }  
                 &.drag-in-place {
                     opacity: 0;
+                    cursor: grabbing;
+                }
+                &[draggable="true"] {
+                    cursor: grabbing;
+                    & a {
+                        cursor: grabbing;
+                    }
                 }
 
                 &[data-isSection="yes"] {

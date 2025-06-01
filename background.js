@@ -12,8 +12,8 @@ import {
     openInNewTab
 } from './lib/helpers.js';
 import * as api from './lib/api.js';
-import posthog from './lib/posthog-js/dist/ph-full.js';
 import "./lib/posthog-init.js";
+import * as analytics from './lib/analytics.js';
 
 (async () => {
     let stashDebouncer = undefined;
@@ -32,7 +32,7 @@ import "./lib/posthog-init.js";
             if (details?.previousVersion !== getVersionFromManifest()) {
                 // (2025-02-06) rTODO: uncomment below when sections feature is ready.
                 // openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
-                posthog.capture('sh-update-happend', {
+                analytics.capture('sh-update-happend', {
                     updatedVersion: getVersionFromManifest()
                 });
             }           
@@ -45,7 +45,7 @@ import "./lib/posthog-init.js";
             const gitToken = await storageGet('gitToken');
             if (!gitToken) {
                 storageSet('gitToken', '');
-                posthog.capture('sh-fresh-install-happend', {
+                analytics.capture('sh-fresh-install-happend', {
                     version: getVersionFromManifest()
                 });
                 // LM: 2023-03-10 13:34:22 [Only open notion page if token does not exist. This means that its a fresh install.]
@@ -166,7 +166,7 @@ import "./lib/posthog-init.js";
             message: 'tab-added-to-stash'
         });
         await api.setGistContents(STASH);
-        posthog.capture('sh-tab-added-to-user-stash', {
+        analytics.capture('sh-tab-added-to-user-stash', {
             title: title ?? 'Untitled'
         })
     }
