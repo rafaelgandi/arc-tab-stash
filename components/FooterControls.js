@@ -8,7 +8,7 @@ export default function FooterControls(props) {
 		<footer>
 			<div class="bstash-footer-child" title="Stash current tab.">
 				<img
-					title="Add current tab to stash (shift + opt + s)"
+					title="Add current tab to your Stash (shift + opt + s)"
 					id="bstash-footer-add-tab-button"
 					class="bstash-footer-control"
 					src="./assets/add.svg"
@@ -25,6 +25,7 @@ export default function FooterControls(props) {
 					id="bstash-section-button"
 					class="bstash-footer-control"
 					src="./assets/tag-outline.svg"
+                    title="Add New Heading"
 					onClick=${(e) => {
 						e.preventDefault();
 						props?.onSectionAddButtonClicked?.();
@@ -35,6 +36,7 @@ export default function FooterControls(props) {
 					id="bstash-footer-settings-button"
 					class="bstash-footer-control"
 					src="./assets/settings.svg"
+					title="Settings"
 					onClick=${(e) => {
 						e.preventDefault();
 						props?.onToggleSettings?.();

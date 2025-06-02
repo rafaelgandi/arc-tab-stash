@@ -160,7 +160,7 @@ function Stash() {
 			return [
 				{
 					url: "about:blank",
-					title: "Untitled Section",
+					title: "Untitled Heading",
 					id: makeSectionId(),
 					favIconUrl: "",
 					order: 0,

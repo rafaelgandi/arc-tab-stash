@@ -27,19 +27,19 @@ export default styled`
 
 @keyframes subtleBlur {
     0% {
-        filter: blur(0px);
+        filter: blur(0px) saturate(1);
     }
     25% {
-        filter: blur(0.5px);
+        filter: blur(0.5px) saturate(1.3);
     }
     50% {
-        filter: blur(1px);
+        filter: blur(1px) saturate(1.1);
     }
     75% {
-        filter: blur(0.5px);
+        filter: blur(0.5px) saturate(1.2);
     }
     100% {
-        filter: blur(0px);
+        filter: blur(0px) saturate(1);
     }
 }
 

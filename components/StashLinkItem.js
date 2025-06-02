@@ -166,7 +166,7 @@ export default function StashLinkItem(props) {
             onClick=${handleOnDeleteItem}
             onMouseOver=${onTrashIconHover}
             onMouseOut=${onTrashIconHover}
-            title=${item.section ? 'Deletes section header only. Items under this section will not be deleted.' : 'Delete item'}
+            title=${item.section ? 'Deletes header title only. Items under this header will not be deleted.' : 'Delete item'}
         />
     `;
 }
