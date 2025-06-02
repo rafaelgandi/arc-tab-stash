@@ -382,10 +382,9 @@ footer {
                 transform: rotate(180deg);
             }
             &#bstash-section-button {
-                --size: 17px;
-                transform: rotate(45deg);
+                --size: 18px;
                 &:hover {
-                    transform: rotate(225deg) !important;
+                    transform: rotate(45deg) scale(1.1) !important;
                 }
             }
             &#bstash-footer-settings-button {

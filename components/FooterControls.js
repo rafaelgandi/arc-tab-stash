@@ -4,6 +4,7 @@ import { html } from "../lib/preact-htm.js";
 export default function FooterControls(props) {
     const sectionCountLimit = 30; // Users are only allowed 30 sections.
     const sectionCount = props?.sectionCount ?? 0;
+
 	return html`
 		<footer>
 			<div class="bstash-footer-child" title="Stash current tab.">
@@ -23,8 +24,8 @@ export default function FooterControls(props) {
                 ${(sectionCount <= sectionCountLimit )  ? html`
 				<img
 					id="bstash-section-button"
-					class="bstash-footer-control"
-					src="./assets/tag-outline.svg"
+					class="bstash-footer-control"					
+					src="./assets/header.png"
                     title="Add New Heading"
 					onClick=${(e) => {
 						e.preventDefault();
