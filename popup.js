@@ -5,7 +5,7 @@
 import "./popup.styles.js";
 import "./lib/posthog-init.js";
 import * as analytics from './lib/analytics.js';
-import { storageSet, storageGet, removeFromStash, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
+import { storageSet, storageGet, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
 import SettingsModal from "./components/SettingsModal.js";
@@ -155,6 +155,7 @@ function Stash() {
 	}, []);
 
 	const onSectionAddButtonClicked = useCallback(() => {
+        analytics.capture('sh-section-add-button-clicked');
 		setStashArr((prev) => {
 			return [
 				{
@@ -205,7 +206,7 @@ function Stash() {
         hideSectionContents(sectionId, !isSectionShown);
         const newOrderedList = getUpdatedListOrder();
         _setListUpdated(newOrderedList);
-    }, []);
+    }, [hideSectionContents, getUpdatedListOrder, _setListUpdated]);
 
     const onTitleEdit = useCallback(async (itemId, newTitle) => {
         // console.log(itemId, newTitle);
@@ -215,6 +216,9 @@ function Stash() {
             }
             return item;
         });
+        analytics.capture('sh-stash-section-title-edited', {
+            'section title': newTitle
+        });
         _setListUpdated(updatedStashArray);
     }, [stashArr, _setListUpdated]);
 
@@ -223,6 +227,9 @@ function Stash() {
 		await getFreshStashData(); // Show saved copy first.
 		const gitCreds = await api.getGitCredsSaved();
 		if (typeof gitCreds !== "undefined" && navigator.onLine) {
+            if (gitCreds?.tokenEncrypted) {
+                analytics.identify(gitCreds.tokenEncrypted);
+            }
 			const stashFromGist = await api.getGistContents(); // Make sure to query fresh data from github api
 			if (!stashFromGist) {
 				return;
@@ -258,10 +265,15 @@ function Stash() {
 				ghostClass: "drag-in-place",
                 dragClass: 'item-currently-dragging',
 				onStart(e) {
-					ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
-						draggedChildItemsRef.current.push(item);
-						item.remove();
-					});
+					try {
+                        ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
+                            draggedChildItemsRef.current.push(item);
+                            item.remove();
+                        });
+                    } catch (err) {
+                        draggedChildItemsRef.current = []; // Cleanup on error
+                        throw err;
+                    }
 				},
 				async onEnd(e) {
 					const sectionElement = e.item;
@@ -283,25 +295,63 @@ function Stash() {
 		}
 	}, false);
 
-	async function onStashItemDelete(stashId) {
-		const updatedStashArray = removeFromStash(stashArr, stashId);
-		_setListUpdated(updatedStashArray);
-	}
+    const onStashItemDelete = useCallback(async (stashId) => {
+        // const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
+        // console.log(updatedStashArray, 'updatedStashArray');
+        // _setListUpdated(updatedStashArray);
+        let isRegularStashItem = false;
+        for (let item of stashArr) {
+            if (item.id.toString() === stashId) {
+                if (!item?.section) {
+                    isRegularStashItem = true;
+                    break;
+                }
+            }
+        }
+        if (isRegularStashItem) {
+            const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
+            _setListUpdated(updatedStashArray);
+            return;
+        }
+        // For section deletion //
+        let isSectionItem = false;
+        const sectionItems = [];
+        for (let item of stashArr) {
+            if (item.id.toString() === stashId) {
+                isSectionItem = true;
+                continue;
+            }
+            if (!item?.section && isSectionItem) {
+                sectionItems.push(item);
+            }
+            else {
+                isSectionItem = false;
+            }
+        }
+        const sectionItemIds = sectionItems.map((item) => item.id);
+        let updatedStashArray = stashArr.filter((item) => !sectionItemIds.includes(item.id));
+        updatedStashArray = updatedStashArray.filter((item) => item.id.toString() !== stashId);
+        updatedStashArray = [...sectionItems, ...updatedStashArray];
+        setStashArr(updatedStashArray); // Update the dom first by rerendering the list.
+        requestAnimationFrame(() => {
+            const stashOrderedArrayFromDOM = getUpdatedListOrder(); // gets the list in correct order from the dom.
+            _setListUpdated(stashOrderedArrayFromDOM);
+        });
+    }, [stashArr, _setListUpdated, getUpdatedListOrder]);
 
 	let parentSectionIdContainer = null;
 
 	return html`
 		<span id="tester-span"></span>
-		<${Empty} show=${stashArr.length < 1} />
-		<div class="bstash-list-con">
+        ${(stashArr.length) && html`<${Empty} show=${stashArr.length < 1} />`}		
+		<div class=${`bstash-list-con`}>
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
 					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;
-                    if (!!item?.section) {
-                        // console.log(item.id, item.sectionShow);
+					if (!!item?.section) {
                         hideSectionContents(item.id, item.sectionShow ? false : true);
                     }
-					return html`
+                    return html`
 						<li
 							key=${item.id}
 							data-sectionId=${!!item?.section ? item.id : ""}

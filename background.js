@@ -67,6 +67,9 @@ import * as analytics from './lib/analytics.js';
         (async () => {
             const gitCreds = await api.getGitCredsSaved();
             if (typeof gitCreds !== 'undefined' && navigator.onLine) {
+                if (gitCreds?.tokenEncrypted) {
+                    analytics.identify(gitCreds.tokenEncrypted);
+                }
                 const stashFromGist = await api.getGistContents(); 
                 if (!stashFromGist) {
                     return;
