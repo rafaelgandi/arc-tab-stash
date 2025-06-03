@@ -146,6 +146,9 @@ import * as analytics from './lib/analytics.js';
     async function handleStashingTab() {
         const gitCreds = await api.getGitCredsSaved();
         if (!navigator.onLine || !gitCreds) { return; }
+        if (gitCreds?.tokenEncrypted) {
+            analytics.identify(gitCreds.tokenEncrypted);
+        }
         const tab = await getCurrentTabData();
         if (!tab) { return; }
         const { favIconUrl, title, url, id } = tab;

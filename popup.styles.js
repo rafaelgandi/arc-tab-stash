@@ -65,6 +65,19 @@ body {
         z-index: -1;
     }
 
+    &::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('./assets/noise-light.png');
+        background-repeat: repeat;
+        background-size: 150px 150px;
+        z-index: 0;
+    }
+
     .hide {
         display: none !important;
     }
@@ -74,6 +87,9 @@ main {
     display: block;
     width: 300px;
     min-height: var(--app-min-height);
+    z-index: 1;
+    position: relative;
+    
     & #bstash-blocker {
         position: fixed;
         top: 0;

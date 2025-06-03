@@ -14,6 +14,7 @@ import useSfx from "./hooks/useSfx.js";
 import StashLinkItem from "./components/StashLinkItem.js";
 import FooterControls from "./components/FooterControls.js";
 import useIsMountedRef from "./hooks/useIsMountedRef.js";
+import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
 
 const $head = document.querySelector("head");
 const $body = document.querySelector("body");
@@ -390,6 +391,9 @@ function Stash() {
 const main = document.getElementById("arc-bookmark-stash-main");
 render(html`<${Stash} />`, main);
 main.style.opacity = 1;
+
+// LM: 2025-06-03 15:46:10 [Set up global error logger]
+setUpAuGlobalErrorLogger();
 
 // LM: 2024-12-11 17:55:13 [Make sure the background.js script knows when the popup closes]
 const port = chrome.runtime.connect({ name: "popup" });
