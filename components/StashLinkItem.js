@@ -59,10 +59,16 @@ export default function StashLinkItem(props) {
     async function handleOnDeleteItem(e) {
         const stashId = e.currentTarget.getAttribute('data-stash-id');
         if (!stashId) { return; }
-        e.currentTarget.parentElement.classList.add('animate__animated', 'animate__fadeOutLeft', 'animate__faster');
-        setTimeout(() => {
+        const parentElement = e.currentTarget.parentElement;
+        if (parentElement && parentElement.tagName.toLowerCase() === 'li') {
+            parentElement.classList.add('animate__animated', 'animate__fadeOutLeft', 'animate__faster');
+            setTimeout(() => {
+                props?.onDelete?.(stashId);
+            }, 400);
+        }
+        else {
             props?.onDelete?.(stashId);
-        }, 400);
+        }      
         analytics.capture('sh-stash-link-deleted');
     }
 
