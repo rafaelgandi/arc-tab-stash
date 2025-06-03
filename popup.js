@@ -344,7 +344,7 @@ function Stash() {
 
 	return html`
 		<span id="tester-span"></span>
-        ${(stashArr.length) && html`<${Empty} show=${stashArr.length < 1} />`}		
+        ${(!stashArr.length) && html`<${Empty} />`}		
 		<div class=${`bstash-list-con`}>
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {

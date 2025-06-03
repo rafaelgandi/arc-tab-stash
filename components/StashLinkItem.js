@@ -59,7 +59,10 @@ export default function StashLinkItem(props) {
     async function handleOnDeleteItem(e) {
         const stashId = e.currentTarget.getAttribute('data-stash-id');
         if (!stashId) { return; }
-        props?.onDelete?.(stashId);
+        e.currentTarget.parentElement.classList.add('animate__animated', 'animate__fadeOutLeft', 'animate__faster');
+        setTimeout(() => {
+            props?.onDelete?.(stashId);
+        }, 400);
         analytics.capture('sh-stash-link-deleted');
     }
 
@@ -166,7 +169,7 @@ export default function StashLinkItem(props) {
             onClick=${handleOnDeleteItem}
             onMouseOver=${onTrashIconHover}
             onMouseOut=${onTrashIconHover}
-            title=${item.section ? 'Deletes header title only. Items under this header will not be deleted.' : 'Delete item'}
+            title=${item.section ? 'Deletes heading title only. Items under this heading will not be deleted.' : 'Delete item'}
         />
     `;
 }

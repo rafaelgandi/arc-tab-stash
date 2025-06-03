@@ -8,10 +8,10 @@ import { html } from '../lib/preact-htm.js';
  */
 export default function Empty(props) {
     return html`
-        <div class="bstash-empty-con ${(!!props?.show) ? '' : 'hide'}">
+        <div class="bstash-empty-con">
             <div>
-                ${`It's kinda lonely here `}
-                <img src="./assets/shortcutkeys.svg" />
+                <span style=${{display: 'block'}} class="animate__animated animate__bounceInDown">${`It's kinda lonely here `}</span>
+                <img class="animate__animated animate__bounceInDown animate__fast" src="./assets/shortcutkeys.svg" />
             </div>
         </div>
     `;
