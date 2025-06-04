@@ -1,7 +1,17 @@
 {
     "name": "Stash",
     "description": "A tiny browser extension that saves and syncs your favorite links across all your chromium browsers.",
-    "version": "1.4.4",
+    
+    
+    
+    "----version": "1.4.5",
+    
+    "version": "0.0.0",
+    "debug": true,
+
+
+
+
     "manifest_version": 3,
     "minimum_chrome_version": "92",
     "icons": {
