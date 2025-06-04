@@ -19,7 +19,7 @@ import * as analytics from './lib/analytics.js';
     let stashDebouncer = undefined;
     const stashDebouncerDelay = 800; // ms
     const stashNotionPage = `https://rafaelgandi.notion.site/Stash-1280c4fcdd48491ab480cf455d671517`;
-    const onStashUpdateNotionPage = `https://rafaelgandi.notion.site/Thanks-for-your-support-2a0e39ac7f154c14beb513d2e8b467e9?pvs=4`;
+    const onStashUpdateNotionPage = `https://rafaelgandi.notion.site/Introducing-Headings-2a0e39ac7f154c14beb513d2e8b467e9`;
 
     let SOMETHING_HAS_CHANGED_FLAG = false;
 
@@ -30,8 +30,7 @@ import * as analytics from './lib/analytics.js';
         // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
         if (details?.reason === 'update') {
             if (details?.previousVersion !== getVersionFromManifest()) {
-                // (2025-02-06) rTODO: uncomment below when sections feature is ready.
-                // openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+                openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
                 analytics.capture('sh-update-happend', {
                     updatedVersion: getVersionFromManifest()
                 });
