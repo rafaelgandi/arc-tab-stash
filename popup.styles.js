@@ -4,7 +4,8 @@ export default styled`
 :root {
     --app-spacing: 1rem;
     --app-min-height: 350px;
-    --stash-default-gradient: linear-gradient(129deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 46%, rgba(185, 101, 255, 1) 100%);
+    --stash-default-gradient: linear-gradient(135deg, rgba(255, 160, 20, 1) 0%, rgba(185, 101, 255, 1) 25%, rgba(170, 249, 164, 1) 50%, rgba(255, 160, 20, 1) 75%, rgba(185, 101, 255, 1) 100%);
+    /* --stash-default-gradient: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%); */
 }
 
 @keyframes gradientRotate {
@@ -52,7 +53,10 @@ body {
     position: relative;
     overflow-x: hidden; /* Only hide horizontal overflow */
     overflow-y: auto;   /* Allow vertical scrolling for auto-scroll to work */
-    /* overscroll-behavior: none; */
+
+    /* &::-webkit-scrollbar {
+        display: none;
+    } */
 
     &::before {
         content: '';
@@ -61,8 +65,10 @@ body {
         left: -50%;
         width: 200%;
         height: 200%;
-        background: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%);
-        animation: gradientRotate 40s linear infinite, subtleBlur 8s ease-in-out infinite;
+        /* background: linear-gradient(45deg, rgba(170, 249, 164, 1) 0%, rgba(255, 160, 20, 1) 25%, rgba(185, 101, 255, 1) 50%, rgba(170, 249, 164, 1) 75%, rgba(255, 160, 20, 1) 100%); */
+        background: var(--stash-default-gradient);
+        animation: gradientRotate 40s linear infinite, 
+                   subtleBlur 8s ease-in-out infinite;
         z-index: -1;
     }
 
@@ -247,7 +253,7 @@ main {
         & div {
             text-align: center;
             font-size: 1.5em;
-            opacity: .6;
+            opacity: .9;
             & img {
                 display: block;
                 margin: 0 auto;
