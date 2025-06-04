@@ -50,7 +50,8 @@ body * {
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden; /* Only hide horizontal overflow */
+    overflow-y: auto;   /* Allow vertical scrolling for auto-scroll to work */
     /* overscroll-behavior: none; */
 
     &::before {
@@ -87,9 +88,20 @@ main {
     display: block;
     width: 300px;
     min-height: var(--app-min-height);
+    max-height: 600px; /* Add max height to create scrollable area */
+    overflow-y: auto;  /* Allow vertical scrolling */
     z-index: 1;
     position: relative;
     
+    /* Hide scrollbars while keeping scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    
+    /* Hide scrollbar for webkit browsers (Chrome, Safari, newer Edge) */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
     & #bstash-blocker {
         position: fixed;
         top: 0;

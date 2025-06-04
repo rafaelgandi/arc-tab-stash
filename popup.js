@@ -261,10 +261,18 @@ function Stash() {
 
 		if (ulRef.current) {
 			// See: https://github.com/SortableJS/Sortable
-			const { Sortable } = await import("./lib/sortable.js");
-			sortableRef.current = new Sortable(ulRef.current, {
+            // const { Sortable } = await import("./lib/sortable.js");
+            const { default: Sortable } = await import("./lib/sortable.complete.esm.1.15.6.js");
+            sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
                 dragClass: 'item-currently-dragging',
+                // Auto-scroll configuration for better UX with long lists
+                scroll: true, // Explicitly specify scroll container
+                forceAutoScrollFallback: true, // Force fallback mode for better compatibility
+                scrollSensitivity: 20, // Reduced sensitivity for easier triggering
+                scrollSpeed: 20, // Increased speed for more noticeable effect
+                bubbleScroll: true,
+                emptyInsertThreshold: 5, // Allow insertion in empty areas
 				onStart(e) {
 					try {
                         ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
