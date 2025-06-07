@@ -4,7 +4,7 @@
 */
 import "./popup.styles.js";
 import "./lib/posthog-init.js";
-import * as analytics from './lib/analytics.js';
+import * as analytics from "./lib/analytics.js";
 import { storageSet, storageGet, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
@@ -15,7 +15,6 @@ import StashLinkItem from "./components/StashLinkItem.js";
 import FooterControls from "./components/FooterControls.js";
 import useIsMountedRef from "./hooks/useIsMountedRef.js";
 import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
-
 
 function sortByOrderProp(arr) {
 	let newArr = [...arr];
@@ -39,10 +38,9 @@ function Stash() {
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
 	const draggedChildItemsRef = useRef([]);
-    const sectionCount = useMemo(() => {
-        return stashArr.filter(item => !!item?.section).length;
-    }, [stashArr]);
-
+	const sectionCount = useMemo(() => {
+		return stashArr.filter((item) => !!item?.section).length;
+	}, [stashArr]);
 
 	const getFreshStashData = useCallback(async () => {
 		isMountedRef.current && setStashArr(sortByOrderProp(await storageGet("stash")));
@@ -87,25 +85,54 @@ function Stash() {
 	}, []);
 
 	const onSectionAddButtonClicked = useCallback(() => {
-        analytics.capture('sh-section-add-button-clicked');
+		analytics.capture("sh-section-add-button-clicked");
+        const newSectionId = makeSectionId();
 		setStashArr((prev) => {
 			return [
+				...prev,
 				{
 					url: "about:blank",
 					title: "Untitled Heading",
-					id: makeSectionId(),
+					id: newSectionId,
 					favIconUrl: "",
 					order: 0,
 					section: true,
 					sectionShow: true
-				},
-				...prev
+				}
 			];
 		});
+		// Scroll to bottom smoothly after adding section
+		setTimeout(() => {
+			document.querySelector("main").scrollTo({
+				top: document.querySelector("main").scrollHeight,
+				behavior: "smooth",
+				duration: 1000 // Add 800ms duration for smoother scroll
+			});
+			// Trigger double click on the newly added section title
+			const lastSection = document.querySelector('li[data-sectionId="' + newSectionId + '"] .bstash-title');
+            if (lastSection) {
+				lastSection.dispatchEvent(
+					new MouseEvent("dblclick", {
+						bubbles: true,
+						cancelable: true
+					})
+				);
+                const li = document.querySelector('li[data-sectionId="' + newSectionId + '"]');
+                if (li) {
+                    li.classList.add('animate__animated', 'animate__jackInTheBox');
+                    setTimeout(() => {
+                        li.classList.remove('animate__animated', 'animate__jackInTheBox');
+                    }, 2000);
+                }
+			}
+		}, 400);
 	}, [makeSectionId]);
 
-    const hideSectionContents = useCallback((sectionId, hide) => {
-        toggleStyleElement(sectionId, hide, /* css */`
+	const hideSectionContents = useCallback((sectionId, hide) => {
+		toggleStyleElement(
+			sectionId,
+			hide,
+			/* css */ `
             li[data-myParentSectionId="${sectionId}"] {
                 display: none !important;
             }
@@ -114,53 +141,61 @@ function Stash() {
                     transform: rotate(90deg) !important;
                 }
             }
-        `);    
-    }, []);
+        `
+		);
+	}, []);
 
-    const _setListUpdated = useCallback(async (updatedList) => {
-        await storageSet("stash", updatedList);
-        setStashArr(updatedList);
-        sendMessageToBg({
-            message: "something-has-changed"
-        });
-    }, []);
+	const _setListUpdated = useCallback(async (updatedList) => {
+		await storageSet("stash", updatedList);
+		setStashArr(updatedList);
+		sendMessageToBg({
+			message: "something-has-changed"
+		});
+	}, []);
 
-    const onSectionToggle = useCallback(async (sectionId) => {
-        const sectionElement = document.querySelector(`li[data-sectionId="${sectionId}"]`);
-        if (!sectionElement) { return; }
-        const isSectionShown = sectionElement.getAttribute('data-isShowSection') === 'yes';
-        if (isSectionShown) {
-            sectionElement.setAttribute('data-isShowSection', '');
-        }
-        else {
-            sectionElement.setAttribute('data-isShowSection', 'yes');
-        }
-        hideSectionContents(sectionId, !isSectionShown);
-        const newOrderedList = getUpdatedListOrder();
-        _setListUpdated(newOrderedList);
-    }, [hideSectionContents, getUpdatedListOrder, _setListUpdated]);
+	const onSectionToggle = useCallback(
+		async (sectionId) => {
+			const sectionElement = document.querySelector(`li[data-sectionId="${sectionId}"]`);
+			if (!sectionElement) {
+				return;
+			}
+			const isSectionShown = sectionElement.getAttribute("data-isShowSection") === "yes";
+			if (isSectionShown) {
+				sectionElement.setAttribute("data-isShowSection", "");
+			} else {
+				sectionElement.setAttribute("data-isShowSection", "yes");
+			}
+			hideSectionContents(sectionId, !isSectionShown);
+			const newOrderedList = getUpdatedListOrder();
+			_setListUpdated(newOrderedList);
+		},
+		[hideSectionContents, getUpdatedListOrder, _setListUpdated]
+	);
 
-    const onTitleEdit = useCallback(async (itemId, newTitle) => {
-        // console.log(itemId, newTitle);
-        const updatedStashArray = stashArr.map(item => {
-            if (item.id === itemId) {
-                return { ...item, title: newTitle };
-            }
-            return item;
-        });
-        analytics.capture('sh-stash-section-title-edited', {
-            'section title': newTitle
-        });
-        _setListUpdated(updatedStashArray);
-    }, [stashArr, _setListUpdated]);
+	const onTitleEdit = useCallback(
+		async (itemId, newTitle) => {
+			// console.log(itemId, newTitle);
+			const updatedStashArray = stashArr.map((item) => {
+				if (item.id === itemId) {
+					return { ...item, title: newTitle };
+				}
+				return item;
+			});
+			analytics.capture("sh-stash-section-title-edited", {
+				"section title": newTitle
+			});
+			_setListUpdated(updatedStashArray);
+		},
+		[stashArr, _setListUpdated]
+	);
 
 	useSfx(async function init() {
 		await getFreshStashData(); // Show saved copy first.
 		const gitCreds = await api.getGitCredsSaved();
 		if (typeof gitCreds !== "undefined" && navigator.onLine) {
-            if (gitCreds?.tokenEncrypted) {
-                analytics.identify(gitCreds.tokenEncrypted);
-            }
+			if (gitCreds?.tokenEncrypted) {
+				analytics.identify(gitCreds.tokenEncrypted);
+			}
 			const stashFromGist = await api.getGistContents(); // Make sure to query fresh data from github api
 			if (!stashFromGist) {
 				return;
@@ -191,42 +226,42 @@ function Stash() {
 
 		if (ulRef.current) {
 			// See: https://github.com/SortableJS/Sortable
-            // const { Sortable } = await import("./lib/sortable.js");
-            const { default: Sortable } = await import("./lib/sortable.complete.esm.1.15.6.js");
-            sortableRef.current = new Sortable(ulRef.current, {
+			// const { Sortable } = await import("./lib/sortable.js");
+			const { default: Sortable } = await import("./lib/sortable.complete.esm.1.15.6.js");
+			sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
-                dragClass: 'item-currently-dragging',
-                // Auto-scroll configuration for better UX with long lists
-                scroll: true, // Explicitly specify scroll container
-                forceAutoScrollFallback: true, // Force fallback mode for better compatibility
-                scrollSensitivity: 20, // Reduced sensitivity for easier triggering
-                scrollSpeed: 20, // Increased speed for more noticeable effect
-                bubbleScroll: true,
-                emptyInsertThreshold: 5, // Allow insertion in empty areas
+				dragClass: "item-currently-dragging",
+				// Auto-scroll configuration for better UX with long lists
+				scroll: true, // Explicitly specify scroll container
+				forceAutoScrollFallback: true, // Force fallback mode for better compatibility
+				scrollSensitivity: 20, // Reduced sensitivity for easier triggering
+				scrollSpeed: 20, // Increased speed for more noticeable effect
+				bubbleScroll: true,
+				emptyInsertThreshold: 5, // Allow insertion in empty areas
 				onStart(e) {
 					try {
-                        ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
-                            draggedChildItemsRef.current.push(item);
-                            item.remove();
-                        });
-                    } catch (err) {
-                        draggedChildItemsRef.current = []; // Cleanup on error
-                        throw err;
-                    }
+						ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
+							draggedChildItemsRef.current.push(item);
+							item.remove();
+						});
+					} catch (err) {
+						draggedChildItemsRef.current = []; // Cleanup on error
+						throw err;
+					}
 				},
 				async onEnd(e) {
 					const sectionElement = e.item;
-                    if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
-                        if (draggedChildItemsRef.current.length) {
-                            let sibling = sectionElement;
-                            draggedChildItemsRef.current.forEach((childItem) => {
-                                sibling.insertAdjacentElement("afterend", childItem);
-                                sibling = childItem;
-                            });
-                        }
-                        draggedChildItemsRef.current = [];
-                    }
-					
+					if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
+						if (draggedChildItemsRef.current.length) {
+							let sibling = sectionElement;
+							draggedChildItemsRef.current.forEach((childItem) => {
+								sibling.insertAdjacentElement("afterend", childItem);
+								sibling = childItem;
+							});
+						}
+						draggedChildItemsRef.current = [];
+					}
+
 					const newOrderedList = getUpdatedListOrder();
 					_setListUpdated(newOrderedList);
 				}
@@ -234,63 +269,65 @@ function Stash() {
 		}
 	}, false);
 
-    const onStashItemDelete = useCallback(async (stashId) => {
-        // const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
-        // console.log(updatedStashArray, 'updatedStashArray');
-        // _setListUpdated(updatedStashArray);
-        let isRegularStashItem = false;
-        for (let item of stashArr) {
-            if (item.id.toString() === stashId) {
-                if (!item?.section) {
-                    isRegularStashItem = true;
-                    break;
-                }
-            }
-        }
-        if (isRegularStashItem) {
-            const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
-            _setListUpdated(updatedStashArray);
-            return;
-        }
-        // For section deletion //
-        let isSectionItem = false;
-        const sectionItems = [];
-        for (let item of stashArr) {
-            if (item.id.toString() === stashId) {
-                isSectionItem = true;
-                continue;
-            }
-            if (!item?.section && isSectionItem) {
-                sectionItems.push(item);
-            }
-            else {
-                isSectionItem = false;
-            }
-        }
-        const sectionItemIds = sectionItems.map((item) => item.id);
-        let updatedStashArray = stashArr.filter((item) => !sectionItemIds.includes(item.id));
-        updatedStashArray = updatedStashArray.filter((item) => item.id.toString() !== stashId);
-        updatedStashArray = [...sectionItems, ...updatedStashArray];
-        setStashArr(updatedStashArray); // Update the dom first by rerendering the list.
-        requestAnimationFrame(() => {
-            const stashOrderedArrayFromDOM = getUpdatedListOrder(); // gets the list in correct order from the dom.
-            _setListUpdated(stashOrderedArrayFromDOM);
-        });
-    }, [stashArr, _setListUpdated, getUpdatedListOrder]);
+	const onStashItemDelete = useCallback(
+		async (stashId) => {
+			// const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
+			// console.log(updatedStashArray, 'updatedStashArray');
+			// _setListUpdated(updatedStashArray);
+			let isRegularStashItem = false;
+			for (let item of stashArr) {
+				if (item.id.toString() === stashId) {
+					if (!item?.section) {
+						isRegularStashItem = true;
+						break;
+					}
+				}
+			}
+			if (isRegularStashItem) {
+				const updatedStashArray = stashArr.filter((item) => !(item.id.toString() === stashId));
+				_setListUpdated(updatedStashArray);
+				return;
+			}
+			// For section deletion //
+			let isSectionItem = false;
+			const sectionItems = [];
+			for (let item of stashArr) {
+				if (item.id.toString() === stashId) {
+					isSectionItem = true;
+					continue;
+				}
+				if (!item?.section && isSectionItem) {
+					sectionItems.push(item);
+				} else {
+					isSectionItem = false;
+				}
+			}
+			const sectionItemIds = sectionItems.map((item) => item.id);
+			let updatedStashArray = stashArr.filter((item) => !sectionItemIds.includes(item.id));
+			updatedStashArray = updatedStashArray.filter((item) => item.id.toString() !== stashId);
+			updatedStashArray = [...sectionItems, ...updatedStashArray];
+			setStashArr(updatedStashArray); // Update the dom first by rerendering the list.
+			requestAnimationFrame(() => {
+				const stashOrderedArrayFromDOM = getUpdatedListOrder(); // gets the list in correct order from the dom.
+				_setListUpdated(stashOrderedArrayFromDOM);
+			});
+		},
+		[stashArr, _setListUpdated, getUpdatedListOrder]
+	);
 
 	let parentSectionIdContainer = null;
 
 	return html`
 		<span id="tester-span"></span>
-        ${(!stashArr.length) && html`<${Empty} />`}		
+		${!stashArr.length && html`<${Empty} />`}
 		<div class=${`bstash-list-con`}>
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
 					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;
 					if (!!item?.section) {
-                        hideSectionContents(item.id, item.sectionShow ? false : true);
-                    }
-                    return html`
+						hideSectionContents(item.id, item.sectionShow ? false : true);
+					}
+					return html`
 						<li
 							key=${item.id}
 							data-sectionId=${!!item?.section ? item.id : ""}
@@ -298,13 +335,13 @@ function Stash() {
 							data-isShowSection=${!!item?.sectionShow ? "yes" : ""}
 							data-myParentSectionId=${!item?.section && !!parentSectionIdContainer ? parentSectionIdContainer : "none"}
 						>
-							<${StashLinkItem} 
-                                item=${item} 
-                                onDelete=${onStashItemDelete} 
-                                tabIndex=${index} 
-                                onSectionToggle=${onSectionToggle}
-                                onTitleEdit=${onTitleEdit}
-                            />
+							<${StashLinkItem}
+								item=${item}
+								onDelete=${onStashItemDelete}
+								tabIndex=${index}
+								onSectionToggle=${onSectionToggle}
+								onTitleEdit=${onTitleEdit}
+							/>
 						</li>
 					`;
 				})}
