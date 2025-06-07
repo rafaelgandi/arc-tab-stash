@@ -5,7 +5,7 @@
 import "./popup.styles.js";
 import "./lib/posthog-init.js";
 import * as analytics from "./lib/analytics.js";
-import { storageSet, storageGet, logThis, sendMessageToBg, getCurrentTabData, isValidJson, toggleStyleElement } from "./lib/helpers.js";
+import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard } from "./lib/helpers.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
 import SettingsModal from "./components/SettingsModal.js";
@@ -68,11 +68,25 @@ function Stash() {
 
 	const onAddCurrentTabToStash = useCallback(async () => {
 		setBlock(true);
-		analytics.capture("sh-button-was-used-for-stashing");
-		await sendMessageToBg({
-			message: "stash-current-tab"
+		const { error } = await guard(async () => {
+			analytics.capture("sh-button-was-used-for-stashing");
+			await sendMessageToBg({
+				message: "stash-current-tab"
+			});
+			await getFreshStashData();
+            document.querySelector("main").scrollTo({
+				top: 0,
+				behavior: "smooth",
+				duration: 1000 // Add 800ms duration for smoother scroll
+			});
 		});
-		await getFreshStashData();
+		if (error) {
+			console.error(error);
+			analytics.capture("sh-error", {
+				message: error?.message ?? "Error adding current tab to stash",
+				source: "onAddCurrentTabToStash"
+			});
+		}
 		setBlock(false);
 	}, [getFreshStashData]);
 
@@ -86,7 +100,7 @@ function Stash() {
 
 	const onSectionAddButtonClicked = useCallback(() => {
 		analytics.capture("sh-section-add-button-clicked");
-        const newSectionId = makeSectionId();
+		const newSectionId = makeSectionId();
 		setStashArr((prev) => {
 			return [
 				...prev,
@@ -95,7 +109,7 @@ function Stash() {
 					title: "Untitled Heading",
 					id: newSectionId,
 					favIconUrl: "",
-					order: 0,
+					order: prev.length,
 					section: true,
 					sectionShow: true
 				}
@@ -110,20 +124,21 @@ function Stash() {
 			});
 			// Trigger double click on the newly added section title
 			const lastSection = document.querySelector('li[data-sectionId="' + newSectionId + '"] .bstash-title');
-            if (lastSection) {
+			if (lastSection) {
 				lastSection.dispatchEvent(
 					new MouseEvent("dblclick", {
 						bubbles: true,
 						cancelable: true
 					})
 				);
-                const li = document.querySelector('li[data-sectionId="' + newSectionId + '"]');
-                if (li) {
-                    li.classList.add('animate__animated', 'animate__jackInTheBox');
-                    setTimeout(() => {
-                        li.classList.remove('animate__animated', 'animate__jackInTheBox');
-                    }, 2000);
-                }
+				// Add animation to the newly added section so user can notice it //
+				const li = document.querySelector('li[data-sectionId="' + newSectionId + '"]');
+				if (li) {
+					li.classList.add("animate__animated", "animate__jackInTheBox");
+					setTimeout(() => {
+						li.classList.remove("animate__animated", "animate__jackInTheBox");
+					}, 2000);
+				}
 			}
 		}, 400);
 	}, [makeSectionId]);
@@ -190,21 +205,24 @@ function Stash() {
 	);
 
 	useSfx(async function init() {
-		await getFreshStashData(); // Show saved copy first.
+		await getFreshStashData();
 		const gitCreds = await api.getGitCredsSaved();
 		if (typeof gitCreds !== "undefined" && navigator.onLine) {
 			if (gitCreds?.tokenEncrypted) {
 				analytics.identify(gitCreds.tokenEncrypted);
 			}
-			const stashFromGist = await api.getGistContents(); // Make sure to query fresh data from github api
+			const stashFromGist = await api.getGistContents();
 			if (!stashFromGist) {
 				return;
 			}
 			await storageSet("stash", stashFromGist.stash);
-			getFreshStashData();
+			if (isMountedRef.current) {
+				getFreshStashData();
+			}
 		} else {
-			// Show settings modal if notion integration is not set yet //
-			setShowSettings(true);
+			if (isMountedRef.current) {
+				setShowSettings(true);
+			}
 		}
 	}, false);
 
