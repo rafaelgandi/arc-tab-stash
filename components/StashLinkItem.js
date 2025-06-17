@@ -54,6 +54,9 @@ export default function StashLinkItem(props) {
         }
         openInNewTab(e.currentTarget.href);
         analytics.capture('sh-stash-link-opened');
+        if (!item?.section) {
+            requestAnimationFrame(() => window.close());
+        }
     }
 
     async function handleOnDeleteItem(e) {
@@ -150,7 +153,7 @@ export default function StashLinkItem(props) {
                     />`
             }
             ${
-                isEditing 
+                (isEditing) 
                     ? html`<input 
                         ref=${inputRef}
                         class="bstash-title-input"

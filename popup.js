@@ -15,6 +15,7 @@ import StashLinkItem from "./components/StashLinkItem.js";
 import FooterControls from "./components/FooterControls.js";
 import useIsMountedRef from "./hooks/useIsMountedRef.js";
 import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
+import LiquidGlassContainer from "./components/LiquidGlassContainer.js";
 
 function sortByOrderProp(arr) {
 	let newArr = [...arr];
@@ -249,6 +250,8 @@ function Stash() {
 			sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
 				dragClass: "item-currently-dragging",
+				// Delay before drag starts (prevents accidental dragging on click)
+				delay: 100, // delay before drag starts
 				// Auto-scroll configuration for better UX with long lists
 				scroll: true, // Explicitly specify scroll container
 				forceAutoScrollFallback: true, // Force fallback mode for better compatibility
@@ -371,7 +374,14 @@ function Stash() {
 			doBlock=${(b) => setBlock(b)}
 			onTokenSaved=${() => getFreshStashData()}
 		/>
-		<${FooterControls}
+
+
+
+        <${LiquidGlassContainer} style=${{position: 'fixed', top: '50px', left: 0, width: '100%', height: '150px', zIndex: 1000}}>Content here hello</${LiquidGlassContainer}>
+		
+        
+        
+        <${FooterControls}
 			onAddCurrentTabToStash=${onAddCurrentTabToStash}
 			onToggleSettings=${onToggleSettings}
 			onSectionAddButtonClicked=${onSectionAddButtonClicked}
