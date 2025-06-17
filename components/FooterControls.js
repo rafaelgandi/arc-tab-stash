@@ -1,4 +1,5 @@
 import { html } from "../lib/preact-htm.js";
+import LiquidGlassContainer from "./LiquidGlassContainer.js";
 
 /** @param {import("../types/types.d.ts").FooterControlsProps} props */
 export default function FooterControls(props) {
@@ -6,6 +7,10 @@ export default function FooterControls(props) {
     const sectionCount = props?.sectionCount ?? 0;
 
 	return html`
+    <${LiquidGlassContainer} 
+        blurAmount=${5} 
+        className="bstash-footer-liquid-glass-container"
+    >
 		<footer>
 			<div class="bstash-footer-child" title="Stash current tab.">
 				<img
@@ -45,5 +50,6 @@ export default function FooterControls(props) {
 				/>
 			</div>
 		</footer>
+    </LiquidGlassContainer>
 	`;
 }

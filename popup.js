@@ -341,7 +341,7 @@ function Stash() {
 	return html`
 		<span id="tester-span"></span>
 		${!stashArr.length && html`<${Empty} />`}
-		<div class=${`bstash-list-con`}>
+		<div class=${`bstash-list-con`} style=${{pointerEvents: (showSettings) ? "none" : "auto" }}>
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
 					parentSectionIdContainer = !!item?.section ? item.id : parentSectionIdContainer;

@@ -27,6 +27,9 @@ function ensureGlassDistortionFilter() {
 	document.body.appendChild(svg);
 }
 
+// See: https://github.com/archisvaze/liquid-glass?tab=readme-ov-file
+// See: https://liquid-glass-eta.vercel.app
+
 export default function LiquidGlassContainer(props) {
 	const { className = "", children, blurAmount = 3, ...rest } = props;
 
