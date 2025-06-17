@@ -390,15 +390,33 @@ footer {
     bottom: 0;
     left: 0;
     width: 100%;  
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, .3);
-    border-top: 1px outset #e2e2e2;
+    /* backdrop-filter: blur(11px); */
+    background-color: rgba(255, 255, 255, .5);
+    border-top: 2px outset rgba(226, 226, 226, 0.5);
     z-index: 1000;
     display: grid;
     grid-template-columns: 15% 1fr 20%;
     align-items: center;
-    justify-content: center;
+    justify-content: top;
     padding: 0;
+    transition: transform .5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* transform: translateY(10px); */
+    height: 40px;
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        isolation: isolate;
+        backdrop-filter: blur(5px);
+        filter:url(#frosted);
+    }
+    &:hover {
+        /* transform: translateY(-10px); */
+        /* height: 50px; */
+    }
     .bstash-footer-child { 
         text-align: center;
         padding: .3rem;
