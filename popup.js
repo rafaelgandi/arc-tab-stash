@@ -251,7 +251,7 @@ function Stash() {
 				ghostClass: "drag-in-place",
 				dragClass: "item-currently-dragging",
 				// Delay before drag starts (prevents accidental dragging on click)
-				delay: 100, // delay before drag starts
+				delay: 200, // delay before drag starts
 				// Auto-scroll configuration for better UX with long lists
 				scroll: true, // Explicitly specify scroll container
 				forceAutoScrollFallback: true, // Force fallback mode for better compatibility
@@ -373,14 +373,7 @@ function Stash() {
 			onDidDismiss=${() => setShowSettings(false)}
 			doBlock=${(b) => setBlock(b)}
 			onTokenSaved=${() => getFreshStashData()}
-		/>
-
-
-
-        <${LiquidGlassContainer} style=${{position: 'fixed', top: '50px', left: 0, width: '100%', height: '150px', zIndex: 1000}}>Content here hello</${LiquidGlassContainer}>
-		
-        
-        
+		/>    
         <${FooterControls}
 			onAddCurrentTabToStash=${onAddCurrentTabToStash}
 			onToggleSettings=${onToggleSettings}

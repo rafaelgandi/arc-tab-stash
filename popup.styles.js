@@ -265,17 +265,19 @@ main {
 
     .bstash-setting {
         display: block;
-        transition: all .1s ease-out;
+        transition: transform .2s cubic-bezier(0.34, 1.56, 0.64, 1);
         padding: 5px;
         position: fixed;
         top: 1rem;
         left: .5rem;
         right: .5rem;
-        backdrop-filter: blur(10px);
+        /* backdrop-filter: blur(3px); */
         background-color: rgba(255, 255, 255, .4);
+        overflow: hidden;
         z-index: 90000;
         border-radius: 15px;
         box-shadow: 0px 3px 0px 5000px rgba(0,0,0,0.31);
+        border: 4px solid rgba(255, 255, 255, 0.46);
         &::before {
             content: '';
             position: absolute; 
@@ -288,10 +290,11 @@ main {
         &.hide-settings {
             opacity: 0;
             transform: scale(0);
+            /* display: none; */
         }
         & a {
             text-decoration: none;
-            color: #3dbafc;
+            color: #a059b7;
         }
         & section, 
         & button {
@@ -302,7 +305,7 @@ main {
             padding: var(--app-spacing);
             padding-bottom: .1rem;
             border-radius: 11px;
-            box-shadow: -1px -1px 10px 1px rgba(0,0,0,0.16);
+            /* box-shadow: -1px -1px 10px 1px rgba(0,0,0,0.16); */
             & section {  
                 position: relative;        
                 margin: calc(var(--app-spacing) * 1.5) 0;
@@ -343,7 +346,7 @@ main {
                     }
                 }
                 & p {
-                    color: #7c7c7c;
+                    color:rgb(67, 67, 67);
                     margin: .2rem 0;
                     font-size: .7rem;                    
                     user-select: none;
