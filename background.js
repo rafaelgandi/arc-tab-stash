@@ -30,7 +30,7 @@ import * as analytics from './lib/analytics.js';
         // See: https://stackoverflow.com/questions/2399389/detect-chrome-extension-first-run-update
         if (details?.reason === 'update') {
             if (details?.previousVersion !== getVersionFromManifest()) {
-                openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
+                // openInNewTab(onStashUpdateNotionPage); // Open review campaign notion page.
                 analytics.capture('sh-update-happend', {
                     updatedVersion: getVersionFromManifest()
                 });
