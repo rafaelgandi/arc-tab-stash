@@ -251,7 +251,7 @@ function Stash() {
 				ghostClass: "drag-in-place",
 				dragClass: "item-currently-dragging",
 				// Delay before drag starts (prevents accidental dragging on click)
-				delay: 200, // delay before drag starts
+				delay: 130, // delay before drag starts
 				// Auto-scroll configuration for better UX with long lists
 				scroll: true, // Explicitly specify scroll container
 				forceAutoScrollFallback: true, // Force fallback mode for better compatibility

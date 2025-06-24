@@ -1,0 +1,229 @@
+# Stash Browser Extension - Firefox Compatibility PRD
+
+## Project Overview
+Extend the existing Stash Chrome extension to support Mozilla Firefox while maintaining the buildless architecture and reusing the existing codebase.
+
+## Goals
+- Enable Stash extension to run on Firefox browsers
+- Maintain buildless development workflow
+- Reuse existing codebase with minimal modifications
+- Abstract browser APIs for cross-platform compatibility
+- Keep Chrome version using Manifest V3
+
+## Requirements
+
+### Core Requirements
+1. **Buildless Architecture**: No build process, package managers, or compilation steps
+2. **Code Reuse**: Maximum reuse of existing components and logic
+3. **Manifest Strategy**: Dual manifest approach (Chrome MV3 + Firefox MV2/MV3)
+4. **API Abstraction**: Create browser API abstraction layer
+5. **Feature Parity**: All existing features must work on both platforms
+
+### Technical Requirements
+1. **Manifest Files**:
+   - Keep `manifest.json` for Chrome (MV3)
+   - Create `manifest-firefox.json` for Firefox
+   - Firefox can use MV3 (supported since Firefox 109)
+   - If possible use MV3 for both firefox and chrome browsers
+
+2. **Browser API Compatibility**:
+   - Abstract chrome.* APIs to work with both chrome and browser namespaces
+   - Handle API differences between Chrome and Firefox
+   - Maintain backward compatibility
+
+3. **Development Strategy**:
+   - Single codebase with platform-specific manifests
+   - Simple shell scripts for manifest switching
+   - Manual file copying for distribution
+
+## Technical Analysis
+
+### Current Chrome API Usage
+Based on codebase analysis, the following Chrome APIs are used:
+- `chrome.tabs` (query, sendMessage, create)
+- `chrome.storage.local` (get, set)
+- `chrome.runtime` (onInstalled, onStartup, onConnect, onMessage, sendMessage, getManifest, connect)
+- `chrome.commands` (onCommand)
+
+### Firefox Compatibility
+- Firefox supports both `chrome.*` and `browser.*` namespaces
+- Firefox MV3 support available since version 109
+- Some API differences exist but are manageable
+
+## Implementation Plan
+
+### Phase 1: Browser API Abstraction
+1. Create `lib/browser-api.js` - unified browser API wrapper
+2. Replace direct chrome.* calls with abstracted calls
+3. Handle Chrome vs Firefox API differences
+
+### Phase 2: Manifest Management
+1. Create Firefox-specific manifest
+2. Create simple shell scripts for development
+3. Update documentation
+
+### Phase 3: Testing & Validation
+1. Test all features on Firefox
+2. Validate keyboard shortcuts
+3. Test storage synchronization
+4. Verify popup functionality
+
+### Phase 4: Distribution Setup
+1. Create simple packaging scripts
+2. Update build documentation
+3. Firefox Add-ons store preparation
+
+## File Changes Required
+
+### New Files
+- `manifest-firefox.json` - Firefox manifest
+- `lib/browser-api.js` - Browser API abstraction layer
+- `build-firefox.sh` - Firefox build script (copies Firefox manifest)
+- `build-chrome.sh` - Chrome build script (copies Chrome manifest)
+
+### Modified Files
+- `lib/helpers.js` - Replace chrome.* with abstracted API calls
+- `background.js` - Replace chrome.* with abstracted API calls
+- `content.js` - Replace chrome.* with abstracted API calls
+- `popup.js` - Replace chrome.* with abstracted API calls
+- `README.md` - Update with Firefox instructions
+
+## Risk Assessment
+
+### Low Risk
+- API abstraction (straightforward mapping)
+- Manifest creation (well-documented differences)
+- Feature compatibility (most features have 1:1 mapping)
+
+### Medium Risk
+- Storage API differences (different size limits)
+- Keyboard shortcut handling (different key combinations)
+- Extension lifecycle differences
+
+### Mitigation Strategies
+- Thorough testing on both platforms
+- Graceful fallbacks for platform-specific features
+- Clear documentation of platform differences
+
+## Success Metrics
+1. All existing features work on Firefox
+2. No build process or package managers required
+3. Single codebase maintains both platforms
+4. Performance parity between platforms
+5. Successful Firefox Add-ons store submission
+
+## Timeline Estimate
+- Phase 1: 2-3 days
+- Phase 2: 1-2 days  
+- Phase 3: 2-3 days
+- Phase 4: 1-2 days
+- **Total: 6-10 days**
+
+## Dependencies
+- Firefox Developer Edition for testing
+- Firefox Add-ons store developer account
+- Understanding of Firefox extension review process
+
+## Development Workflow
+1. **Chrome Development**: Use existing `manifest.json`
+2. **Firefox Development**: Run `./build-firefox.sh` to copy Firefox manifest
+3. **Back to Chrome**: Run `./build-chrome.sh` to restore Chrome manifest
+4. **Distribution**: Create separate zip files with appropriate manifests
+
+## Future Considerations
+- Safari extension support (would require different approach)
+- Edge extension support (similar to Chrome)
+- Automated testing across browsers
+- Simple CI/CD pipeline for multi-browser releases
+
+## TODO List for Firefox Compatibility (Buildless)
+
+### 1. **Create Browser API Abstraction Layer**
+   - [ ] Create `lib/browser-api.js` with unified API wrapper
+   - [ ] Abstract `tabs` API (query, sendMessage, create)
+   - [ ] Abstract `storage` API (local.get, local.set)
+   - [ ] Abstract `runtime` API (onInstalled, onStartup, onConnect, onMessage, sendMessage, getManifest, connect)
+   - [ ] Abstract `commands` API (onCommand)
+   - [ ] Handle promise vs callback differences between browsers
+
+### 2. **Update Existing Files to Use Abstracted APIs**
+   - [ ] Update `lib/helpers.js` - replace all `chrome.*` calls
+   - [ ] Update `background.js` - replace all `chrome.*` calls  
+   - [ ] Update `content.js` - replace all `chrome.*` calls
+   - [ ] Update `popup.js` - replace `chrome.runtime.connect` call
+
+### 3. **Create Firefox Manifest**
+   - [ ] Create `manifest-firefox.json` based on current manifest
+   - [ ] Convert Chrome MV3 specific fields to Firefox compatible versions
+   - [ ] Handle `host_permissions` vs `permissions` differences
+   - [ ] Update `background` script configuration for Firefox
+   - [ ] Verify `web_accessible_resources` format for Firefox
+   - [ ] Test keyboard shortcuts format compatibility
+
+### 4. **Create Simple Build Scripts**
+   - [ ] Create `build-chrome.sh` - ensures `manifest.json` is Chrome version
+   - [ ] Create `build-firefox.sh` - copies `manifest-firefox.json` to `manifest.json`
+   - [ ] Make scripts executable (`chmod +x build-*.sh`)
+   - [ ] Test script functionality on your system
+
+### 5. **Testing & Validation**
+   - [ ] Test extension loading in Firefox Developer Edition
+   - [ ] Verify popup functionality works correctly
+   - [ ] Test content script injection and messaging
+   - [ ] Validate background script service worker functionality
+   - [ ] Test keyboard shortcuts (Alt+Shift+S, Alt+Shift+O)
+   - [ ] Verify storage functionality and data persistence
+   - [ ] Test GitHub integration and API calls
+   - [ ] Validate toast notifications display correctly
+
+### 6. **Cross-Browser Compatibility Fixes**
+   - [ ] Handle any Firefox-specific CSS issues in popup
+   - [ ] Test LiquidGlassContainer component rendering
+   - [ ] Verify SVG filter compatibility in Firefox
+   - [ ] Check styled-components equivalent functionality
+   - [ ] Test Preact/HTM rendering differences
+
+### 7. **Documentation Updates**
+   - [ ] Update `README.md` with Firefox installation instructions
+   - [ ] Document simple development workflow for both platforms
+   - [ ] Add troubleshooting section for Firefox-specific issues
+   - [ ] Create Firefox Add-ons store submission guide
+   - [ ] Document manual build/distribution process
+
+### 8. **Distribution Preparation**
+   - [ ] Create manual process for Firefox extension package
+   - [ ] Test extension installation from file in Firefox
+   - [ ] Prepare Firefox Add-ons store listing materials
+   - [ ] Create release process documentation for both platforms
+   - [ ] Document manual zip creation process
+
+### 9. **Quality Assurance**
+   - [ ] Cross-browser feature parity testing
+   - [ ] Performance comparison between Chrome and Firefox versions
+   - [ ] Memory usage analysis on both platforms
+   - [ ] Edge case testing (offline functionality, error handling)
+
+### 10. **Future Maintenance Setup**
+   - [ ] Create manual testing checklist for both platforms
+   - [ ] Document platform-specific gotchas and solutions
+   - [ ] Set up development environment instructions for contributors
+   - [ ] Plan for ongoing compatibility maintenance without build tools
+
+**Development Workflow Example**:
+```bash
+# For Firefox development
+./build-firefox.sh
+# Load extension in Firefox Developer Edition
+
+# For Chrome development  
+./build-chrome.sh
+# Load extension in Chrome
+
+# For distribution
+./build-firefox.sh && zip -r stash-firefox.zip . -x "*.git*" "*.sh" "manifest-firefox.json"
+./build-chrome.sh && zip -r stash-chrome.zip . -x "*.git*" "*.sh" "manifest-firefox.json"
+```
+
+**Priority Order**: Items 1-3 are critical path and should be completed first, followed by testing (5-6), then documentation and distribution (7-8).
+
+The abstraction layer (#1) is the foundation that enables everything else, so it should be the first focus. The simple shell scripts (#4) will make development switching between platforms effortless without any package management overhead. 
