@@ -11,6 +11,7 @@ import {
     handleError,
     openInNewTab
 } from './lib/helpers.js';
+import { runtime as browserRuntime, commands as browserCommands } from './lib/browser-api.js';
 import * as api from './lib/api.js';
 import "./lib/posthog-init.js";
 import * as analytics from './lib/analytics.js';
@@ -23,7 +24,7 @@ import * as analytics from './lib/analytics.js';
 
     let SOMETHING_HAS_CHANGED_FLAG = false;
 
-    chrome.runtime.onInstalled.addListener(function onStashExtensionInstall(details) {
+    browserRuntime.onInstalled.addListener(function onStashExtensionInstall(details) {
         // console.log(details);
         console.log('Running on install listeners');
         // LM: 2023-11-02 16:01:23 [If user has updated the extension.]
@@ -62,7 +63,7 @@ import * as analytics from './lib/analytics.js';
 
     // LM: 2024-01-31 04:33:28
     // Make sure to query fresh data from github api on browser startup //
-    chrome.runtime.onStartup.addListener(function onBrowserStartUp() {
+    browserRuntime.onStartup.addListener(function onBrowserStartUp() {
         (async () => {
             const gitCreds = await api.getGitCredsSaved();
             if (typeof gitCreds !== 'undefined' && navigator.onLine) {
@@ -80,7 +81,7 @@ import * as analytics from './lib/analytics.js';
     });
 
     // Save stash to gist on popup close
-    chrome.runtime.onConnect.addListener(function handlePopUpVisibility(port) {
+    browserRuntime.onConnect.addListener(function handlePopUpVisibility(port) {
         if (port.name === "popup") {
             // Triggers on popup close //
             // See: https://stackoverflow.com/a/65563521
@@ -100,7 +101,7 @@ import * as analytics from './lib/analytics.js';
 
 
     // See: https://dev.to/paulasantamaria/adding-shortcuts-to-your-chrome-extension-2i20
-    chrome.commands.onCommand.addListener(function setKeyboardShortcut(command) {
+    browserCommands.onCommand.addListener(function setKeyboardShortcut(command) {
         switch (command) {
             case 'stash-current-tab':
                 clearTimeout(stashDebouncer);
@@ -113,7 +114,7 @@ import * as analytics from './lib/analytics.js';
         }
     });
 
-    chrome.runtime.onMessage.addListener(function onExtensionMessaging(data, sender, sendResponse) {
+    browserRuntime.onMessage.addListener(function onExtensionMessaging(data, sender, sendResponse) {
         (async () => {
             if (data.message === 'stash-current-tab') {
                 await handleStashingTab();

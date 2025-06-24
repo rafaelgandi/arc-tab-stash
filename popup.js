@@ -6,6 +6,7 @@ import "./popup.styles.js";
 import "./lib/posthog-init.js";
 import * as analytics from "./lib/analytics.js";
 import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard } from "./lib/helpers.js";
+import { runtime as browserRuntime } from "./lib/browser-api.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
 import SettingsModal from "./components/SettingsModal.js";
@@ -392,7 +393,7 @@ main.style.opacity = 1;
 setUpAuGlobalErrorLogger();
 
 // LM: 2024-12-11 17:55:13 [Make sure the background.js script knows when the popup closes]
-const port = chrome.runtime.connect({ name: "popup" });
+	const port = browserRuntime.connect({ name: "popup" });
 window.addEventListener("unload", (e) => {
 	port.disconnect();
 });

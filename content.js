@@ -2,6 +2,8 @@
     Stash
     www.rafaelgandi.com
 */
+import { runtime as browserRuntime } from './lib/browser-api.js';
+
 (async () => {
     function presentToast(msg, type = 'okay') {
         // const { arcPaletteTitle, arcBGGradients } = getArcPalette();
@@ -36,8 +38,8 @@
     }
     
     function listen() {
-        chrome?.runtime?.onMessage?.removeListener(messageHandler);
-        chrome?.runtime?.onMessage?.addListener(messageHandler);
+        browserRuntime?.onMessage?.removeListener(messageHandler);
+        browserRuntime?.onMessage?.addListener(messageHandler);
     }
     listen();
     // Do something if we are at the Stash home notion page. //
