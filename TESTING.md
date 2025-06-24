@@ -98,4 +98,57 @@ Please test and report:
 1. ✅ **Success**: "All tests passed, ready for Firefox manifest"
 2. ❌ **Issues Found**: Specific error messages and which functionality failed
 
-Once Chrome testing passes, we can proceed to create the Firefox manifest and test cross-browser compatibility! 
+## 🦊 Firefox Testing (Phase 3 Complete!)
+
+### 1. Firefox Testing Setup
+
+**Switch to Firefox Build:**
+```bash
+./build-firefox.sh
+```
+
+**Load Extension in Firefox:**
+1. Open Firefox Developer Edition (recommended) or regular Firefox
+2. Go to `about:debugging`
+3. Click "This Firefox"
+4. Click "Load Temporary Add-on"
+5. Select `manifest.json` from this project folder
+
+**Test Core Functionality:**
+- [ ] Extension loads without errors
+- [ ] Popup opens when clicking extension icon
+- [ ] Can add current tab to stash (Alt+Shift+S or button)
+- [ ] Can open stash popup (Alt+Shift+O)
+- [ ] Settings modal works (GitHub token input)
+- [ ] Storage persists between sessions
+- [ ] Content script shows toast notifications
+
+**Switch Back to Chrome:**
+```bash
+./build-chrome.sh
+```
+
+### 2. Cross-Browser Testing
+
+**Test Both Platforms:**
+1. Test in Chrome (default state)
+2. Run `./build-firefox.sh` and test in Firefox
+3. Run `./build-chrome.sh` to return to Chrome development
+
+**Key Differences to Note:**
+- Firefox: Uses `background.scripts` (traditional background script)
+- Chrome: Uses `background.service_worker` (MV3 service worker)
+- Both: Should have identical functionality through browser API abstraction
+
+### 3. Build Scripts
+
+**Available Commands:**
+- `./build-chrome.sh` - Set up for Chrome development/testing
+- `./build-firefox.sh` - Set up for Firefox development/testing
+
+**What the Scripts Do:**
+- Automatically backup and restore appropriate manifests
+- Validate manifest format for target browser
+- Provide clear instructions for loading extension
+
+Once both Chrome and Firefox testing passes, the cross-browser compatibility is complete! 🎉 

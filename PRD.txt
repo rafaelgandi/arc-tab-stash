@@ -152,19 +152,19 @@ Based on codebase analysis, the following Chrome APIs are used:
    - [ ] Update `content.js` - replace all `chrome.*` calls
    - [ ] Update `popup.js` - replace `chrome.runtime.connect` call
 
-### 3. **Create Firefox Manifest**
-   - [ ] Create `manifest-firefox.json` based on current manifest
-   - [ ] Convert Chrome MV3 specific fields to Firefox compatible versions
-   - [ ] Handle `host_permissions` vs `permissions` differences
-   - [ ] Update `background` script configuration for Firefox
-   - [ ] Verify `web_accessible_resources` format for Firefox
-   - [ ] Test keyboard shortcuts format compatibility
+### 3. **Create Firefox Manifest** ✅ COMPLETE
+   - [x] Create `manifest-firefox.json` based on current manifest
+   - [x] Convert Chrome MV3 specific fields to Firefox compatible versions
+   - [x] Handle `host_permissions` vs `permissions` differences
+   - [x] Update `background` script configuration for Firefox
+   - [x] Verify `web_accessible_resources` format for Firefox
+   - [x] Test keyboard shortcuts format compatibility
 
-### 4. **Create Simple Build Scripts**
-   - [ ] Create `build-chrome.sh` - ensures `manifest.json` is Chrome version
-   - [ ] Create `build-firefox.sh` - copies `manifest-firefox.json` to `manifest.json`
-   - [ ] Make scripts executable (`chmod +x build-*.sh`)
-   - [ ] Test script functionality on your system
+### 4. **Create Simple Build Scripts** ✅ COMPLETE
+   - [x] Create `build-chrome.sh` - ensures `manifest.json` is Chrome version
+   - [x] Create `build-firefox.sh` - copies `manifest-firefox.json` to `manifest.json`
+   - [x] Make scripts executable (`chmod +x build-*.sh`)
+   - [x] Test script functionality on your system
 
 ### 5. **Testing & Validation**
    - [ ] Test extension loading in Firefox Developer Edition
