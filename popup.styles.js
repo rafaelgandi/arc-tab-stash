@@ -92,7 +92,7 @@ body {
 
 main {
     display: block;
-    width: 300px;
+    width: 300px; /* Adjust to your desired width */
     min-height: var(--app-min-height);
     max-height: 600px; /* Add max height to create scrollable area */
     overflow-y: auto;  /* Allow vertical scrolling */

@@ -18,6 +18,20 @@ import useIsMountedRef from "./hooks/useIsMountedRef.js";
 import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
 import LiquidGlassContainer from "./components/LiquidGlassContainer.js";
 
+// Detect Firefox and add class to body
+function detectBrowserAndAddClass() {
+	const isFirefox = typeof InstallTrigger !== 'undefined' || 
+					 navigator.userAgent.indexOf('Firefox') > -1 ||
+					 /Firefox/.test(navigator.userAgent);
+	
+	if (isFirefox) {
+		document.body.classList.add('firefox');
+	}
+}
+
+// Initialize browser detection
+detectBrowserAndAddClass();
+
 function sortByOrderProp(arr) {
 	let newArr = [...arr];
 	newArr.sort((a, b) => {
