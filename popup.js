@@ -19,7 +19,7 @@ import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
 import LiquidGlassContainer from "./components/LiquidGlassContainer.js";
 
 // Detect Firefox and add class to body
-function detectBrowserAndAddClass() {
+function detectFirefoxBrowserAndAddClass() {
 	const isFirefox = typeof InstallTrigger !== 'undefined' || 
 					 navigator.userAgent.indexOf('Firefox') > -1 ||
 					 /Firefox/.test(navigator.userAgent);
@@ -30,7 +30,7 @@ function detectBrowserAndAddClass() {
 }
 
 // Initialize browser detection
-detectBrowserAndAddClass();
+detectFirefoxBrowserAndAddClass();
 
 function sortByOrderProp(arr) {
 	let newArr = [...arr];

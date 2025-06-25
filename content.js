@@ -2,9 +2,10 @@
     Stash
     www.rafaelgandi.com
 */
-import { runtime as browserRuntime } from './lib/browser-api.js';
 
 (async () => {
+    // Create browser runtime object directly (can't import ES6 modules in content scripts)
+    const browserRuntime = (typeof chrome !== 'undefined' ? chrome : browser).runtime;
     function presentToast(msg, type = 'okay') {
         // const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({

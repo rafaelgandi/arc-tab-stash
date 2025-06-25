@@ -437,4 +437,22 @@ footer {
     }
 }
 
+.firefox {
+    main {
+        width: 350px;
+        padding: var(--app-spacing);
+        padding-left: 0;
+        & .bstash-list-con {
+            & li {
+                padding: calc(var(--app-spacing) / 1.1);
+                /* padding-right: 0; */
+                & .bstash-trash-icon {
+                    --size: 50px;
+                    top: 0;
+                }
+            }
+        }
+    }
+}
+
 `;
