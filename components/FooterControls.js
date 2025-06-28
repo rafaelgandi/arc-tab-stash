@@ -24,7 +24,17 @@ export default function FooterControls(props) {
 					}}
 				/>
 			</div>
-			<div id="bstash-msg-con" class="bstash-footer-child"></div>
+			<div id="bstash-msg-con" class="bstash-footer-child">
+				${props?.loadingMessage && html`
+					<span style=${{
+						fontSize: '0.7rem', 
+						opacity: 0.6, 
+						fontStyle: 'italic'
+					}}>
+						${props.loadingMessage}
+					</span>
+				`}
+			</div>
 			<div class="bstash-footer-child">
                 ${(sectionCount <= sectionCountLimit )  ? html`
 				<img

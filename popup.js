@@ -3,8 +3,9 @@
     www.rafaelgandi.com
 */
 import "./popup.styles.js";
-import "./lib/posthog-init.js";
-import * as analytics from "./lib/analytics.js";
+// PHASE 2: Defer analytics loading - remove synchronous imports
+// import "./lib/posthog-init.js";
+// import * as analytics from "./lib/analytics.js";
 import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard } from "./lib/helpers.js";
 import { runtime as browserRuntime } from "./lib/browser-api.js";
 import * as api from "./lib/api.js";
@@ -32,6 +33,11 @@ function detectFirefoxBrowserAndAddClass() {
 // Initialize browser detection
 detectFirefoxBrowserAndAddClass();
 
+// PHASE 2: Import shared lazy analytics loader
+import { loadAnalytics } from "./lib/lazy-analytics.js";
+// PHASE 3: Import shared lazy sortable loader
+import { loadSortable, isSortableLoaded } from "./lib/lazy-sortable.js";
+
 function sortByOrderProp(arr) {
 	let newArr = [...arr];
 	newArr.sort((a, b) => {
@@ -50,6 +56,7 @@ function Stash() {
 	const [stashArr, setStashArr] = useState([]);
 	const [showSettings, setShowSettings] = useState(false);
 	const [block, setBlock] = useState(false);
+	const [isInitialLoading, setIsInitialLoading] = useState(true); // PHASE 1: Track initial loading state
 	const ulRef = useRef(null);
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
@@ -85,6 +92,8 @@ function Stash() {
 	const onAddCurrentTabToStash = useCallback(async () => {
 		setBlock(true);
 		const { error } = await guard(async () => {
+			// PHASE 2: Load analytics on demand
+			const analytics = await loadAnalytics();
 			analytics.capture("sh-button-was-used-for-stashing");
 			await sendMessageToBg({
 				message: "stash-current-tab"
@@ -98,6 +107,8 @@ function Stash() {
 		});
 		if (error) {
 			console.error(error);
+			// PHASE 2: Load analytics on demand for error tracking
+			const analytics = await loadAnalytics();
 			analytics.capture("sh-error", {
 				message: error?.message ?? "Error adding current tab to stash",
 				source: "onAddCurrentTabToStash"
@@ -114,7 +125,9 @@ function Stash() {
 		return "sec-" + new Date().getTime().toString();
 	}, []);
 
-	const onSectionAddButtonClicked = useCallback(() => {
+	const onSectionAddButtonClicked = useCallback(async () => {
+		// PHASE 2: Load analytics on demand
+		const analytics = await loadAnalytics();
 		analytics.capture("sh-section-add-button-clicked");
 		const newSectionId = makeSectionId();
 		setStashArr((prev) => {
@@ -212,6 +225,8 @@ function Stash() {
 				}
 				return item;
 			});
+			// PHASE 2: Load analytics on demand
+			const analytics = await loadAnalytics();
 			analytics.capture("sh-stash-section-title-edited", {
 				"section title": newTitle
 			});
@@ -220,60 +235,126 @@ function Stash() {
 		[stashArr, _setListUpdated]
 	);
 
-	useSfx(async function init() {
+	// PHASE 1: Show cached data immediately for quick link access
+	useSfx(async function showCachedDataFirst() {
+		// Load local data immediately - this is the critical path for quick link access
 		await getFreshStashData();
-		const gitCreds = await api.getGitCredsSaved();
-		if (typeof gitCreds !== "undefined" && navigator.onLine) {
-			if (gitCreds?.tokenEncrypted) {
-				analytics.identify(gitCreds.tokenEncrypted);
-			}
-			const stashFromGist = await api.getGistContents();
-			if (!stashFromGist) {
-				return;
-			}
-			await storageSet("stash", stashFromGist.stash);
-			if (isMountedRef.current) {
-				getFreshStashData();
-			}
-		} else {
-			if (isMountedRef.current) {
-				setShowSettings(true);
-			}
-		}
+		setIsInitialLoading(false); // Mark initial loading as complete
 	}, false);
 
-	useSfx(async function makeListSortable() {
+	// PHASE 1: Background cloud sync (non-blocking)
+	useSfx(async function backgroundCloudSync() {
+		// Defer cloud sync to not block UI - use setTimeout to ensure UI renders first
+		setTimeout(async () => {
+			try {
+				const gitCreds = await api.getGitCredsSaved();
+				if (typeof gitCreds !== "undefined" && navigator.onLine) {
+					if (gitCreds?.tokenEncrypted) {
+						// PHASE 2: Load analytics on demand for user identification
+						const analytics = await loadAnalytics();
+						analytics.identify(gitCreds.tokenEncrypted);
+					}
+					const stashFromGist = await api.getGistContents();
+					if (!stashFromGist) {
+						return;
+					}
+					await storageSet("stash", stashFromGist.stash);
+					if (isMountedRef.current) {
+						// Update UI with fresh cloud data
+						setStashArr(sortByOrderProp(stashFromGist.stash));
+					}
+				} else {
+					if (isMountedRef.current) {
+						setShowSettings(true);
+					}
+				}
+			} catch (error) {
+				console.error('Background sync error:', error);
+				// Don't block UI for sync errors
+			}
+		}, 50); // Small delay to ensure UI renders first
+	}, false);
+
+	// PHASE 3: Smart sortable loading - only when needed and optimized
+	const sortableLoadingRef = useRef(false);
+	const [isSortableReady, setIsSortableReady] = useState(false);
+
+	// PHASE 3: Determine if sortable is actually needed
+	const needsSortable = useMemo(() => {
+		return stashArr.length > 1; // Only load if there's more than 1 item to sort
+	}, [stashArr.length]);
+
+	// Helper function to get current loading message
+	const getLoadingMessage = useCallback(() => {
+		if (needsSortable && !isSortableReady) {
+			return "Drag & drop loading...";
+		}
+		// Future loading states can be added here:
+		// if (isCloudSyncing) return "Syncing with cloud...";
+		// if (isAnalyticsLoading) return "Initializing analytics...";
+		return null;
+	}, [needsSortable, isSortableReady]);
+
+	// PHASE 3: Preload sortable during idle time when it's likely to be needed
+	useSfx(async function preloadSortableWhenNeeded() {
+		if (needsSortable && !isSortableLoaded() && !sortableLoadingRef.current) {
+			sortableLoadingRef.current = true;
+			
+			// Use requestIdleCallback with longer timeout for true background loading
+			const preloadSortable = async () => {
+				try {
+					// Preload the library but don't initialize yet
+					await loadSortable();
+				} catch (error) {
+					console.error('Sortable preload error:', error);
+				} finally {
+					sortableLoadingRef.current = false;
+				}
+			};
+
+			// Use requestIdleCallback with long timeout for true background loading
+			if (typeof requestIdleCallback !== 'undefined') {
+				requestIdleCallback(preloadSortable, { timeout: 2000 });
+			} else {
+				// Longer delay for setTimeout fallback to ensure UI is fully ready
+				setTimeout(preloadSortable, 500);
+			}
+		}
+	}, [needsSortable]);
+
+	// PHASE 3: Initialize sortable only when library is loaded and needed
+	useSfx(async function initializeSortable() {
+		if (!needsSortable || !isSortableLoaded() || !ulRef.current || sortableRef.current) {
+			return; // Don't initialize if not needed, not loaded, no DOM ref, or already initialized
+		}
+
 		function ifSectionBeingDraggedDoThisToChildItems(e, callback) {
-			// console.log(e.item, e.item?.getAttribute?.('data-isSection'));
 			if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
 				const sectionId = e.item?.getAttribute?.("data-sectionId");
 				const childItems = ulRef.current.querySelectorAll(`li[data-myParentSectionId="${sectionId}"]`);
 				if (childItems.length) {
-					// console.log(childItems);
 					childItems.forEach((item) => {
-						// Sortable.utils.select(item);
 						callback(item);
 					});
 				}
 			}
 		}
 
-		if (ulRef.current) {
-			// See: https://github.com/SortableJS/Sortable
-			// const { Sortable } = await import("./lib/sortable.js");
-			const { default: Sortable } = await import("./lib/sortable.complete.esm.1.15.6.js");
+		try {
+			// Library is already loaded, just get the reference
+			const { default: Sortable } = await loadSortable();
+			
 			sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
 				dragClass: "item-currently-dragging",
-				// Delay before drag starts (prevents accidental dragging on click)
-				delay: 130, // delay before drag starts
-				// Auto-scroll configuration for better UX with long lists
-				scroll: true, // Explicitly specify scroll container
-				forceAutoScrollFallback: true, // Force fallback mode for better compatibility
-				scrollSensitivity: 20, // Reduced sensitivity for easier triggering
-				scrollSpeed: 20, // Increased speed for more noticeable effect
+				delay: 130, // Delay before drag starts (prevents accidental dragging on click)
+				// PHASE 3: Optimized scroll configuration
+				scroll: true,
+				forceAutoScrollFallback: true,
+				scrollSensitivity: 20,
+				scrollSpeed: 20,
 				bubbleScroll: true,
-				emptyInsertThreshold: 5, // Allow insertion in empty areas
+				emptyInsertThreshold: 5,
 				onStart(e) {
 					try {
 						ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
@@ -302,8 +383,26 @@ function Stash() {
 					_setListUpdated(newOrderedList);
 				}
 			});
+			
+			// PHASE 3: Mark sortable as ready
+			setIsSortableReady(true);
+		} catch (error) {
+			console.error('Sortable initialization error:', error);
 		}
-	}, false);
+	}, [needsSortable, ulRef.current]); // Initialize when conditions are met
+
+	// PHASE 3: Cleanup sortable when no longer needed
+	useSfx(async function cleanupSortableWhenNotNeeded() {
+		if (!needsSortable && sortableRef.current) {
+			try {
+				sortableRef.current.destroy();
+				sortableRef.current = null;
+				setIsSortableReady(false);
+			} catch (error) {
+				console.error('Sortable cleanup error:', error);
+			}
+		}
+	}, [needsSortable]);
 
 	const onStashItemDelete = useCallback(
 		async (stashId) => {
@@ -355,7 +454,14 @@ function Stash() {
 
 	return html`
 		<span id="tester-span"></span>
-		${!stashArr.length && html`<${Empty} />`}
+		${!stashArr.length && !isInitialLoading && html`<${Empty} />`}
+		${!stashArr.length && isInitialLoading && html`
+			<div class="bstash-loading-state">
+				<div style=${{textAlign: 'center', padding: '2rem', opacity: 0.7}}>
+					<div>Loading your stash...</div>
+				</div>
+			</div>
+		`}
 		<div class=${`bstash-list-con`} style=${{pointerEvents: (showSettings) ? "none" : "auto" }}>
 			<ul ref=${ulRef}>
 				${stashArr.map((/** @type {import("./types/types.d.ts").StashItem} */ item, index) => {
@@ -394,6 +500,7 @@ function Stash() {
 			onToggleSettings=${onToggleSettings}
 			onSectionAddButtonClicked=${onSectionAddButtonClicked}
 			sectionCount=${sectionCount}
+			loadingMessage=${getLoadingMessage()}
 		/>
 		<div id="bstash-blocker" class=${!block ? "hide" : ""}></div>
 	`;
@@ -401,7 +508,7 @@ function Stash() {
 
 const main = document.getElementById("arc-bookmark-stash-main");
 render(html`<${Stash} />`, main);
-main.style.opacity = 1;
+// PHASE 1: No need to set opacity - already visible in HTML
 
 // LM: 2025-06-03 15:46:10 [Set up global error logger]
 setUpAuGlobalErrorLogger();

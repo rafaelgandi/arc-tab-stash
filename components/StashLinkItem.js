@@ -3,7 +3,9 @@ import { openInNewTab } from '../lib/helpers.js';
 import useSfx from '../hooks/useSfx.js';
 import useHighlightFade from '../hooks/useHighlightFade.js';
 import Toggle from './Toggle.js';
-import * as analytics from '../lib/analytics.js';
+// PHASE 2: Remove synchronous analytics import
+// import * as analytics from '../lib/analytics.js';
+import { loadAnalytics } from '../lib/lazy-analytics.js';
 
 const defaultFavicon = './assets/empty_favicon.ico';
 
@@ -41,7 +43,7 @@ export default function StashLinkItem(props) {
         }
     }, [isEditing]);
 
-    function handleOnLinkClick(e) {
+    async function handleOnLinkClick(e) {
         e.preventDefault();
         if (!!item?.section) {
             if (e.target.classList.contains('section-toggle-icon')) {
@@ -53,6 +55,8 @@ export default function StashLinkItem(props) {
             return;
         }
         openInNewTab(e.currentTarget.href);
+        // PHASE 2: Load analytics on demand
+        const analytics = await loadAnalytics();
         analytics.capture('sh-stash-link-opened');
         if (!item?.section) {
             requestAnimationFrame(() => window.close());
@@ -72,6 +76,8 @@ export default function StashLinkItem(props) {
         else {
             props?.onDelete?.(stashId);
         }      
+        // PHASE 2: Load analytics on demand
+        const analytics = await loadAnalytics();
         analytics.capture('sh-stash-link-deleted');
     }
 

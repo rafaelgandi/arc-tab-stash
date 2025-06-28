@@ -2,8 +2,10 @@ import { html, useState } from "../lib/preact-htm.js";
 import { storageSet, getVersionFromManifest, sendMessageToBg } from "../lib/helpers.js";
 import * as api from "../lib/api.js";
 import useSfx from "../hooks/useSfx.js";
-import * as analytics from "../lib/analytics.js";
+// PHASE 2: Remove synchronous analytics import
+// import * as analytics from "../lib/analytics.js";
 import LiquidGlassContainer from "./LiquidGlassContainer.js";
+import { loadAnalytics } from "../lib/lazy-analytics.js";
 
 /**
  *
@@ -37,6 +39,8 @@ export default function SettingsModal(props) {
 				gitToken: tokenValue
 			}
 		});
+		// PHASE 2: Load analytics on demand
+		const analytics = await loadAnalytics();
 		analytics.capture("sh-git-token-saved");
 		props?.doBlock?.(false);
 		props?.onTokenSaved?.();

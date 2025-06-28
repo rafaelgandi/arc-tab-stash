@@ -7,7 +7,6 @@
     // Create browser runtime object directly (can't import ES6 modules in content scripts)
     const browserRuntime = (typeof chrome !== 'undefined' ? chrome : browser).runtime;
     function presentToast(msg, type = 'okay') {
-        // const { arcPaletteTitle, arcBGGradients } = getArcPalette();
         Toastify({
             text: msg,
             duration: 5000,

@@ -32,4 +32,5 @@ export type FooterControlsProps = {
     onSectionAddButtonClicked?: () => void;
     onToggleSettings?: () => void;
     sectionCount: number;
+    loadingMessage?: string;
 };
