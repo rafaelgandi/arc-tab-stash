@@ -316,7 +316,7 @@ function Stash() {
 				setTimeout(preloadSortable, 500);
 			}
 		}
-	}, [needsSortable]);
+	});
 
 	// PHASE 3: Initialize sortable only when library is loaded and needed
 	useSfx(async function initializeSortable() {
@@ -385,7 +385,7 @@ function Stash() {
 		} catch (error) {
 			console.error('Sortable initialization error:', error);
 		}
-	}, [needsSortable, ulRef.current]); // Initialize when conditions are met
+	}); 
 
 	// PHASE 3: Cleanup sortable when no longer needed
 	useSfx(async function cleanupSortableWhenNotNeeded() {
@@ -398,7 +398,7 @@ function Stash() {
 				console.error('Sortable cleanup error:', error);
 			}
 		}
-	}, [needsSortable]);
+	});
 
 	const onStashItemDelete = useCallback(
 		async (stashId) => {
