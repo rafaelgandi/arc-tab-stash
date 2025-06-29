@@ -6,7 +6,7 @@ import "./popup.styles.js";
 // PHASE 2: Defer analytics loading - remove synchronous imports
 // import "./lib/posthog-init.js";
 // import * as analytics from "./lib/analytics.js";
-import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard } from "./lib/helpers.js";
+import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard, isFirefoxBasedBrowser } from "./lib/helpers.js";
 import { runtime as browserRuntime } from "./lib/browser-api.js";
 import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
@@ -17,14 +17,10 @@ import StashLinkItem from "./components/StashLinkItem.js";
 import FooterControls from "./components/FooterControls.js";
 import useIsMountedRef from "./hooks/useIsMountedRef.js";
 import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
-import LiquidGlassContainer from "./components/LiquidGlassContainer.js";
 
 // Detect Firefox and add class to body
 function detectFirefoxBrowserAndAddClass() {
-	const isFirefox = typeof InstallTrigger !== 'undefined' || 
-					 navigator.userAgent.indexOf('Firefox') > -1 ||
-					 /Firefox/.test(navigator.userAgent);
-	
+	const isFirefox = isFirefoxBasedBrowser();
 	if (isFirefox) {
 		document.body.classList.add('firefox');
 	}

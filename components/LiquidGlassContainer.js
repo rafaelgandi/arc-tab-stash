@@ -16,12 +16,22 @@ function ensureGlassDistortionFilter() {
 	svg.innerHTML = `
         <defs>
             <filter id="frosted" x="0%" y="0%" width="100%" height="100%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.007 0.007" numOctaves="2" seed="92" result="noise"></feTurbulence>
+                <feTurbulence type="fractalNoise" baseFrequency="0.003 0.003" numOctaves="1" seed="52" result="noise"></feTurbulence>
                 <feGaussianBlur in="noise" stdDeviation="2" result="blurred"></feGaussianBlur>
-                <feDisplacementMap in="SourceGraphic" in2="blurred" scale="51" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+                <feDisplacementMap in="SourceGraphic" in2="blurred" scale="105" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
             </filter>
         </defs>
 	`;
+
+    // svg.innerHTML = `
+    //     <defs>
+    //         <filter id="frosted" x="0%" y="0%" width="100%" height="100%">
+    //             <feTurbulence type="fractalNoise" baseFrequency="0.007 0.007" numOctaves="2" seed="92" result="noise"></feTurbulence>
+    //             <feGaussianBlur in="noise" stdDeviation="2" result="blurred"></feGaussianBlur>
+    //             <feDisplacementMap in="SourceGraphic" in2="blurred" scale="51" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    //         </filter>
+    //     </defs>
+	// `;
 
 	// Append to document body
 	document.body.appendChild(svg);
