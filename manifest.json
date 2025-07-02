@@ -4,14 +4,8 @@
     
     
     
-    "---version": "1.5.2",
-    
-    "version": "0.0.0",
-    "debug": true,
-
-
-
-
+    "version": "1.5.2",
+   
     "manifest_version": 3,
     "minimum_chrome_version": "92",
     "icons": {
