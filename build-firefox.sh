@@ -6,20 +6,20 @@
 echo "🦊 Setting up Firefox build..."
 
 # Check if Firefox manifest exists
-if [ ! -f "manifest-firefox.json" ]; then
-    echo "❌ Error: manifest-firefox.json not found!"
+if [ ! -f "__manifest-firefox.json" ]; then
+    echo "❌ Error: __manifest-firefox.json not found!"
     exit 1
 fi
 
 # Backup current manifest if it's Chrome version
 if [ -f "manifest.json" ] && grep -q "service_worker" manifest.json; then
     echo "💾 Backing up Chrome manifest..."
-    cp manifest.json manifest-chrome-backup.json
+    cp manifest.json __manifest-chrome.json
 fi
 
 # Copy Firefox manifest
 echo "📋 Copying Firefox manifest..."
-cp manifest-firefox.json manifest.json
+cp __manifest-firefox.json manifest.json
 
 # Verify the copy worked
 if grep -q '"scripts"' manifest.json; then
