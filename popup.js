@@ -343,7 +343,7 @@ function Stash() {
 			sortableRef.current = new Sortable(ulRef.current, {
 				ghostClass: "drag-in-place",
 				dragClass: "item-currently-dragging",
-				delay: 130, // Delay before drag starts (prevents accidental dragging on click)
+				delay: 110, // Delay before drag starts (prevents accidental dragging on click)
 				// PHASE 3: Optimized scroll configuration
 				scroll: true,
 				forceAutoScrollFallback: true,
