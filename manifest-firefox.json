@@ -2,7 +2,13 @@
 	"name": "Stash",
 	"description": "A tiny browser extension that saves and syncs your favorite links across all your browsers.",
 	"version": "1.5.2",
+
+
+    
 	"debug": true,
+
+
+
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "stash@tinydailysolutions.app",

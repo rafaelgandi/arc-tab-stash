@@ -1,15 +1,10 @@
 {
     "name": "Stash",
     "description": "A tiny browser extension that saves and syncs your favorite links across all your browsers.",
-    
-    
-    
-    "---version": "1.5.3",
-    
-    "version": "0.0.0",
+    "version": "1.5.3",
+
+
     "debug": true,
-
-
 
 
     "manifest_version": 3,
