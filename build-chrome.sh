@@ -6,9 +6,9 @@
 echo "🔧 Setting up Chrome build..."
 
 # If there's a backup Chrome manifest, restore it
-if [ -f "__manifest-chrome.json" ]; then
+if [ -f "Manifest-chrome.json" ]; then
     echo "📋 Restoring Chrome manifest from backup..."
-    cp __manifest-chrome.json manifest.json
+    cp Manifest-chrome.json manifest.json
     echo "✅ Chrome manifest restored"
 elif [ -f "manifest.json" ] && grep -q "service_worker" manifest.json; then
     echo "✅ Chrome manifest is already active"

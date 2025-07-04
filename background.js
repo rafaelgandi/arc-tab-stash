@@ -9,7 +9,9 @@ import {
     storageGet,
     getVersionFromManifest,
     handleError,
-    openInNewTab
+    openInNewTab,
+    isInDevMode,
+    setExtensionIcon
 } from './lib/helpers.js';
 import { runtime as browserRuntime, commands as browserCommands } from './lib/browser-api.js';
 import * as api from './lib/api.js';
@@ -23,6 +25,13 @@ import * as analytics from './lib/analytics.js';
     const onStashUpdateNotionPage = `https://rafaelgandi.notion.site/Introducing-Headings-2a0e39ac7f154c14beb513d2e8b467e9`;
 
     let SOMETHING_HAS_CHANGED_FLAG = false;
+
+    // Initialize dev mode icon on extension start
+    async function initializeDevModeIcon() {
+        if (isInDevMode()) {
+            await setExtensionIcon(true);
+        }
+    }
 
     browserRuntime.onInstalled.addListener(function onStashExtensionInstall(details) {
         // console.log(details);
@@ -59,11 +68,17 @@ import * as analytics from './lib/analytics.js';
                 });
             }
         })();
+        
+        // Initialize dev mode icon
+        initializeDevModeIcon();
     });
 
     // LM: 2024-01-31 04:33:28
     // Make sure to query fresh data from github api on browser startup //
     browserRuntime.onStartup.addListener(function onBrowserStartUp() {
+        // Initialize dev mode icon
+        initializeDevModeIcon();
+        
         (async () => {
             const gitCreds = await api.getGitCredsSaved();
             if (typeof gitCreds !== 'undefined' && navigator.onLine) {
