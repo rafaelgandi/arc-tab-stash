@@ -4,6 +4,16 @@ This guide explains how to use the `build-store.sh` script to package your Stash
 
 ## 🚀 Quick Start
 
+### Local Development (load unpacked)
+```bash
+# Switch to Chrome manifest (for chrome://extensions → Load unpacked)
+./build-chrome.sh
+
+# Switch to Firefox manifest (for about:debugging → Load Temporary Add-on)
+./build-firefox.sh
+```
+
+### Store Submission
 ```bash
 # Build for Chrome Web Store
 ./build-store.sh chrome
@@ -20,34 +30,50 @@ This guide explains how to use the `build-store.sh` script to package your Stash
 
 ## 🔧 How to Use
 
-### 1. Make the Script Executable (First Time Only)
+### 1. Make Scripts Executable (First Time Only)
 
 ```bash
-chmod +x build-store.sh
+chmod +x build-chrome.sh build-firefox.sh build-store.sh
 ```
 
-### 2. Build for Chrome Web Store
+### 2. Switch Manifest for Local Development
+
+Each platform has a dedicated source manifest (`Manifest-chrome.json` / `Manifest-firefox.json`). Before loading the unpacked extension in a browser, run the appropriate script to copy the correct manifest into `manifest.json`:
+
+```bash
+# Activate Chrome manifest
+./build-chrome.sh
+
+# Activate Firefox manifest
+./build-firefox.sh
+```
+
+Both scripts follow the same pattern:
+- Copy the platform-specific source manifest → `manifest.json`
+- Verify the copy succeeded
+- `manifest.json` will always have `"debug": true` since it is baked into both `Manifest-chrome.json` and `Manifest-firefox.json`
+
+### 3. Build for Chrome Web Store
 
 ```bash
 ./build-store.sh chrome
 ```
 
 **What happens:**
-- Uses `manifest.json` as the manifest file
-- Extracts version from `manifest.json`
-- Creates `stash-chrome-v{version}.zip`
+- Reads version and manifest from `Manifest-chrome.json`
+- Detects `"debug": true` and automatically strips it from both the build copy and the root `manifest.json`
+- Creates `stash-chrome-v{version}.zip` with no debug flag
 
-### 3. Build for Mozilla Add-ons Store
+### 4. Build for Mozilla Add-ons Store
 
 ```bash
 ./build-store.sh firefox
 ```
 
 **What happens:**
-- Uses `manifest-firefox.json` as the source manifest
-- Copies `manifest-firefox.json` → `manifest.json` in the build
-- Extracts version from `manifest-firefox.json`
-- Creates `stash-firefox-v{version}.zip`
+- Reads version and manifest from `Manifest-firefox.json`
+- Detects `"debug": true` and automatically strips it from both the build copy and the root `manifest.json`
+- Creates `stash-firefox-v{version}.zip` with no debug flag
 
 ## 📁 What Gets Included in the Build
 
@@ -139,8 +165,8 @@ The script uses a **blacklist approach**, meaning it copies **ALL** files from y
 
 The script automatically detects the version from your manifest files:
 
-- **Chrome**: Reads version from `manifest.json`
-- **Firefox**: Reads version from `manifest-firefox.json`
+- **Chrome**: Reads version from `Manifest-chrome.json`
+- **Firefox**: Reads version from `Manifest-firefox.json`
 
 It handles both standard version format and the custom `---version` format:
 ```json
@@ -183,40 +209,20 @@ or
 
 **Error: "manifest.json not found!" or "manifest-firefox.json not found!"**
 - Ensure you're running the script from the project root directory
-- Verify the manifest files exist in the current directory
+- For Chrome: run `./build-chrome.sh` first to generate `manifest.json` from `Manifest-chrome.json`
+- For Firefox: verify `Manifest-firefox.json` exists in the current directory
 
 **Error: "Could not extract version"**
 - Check that your manifest file has a valid `version` field
 - The script will use "latest" as fallback if version can't be detected
 
-**Error: "DEBUG MODE DETECTED!"**
-```
-🚨 ==============================================  🚨
-
-❌ DEBUG MODE DETECTED!
-
-   The manifest file contains: "debug": true
-   This indicates the extension is in development mode.
-
-❌ Cannot build for store distribution while in debug mode!
-
-   To fix this:
-   1. Open: manifest.json (or manifest-firefox.json)
-   2. Change: "debug": true  
-   3. To:     "debug": false
-   4. Save the file and run the build again
-
-⚠️  This safety check prevents accidental submission of debug builds.
-
-🚨 ==============================================  🚨
-```
-- This is a safety feature to prevent shipping debug builds to production
-- Simply change `"debug": true` to `"debug": false` in your manifest file
-- Make sure to update both manifest files if you're building for both platforms
+**Warning: "Debug mode detected"**
+- `"debug": true` is permanently baked into `Manifest-chrome.json` and `Manifest-firefox.json` for development convenience
+- `build-store.sh` will automatically detect and strip `"debug": true` from both the packaged zip and the root `manifest.json` — no manual action needed
 
 **Permission denied**
 ```bash
-chmod +x build-store.sh
+chmod +x build-chrome.sh build-firefox.sh build-store.sh
 ```
 
 ### Script won't run?
@@ -242,7 +248,7 @@ No manual cleanup is needed!
 
 1. **Always run from project root** - The script expects to find manifest files in the current directory
 2. **Check version numbers** - Make sure your manifest versions are updated before building
-3. **Disable debug mode** - The script will prevent builds if `"debug": true` is found in your manifest files (safety feature)
+3. **Debug mode is automatic** - `"debug": true` is always present during development and is automatically stripped by `build-store.sh` before packaging
 4. **Test locally first** - Load the unpacked extension locally before submitting to stores
 5. **Keep builds organized** - The script names files with versions, so you can keep multiple builds
 6. **Future-proof design** - The blacklist approach means any new files you add (new components, utilities, assets) will automatically be included in builds without updating the script
@@ -250,23 +256,33 @@ No manual cleanup is needed!
 
 ## 🔄 Development Workflow
 
+### Local testing
+```bash
+# Load in Chrome (unpacked)
+./build-chrome.sh
+# → chrome://extensions/ → Load unpacked
+
+# Load in Firefox (temporary add-on)
+./build-firefox.sh
+# → about:debugging → This Firefox → Load Temporary Add-on
+```
+
+### Store submission
 ```bash
 # 1. Update your code
-# 2. Update version in manifest files  
-# 3. Set debug mode to false in manifest files
-# 4. Build for both platforms
+# 2. Update version in Manifest-chrome.json and Manifest-firefox.json
+# 3. Build for both platforms (debug flag is stripped automatically)
 ./build-store.sh chrome
 ./build-store.sh firefox
-
-# 5. Test the zip files locally (optional)
-# 6. Submit to stores
+# 4. Test the zip files locally (optional)
+# 5. Submit to stores
 ```
 
 ### 🔍 Pre-Build Checklist:
 - ✅ Code changes completed
-- ✅ Version numbers updated in both manifest files
-- ✅ **`"debug": false`** set in both manifest files
+- ✅ Version numbers updated in `Manifest-chrome.json` and `Manifest-firefox.json`
 - ✅ Extension tested locally
+- ✅ `build-store.sh` will handle stripping `"debug": true` automatically
 
 ---
 

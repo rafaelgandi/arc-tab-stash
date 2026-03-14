@@ -77,9 +77,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Determine which manifest to use and extract version
 if [ "$PLATFORM" = "chrome" ]; then
-    MANIFEST_FILE="manifest.json"
+    MANIFEST_FILE="Manifest-chrome.json"
     if [ ! -f "$MANIFEST_FILE" ]; then
-        print_error "manifest.json not found!"
+        print_error "Manifest-chrome.json not found!"
         exit 1
     fi
 else
@@ -109,30 +109,10 @@ print_header "Checking for debug mode"
 DEBUG_MODE=$(grep -E '"debug"[[:space:]]*:[[:space:]]*true' "$MANIFEST_FILE" || echo "")
 
 if [ -n "$DEBUG_MODE" ]; then
-    echo ""
-    echo "🚨 ============================================== 🚨"
-    echo ""
-    print_error "DEBUG MODE DETECTED!"
-    echo ""
-    print_info "The manifest file contains: \"debug\": true"
-    print_info "This indicates the extension is in development mode."
-    echo ""
-    print_error "❌ Cannot build for store distribution while in debug mode!"
-    echo ""
-    print_info "To fix this:"
-    print_info "1. Open: $MANIFEST_FILE"
-    print_info "2. Change: \"debug\": true"
-    print_info "3. To:     \"debug\": false"
-    print_info "4. Save the file and run the build again"
-    echo ""
-    print_warning "This safety check prevents accidental submission of debug builds."
-    echo ""
-    echo "🚨 ============================================== 🚨"
-    echo ""
-    exit 1
+    print_warning "Debug mode detected — will be stripped from the store build automatically."
+else
+    print_success "Debug mode not present in manifest."
 fi
-
-print_success "Debug mode check passed (debug: false or not present)"
 
 ZIP_NAME="stash-$PLATFORM-v$VERSION.zip"
 
@@ -232,6 +212,31 @@ else
     # For Firefox, copy manifest-firefox.json as manifest.json
     print_info "Copying Firefox manifest (manifest-firefox.json → manifest.json)"
     cp "$MANIFEST_FILE" "$BUILD_DIR/manifest.json"
+fi
+
+# Strip debug flag from both the build copy and the root manifest.json
+if [ -n "$DEBUG_MODE" ]; then
+    print_info "Removing debug flag from store build manifest..."
+    python3 -c "
+import json
+with open('$BUILD_DIR/manifest.json', 'r') as f:
+    data = json.load(f)
+data.pop('debug', None)
+with open('$BUILD_DIR/manifest.json', 'w') as f:
+    json.dump(data, f, indent=4)
+"
+    print_success "Debug flag removed from store build manifest"
+
+    print_info "Removing debug flag from root manifest.json..."
+    python3 -c "
+import json
+with open('manifest.json', 'r') as f:
+    data = json.load(f)
+data.pop('debug', None)
+with open('manifest.json', 'w') as f:
+    json.dump(data, f, indent=4)
+"
+    print_success "Debug flag removed from root manifest.json"
 fi
 
 print_success "Manifest file configured for $PLATFORM"

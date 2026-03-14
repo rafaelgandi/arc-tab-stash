@@ -1,27 +1,30 @@
 #!/bin/bash
 
 # Build script for Chrome extension
-# Ensures Chrome manifest is active
+# Copies Chrome manifest to replace active manifest
 
 echo "🔧 Setting up Chrome build..."
 
-# If there's a backup Chrome manifest, restore it
-if [ -f "Manifest-chrome.json" ]; then
-    echo "📋 Restoring Chrome manifest from backup..."
-    cp Manifest-chrome.json manifest.json
-    echo "✅ Chrome manifest restored"
-elif [ -f "manifest.json" ] && grep -q "service_worker" manifest.json; then
-    echo "✅ Chrome manifest is already active"
-elif [ ! -f "manifest.json" ]; then
-    echo "❌ Error: manifest.json not found!"
+# Check if Chrome manifest exists
+if [ ! -f "Manifest-chrome.json" ]; then
+    echo "❌ Error: Manifest-chrome.json not found!"
     exit 1
+fi
+
+# Copy Chrome manifest
+echo "📋 Copying Chrome manifest..."
+cp Manifest-chrome.json manifest.json
+
+# Verify the copy worked
+if grep -q "service_worker" manifest.json; then
+    echo "✅ Chrome manifest is now active"
 else
-    echo "❌ Error: manifest.json doesn't appear to be Chrome version"
-    echo "   Expected to find 'service_worker' in background section"
-    echo "   Run ./build-firefox.sh first if you want to switch to Firefox"
+    echo "❌ Error: Chrome manifest copy failed"
     exit 1
 fi
 
 echo "✅ Chrome build ready!"
 echo "📦 Load extension from this directory in Chrome"
-echo "   chrome://extensions/ → Load unpacked" 
+echo "   chrome://extensions/ → Load unpacked"
+echo ""
+echo "⚠️  To switch to Firefox, run: ./build-firefox.sh"

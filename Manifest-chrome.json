@@ -64,5 +64,6 @@
             },
             "description": "Open stash window."
         }
-    }
+    },
+    "debug": true
 }
