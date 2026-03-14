@@ -56,7 +56,7 @@ function Stash() {
 	const ulRef = useRef(null);
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
-	const draggedChildItemsRef = useRef([]);
+	const draggedChildItemsRef = useRef({ sectionItems: new Map(), noSectionItems: [] });
 	const sectionCount = useMemo(() => {
 		return stashArr.filter((item) => !!item?.section).length;
 	}, [stashArr]);
@@ -353,26 +353,57 @@ function Stash() {
 				emptyInsertThreshold: 5,
 				onStart(e) {
 					try {
-						ifSectionBeingDraggedDoThisToChildItems(e, (item) => {
-							draggedChildItemsRef.current.push(item);
-							item.remove();
-						});
+						if (e.item?.getAttribute?.('data-isSection') === 'yes') {
+							const allNonSectionLis = ulRef.current.querySelectorAll(`li:not([data-isSection="yes"])`);
+							const sectionItems = new Map();
+							const noSectionItems = [];
+							allNonSectionLis.forEach((li) => {
+								const parentId = li.getAttribute('data-myParentSectionId');
+								if (parentId && parentId !== 'none') {
+									if (!sectionItems.has(parentId)) {
+										sectionItems.set(parentId, []);
+									}
+									sectionItems.get(parentId).push(li);
+								}
+								else {
+									noSectionItems.push(li);
+								}
+								li.remove();
+							});
+							draggedChildItemsRef.current = { sectionItems, noSectionItems };
+						}
 					} catch (err) {
-						draggedChildItemsRef.current = []; // Cleanup on error
+						draggedChildItemsRef.current = { sectionItems: new Map(), noSectionItems: [] }; // Cleanup on error
 						throw err;
 					}
 				},
+				onMove(e) {
+					// Prevent dropping a regular item adjacent to a hidden (collapsed section) item
+					const related = e.related;
+					if (related && getComputedStyle(related).display === 'none') {
+						return false;
+					}
+					return true;
+				},
 				async onEnd(e) {
-					const sectionElement = e.item;
-					if (e.item?.getAttribute?.("data-isSection") === "yes" && e.item?.getAttribute?.("data-sectionId")) {
-						if (draggedChildItemsRef.current.length) {
-							let sibling = sectionElement;
-							draggedChildItemsRef.current.forEach((childItem) => {
-								sibling.insertAdjacentElement("afterend", childItem);
-								sibling = childItem;
+					if (e.item?.getAttribute?.('data-isSection') === 'yes') {
+						const { sectionItems, noSectionItems } = draggedChildItemsRef.current;
+						// Items that belong to no section go before the first section heading
+						const firstSectionLi = ulRef.current.querySelector('li[data-isSection="yes"]');
+						noSectionItems.forEach((li) => {
+							ulRef.current.insertBefore(li, firstSectionLi);
+						});
+						// Each heading gets its children re-inserted after it in their original relative order
+						ulRef.current.querySelectorAll('li[data-isSection="yes"]').forEach((sectionLi) => {
+							const id = sectionLi.getAttribute('data-sectionId');
+							const children = sectionItems.get(id) || [];
+							let sibling = sectionLi;
+							children.forEach((child) => {
+								sibling.insertAdjacentElement('afterend', child);
+								sibling = child;
 							});
-						}
-						draggedChildItemsRef.current = [];
+						});
+						draggedChildItemsRef.current = { sectionItems: new Map(), noSectionItems: [] };
 					}
 
 					const newOrderedList = getUpdatedListOrder();
