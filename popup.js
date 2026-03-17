@@ -8,15 +8,12 @@ import "./popup.styles.js";
 // import * as analytics from "./lib/analytics.js";
 import { storageSet, storageGet, logThis, sendMessageToBg, toggleStyleElement, guard, isFirefoxBasedBrowser } from "./lib/helpers.js";
 import { runtime as browserRuntime } from "./lib/browser-api.js";
-import * as api from "./lib/api.js";
 import { html, render, useState, useCallback, useRef, useMemo } from "./lib/preact-htm.js";
-import SettingsModal from "./components/SettingsModal.js";
 import Empty from "./components/Empty.js";
 import useSfx from "./hooks/useSfx.js";
 import StashLinkItem from "./components/StashLinkItem.js";
 import FooterControls from "./components/FooterControls.js";
 import useIsMountedRef from "./hooks/useIsMountedRef.js";
-import setUpAuGlobalErrorLogger from "./lib/global-error-logger.js";
 
 // Detect Firefox and add class to body
 function detectFirefoxBrowserAndAddClass() {
@@ -53,6 +50,8 @@ function Stash() {
 	const [showSettings, setShowSettings] = useState(false);
 	const [block, setBlock] = useState(false);
 	const [isInitialLoading, setIsInitialLoading] = useState(true); // PHASE 1: Track initial loading state
+	const [SettingsModalComponent, setSettingsModalComponent] = useState(null);
+	const settingsModalLoadingRef = useRef(false);
 	const ulRef = useRef(null);
 	const sortableRef = useRef(null);
 	const isMountedRef = useIsMountedRef();
@@ -238,15 +237,14 @@ function Stash() {
 		setIsInitialLoading(false); // Mark initial loading as complete
 	}, false);
 
-	// PHASE 1: Background cloud sync (non-blocking)
+	// PHASE 1: Background cloud sync (non-blocking) - api loaded on demand to speed initial render
 	useSfx(async function backgroundCloudSync() {
-		// Defer cloud sync to not block UI - use setTimeout to ensure UI renders first
 		setTimeout(async () => {
 			try {
+				const api = await import("./lib/api.js");
 				const gitCreds = await api.getGitCredsSaved();
 				if (typeof gitCreds !== "undefined" && navigator.onLine) {
 					if (gitCreds?.tokenEncrypted) {
-						// PHASE 2: Load analytics on demand for user identification
 						const analytics = await loadAnalytics();
 						analytics.identify(gitCreds.tokenEncrypted);
 					}
@@ -256,7 +254,6 @@ function Stash() {
 					}
 					await storageSet("stash", stashFromGist.stash);
 					if (isMountedRef.current) {
-						// Update UI with fresh cloud data
 						setStashArr(sortByOrderProp(stashFromGist.stash));
 					}
 				} else {
@@ -266,9 +263,8 @@ function Stash() {
 				}
 			} catch (error) {
 				console.error('Background sync error:', error);
-				// Don't block UI for sync errors
 			}
-		}, 50); // Small delay to ensure UI renders first
+		}, 50);
 	}, false);
 
 	// PHASE 3: Smart sortable loading - only when needed and optimized
@@ -418,6 +414,16 @@ function Stash() {
 		}
 	}); 
 
+	// Lazy load SettingsModal when first opened (reduces initial bundle parse)
+	useSfx(function loadSettingsModalWhenNeeded() {
+		if (showSettings && !SettingsModalComponent && !settingsModalLoadingRef.current) {
+			settingsModalLoadingRef.current = true;
+			import("./components/SettingsModal.js").then((mod) => {
+				setSettingsModalComponent(() => mod.default);
+			});
+		}
+	}, { showSettings });
+
 	// PHASE 3: Cleanup sortable when no longer needed
 	useSfx(async function cleanupSortableWhenNotNeeded() {
 		if (!needsSortable && sortableRef.current) {
@@ -516,12 +522,12 @@ function Stash() {
 				})}
 			</ul>
 		</div>
-		<${SettingsModal}
+		${showSettings ? (SettingsModalComponent ? html`<${SettingsModalComponent}
 			show=${showSettings}
 			onDidDismiss=${() => setShowSettings(false)}
 			doBlock=${(b) => setBlock(b)}
 			onTokenSaved=${() => getFreshStashData()}
-		/>    
+		/>` : html`<div class="bstash-setting" style=${{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>Loading settings...</div>`) : null}    
         <${FooterControls}
 			onAddCurrentTabToStash=${onAddCurrentTabToStash}
 			onToggleSettings=${onToggleSettings}
@@ -535,13 +541,17 @@ function Stash() {
 
 const main = document.getElementById("arc-bookmark-stash-main");
 render(html`<${Stash} />`, main);
-// PHASE 1: No need to set opacity - already visible in HTML
 
-// LM: 2025-06-03 15:46:10 [Set up global error logger]
-setUpAuGlobalErrorLogger();
+// Port must connect immediately for sync-on-close to work
+const port = browserRuntime.connect({ name: "popup" });
+window.addEventListener("unload", () => port.disconnect());
 
-// LM: 2024-12-11 17:55:13 [Make sure the background.js script knows when the popup closes]
-	const port = browserRuntime.connect({ name: "popup" });
-window.addEventListener("unload", (e) => {
-	port.disconnect();
-});
+// Defer global-error-logger (loads analytics) to avoid blocking first paint
+function initErrorLogger() {
+	import("./lib/global-error-logger.js").then((m) => m.default());
+}
+if (typeof requestIdleCallback !== "undefined") {
+	requestIdleCallback(initErrorLogger, { timeout: 300 });
+} else {
+	setTimeout(initErrorLogger, 100);
+}

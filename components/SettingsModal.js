@@ -33,12 +33,17 @@ export default function SettingsModal(props) {
 		}
 		props?.doBlock?.(true);
 		await storageSet("gitToken", tokenValue);
-		await sendMessageToBg({
+		const result = await sendMessageToBg({
 			message: "make-stash-gist",
 			data: {
 				gitToken: tokenValue
 			}
 		});
+		if (result === "failed") {
+			setHasError(true);
+			props?.doBlock?.(false);
+			return;
+		}
 		// PHASE 2: Load analytics on demand
 		const analytics = await loadAnalytics();
 		analytics.capture("sh-git-token-saved");

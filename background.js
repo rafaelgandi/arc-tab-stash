@@ -146,6 +146,10 @@ import * as analytics from './lib/analytics.js';
                     return;
                 }
                 const stashFromGist = await api.getGistContents();
+                if (!stashFromGist?.stash) {
+                    sendResponse('failed');
+                    return;
+                }
                 await storageSet('stash', stashFromGist.stash);
                 sendResponse('done');
             }
