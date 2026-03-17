@@ -44,7 +44,7 @@ import * as analytics from './lib/analytics.js';
                 analytics.capture('sh-update-happend', {
                     updatedVersion: getVersionFromManifest()
                 });
-            }           
+            }
         }
         (async () => {
             const res = await storageGet('stash');
@@ -54,11 +54,13 @@ import * as analytics from './lib/analytics.js';
             const gitToken = await storageGet('gitToken');
             if (!gitToken) {
                 storageSet('gitToken', '');
-                analytics.capture('sh-fresh-install-happend', {
-                    version: getVersionFromManifest()
-                });
-                // LM: 2023-03-10 13:34:22 [Only open notion page if token does not exist. This means that its a fresh install.]
-                openInNewTab(stashNotionPage);
+                if (details?.reason === 'install') {
+                    analytics.capture('sh-fresh-install-happend', {
+                        version: getVersionFromManifest()
+                    });
+                    // LM: 2023-03-10 13:34:22 [Only open notion page on fresh install.]
+                    openInNewTab(stashNotionPage);
+                }
             }
             const gistLink = await storageGet('gistLink');
             if (!gistLink) {
